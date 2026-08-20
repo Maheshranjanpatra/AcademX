@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}My Uploads{% endblock %}
+
+{% block content %}
+<main class="max-w-[1280px] mx-auto w-full px-margin-mobile md:px-margin-desktop py-lg space-y-lg">
+  <div class="flex justify-between items-center">
+    <h1 class="font-display text-headline-lg-mobile md:text-headline-lg text-on-surface">My Uploads</h1>
+    <a href="{{ url_for('materials.upload_material') }}" class="bg-primary text-on-primary font-label-md text-label-md px-md py-sm rounded-lg shadow-sm transition-all flex items-center gap-sm">
+      <span class="material-symbols-outlined">add</span> Upload New
+    </a>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-md">
+    {% for material in materials %}
+    <div class="bg-surface-container-lowest border rounded-xl p-md card-shadow space-y-sm">
+      <div class="flex items-center justify-between">
+        <span class="bg-primary-fixed text-on-primary-fixed font-label-md text-xs px-2.5 py-1 rounded-full">{{ material.subject or "General" }}</span>
+        <span class="status-badge
+          {% if material.status == 'pending' %}bg-yellow-100 text-yellow-800{% endif %}
+          {% if material.status == 'approved' %}bg-green-100 text-green-800{% endif %}
+          {% if material.status == 'rejected' %}bg-red-100 text-red-800{% endif %}
+        ">
+          {{ material.status|title }}
+        </span>
+      </div>
+      <h2 class="font-headline-md text-headline-md text-on-surface font-semibold">{{ material.title }}</h2>
+      <p class="font-body-md text-body-md text-on-surface-variant">{{ material.category or "Document" }}</p>
+      <p class="font-body-md text-xs text-on-surface-variant">Uploaded: {{ material.uploaded_at.strftime('%b %d, %Y') }}</p>
+      {% if material.status == 'approved' %}
+        <a href="{{ url_for('static', filename='uploads/materials/' + material.file_path.split('/')[-1]) if material.file_path else material.file_url }}" target="_blank" class="text-primary hover:underline">View Material</a>
+      {% elif material.status == 'rejected' %}
+        <p class="text-error text-sm">Rejected. Please contact admin for details.</p>
+      {% else %}
+        <p class="text-on-surface-variant text-sm">
+            <svg class="w-4 h-4 inline-block mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+        </svg> Awaiting admin review…</p>
+      {% endif %}
+    </div>
+    {% else %}
+    <div class="col-span-full text-center p-xl bg-surface-container-lowest rounded-xl border border-outline-variant">
+      <p class="font-body-md text-on-surface-variant">You haven't uploaded any materials yet.</p>
+      <a href="{{ url_for('materials.upload_material') }}" class="text-primary hover:underline">Upload now</a>
+    </div>
+    {% endfor %}
+  </div>
+</main>
+{% endblock %}

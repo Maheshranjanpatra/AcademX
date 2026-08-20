@@ -1,0 +1,73 @@
+{% extends "admin/layout.html" %}
+
+{% block title %}Q&A Moderation - Nymora Admin{% endblock %}
+{% block page_title %}Q&A Moderation{% endblock %}
+
+{% block content %}
+<div class="admin-card">
+    <div class="table-header-actions">
+        <form method="GET" action="{{ url_for('admin.qa') }}" class="search-filter-group">
+            <input type="text" name="q" value="{{ request.args.get('q', '') }}" class="form-input" placeholder="Search questions..." style="max-width: 300px;">
+            <select name="status" class="filter-select" onchange="this.form.submit()">
+                <option value="">All Statuses</option>
+                <option value="resolved" {% if request.args.get('status') == 'resolved' %}selected{% endif %}>Resolved</option>
+                <option value="unresolved" {% if request.args.get('status') == 'unresolved' %}selected{% endif %}>Unresolved</option>
+            </select>
+        </form>
+    </div>
+
+    <div class="admin-table-container">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Question</th>
+                    <th>Status</th>
+                    <th>Author</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for qa in questions %}
+                <tr>
+                    <td>
+                        <strong>{{ qa.title }}</strong>
+                        <p class="text-muted" style="font-size: 0.8rem;">{{ qa.body|truncate(100) }}</p>
+                    </td>
+                    <td>
+                        <span class="status-badge {{ 'resolved' if qa.is_resolved else 'unresolved' }}">
+                            {{ 'Resolved' if qa.is_resolved else 'Unresolved' }}
+                        </span>
+                    </td>
+                    <td>
+                        <button type="button" onclick="revealAuthor({{ qa.id }})" class="action-btn">Reveal Author</button>
+                    </td>
+                    <td>
+                        <div class="flex gap-2">
+                            <form action="{{ url_for('admin.toggle_resolved', question_id=qa.id) }}" method="POST">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="action-btn">Toggle Status</button>
+                            </form>
+                            <form action="{{ url_for('admin.delete_question', question_id=qa.id) }}" method="POST">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="action-btn danger" data-confirm="Delete this question?">Delete</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="4" class="empty-state">No questions found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Reveal Author Modal -->
+<div id="author-modal" class="modal-overlay">
+    <div class="modal-card">
+        <h3>Author Info</h3>
+        <div id="author-modal-content" class="mt-4 mb-4"></div>
+        <button type="button" onclick="closeModal('author-modal')" class="btn btn-secondary" style="width: 100%;">Close</button>
+    </div>
+</div>
+{% endblock %}

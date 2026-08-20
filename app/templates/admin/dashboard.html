@@ -1,0 +1,122 @@
+{% extends "admin/layout.html" %}
+{% block title %}Overview{% endblock %}
+{% block page_title %}Overview{% endblock %}
+
+{% block content %}
+<div class="metrics-grid">
+    <div class="metric-card">
+        <div class="metric-icon" style="background: rgba(0, 88, 190, 0.1); color: var(--accent-primary);">
+            <span class="material-symbols-outlined">group</span>
+        </div>
+        <div class="metric-info">
+            <h3>{{ metrics.users }}</h3>
+            <p>Total Users</p>
+            <span class="trend positive">{{ metrics.users_trend }} from last week</span>
+        </div>
+    </div>
+    <div class="metric-card">
+        <div class="metric-icon" style="background: rgba(0, 107, 95, 0.1); color: var(--accent-secondary);">
+            <span class="material-symbols-outlined">forum</span>
+        </div>
+        <div class="metric-info">
+            <h3>{{ metrics.questions }}</h3>
+            <p>Total Questions</p>
+            <span class="trend positive">{{ metrics.questions_trend }} from last week</span>
+        </div>
+    </div>
+    <div class="metric-card">
+        <div class="metric-icon" style="background: rgba(184, 134, 11, 0.1); color: var(--accent-gold);">
+            <span class="material-symbols-outlined">description</span>
+        </div>
+        <div class="metric-info">
+            <h3>{{ metrics.papers }}</h3>
+            <p>Pending Papers</p>
+            <span class="trend neutral">Requires Review</span>
+        </div>
+    </div>
+    <div class="metric-card">
+        <div class="metric-icon" style="background: rgba(0, 88, 190, 0.1); color: var(--accent-primary);">
+            <span class="material-symbols-outlined">quiz</span>
+        </div>
+        <div class="metric-info">
+            <h3>{{ metrics.quizzes }}</h3>
+            <p>Total Quizzes</p>
+            <span class="trend positive">{{ metrics.quizzes_trend }} from last week</span>
+        </div>
+    </div>
+</div>
+
+<div class="dashboard-columns">
+    <div class="chart-section dashboard-card">
+        <h2>Users Over Time</h2>
+        <canvas id="userChart"></canvas>
+    </div>
+
+    <div class="activity-section dashboard-card">
+        <h2>Recent Activity</h2>
+        <ul class="activity-feed">
+            {% for item in activities %}
+            <li>
+                <a href="{{ item.url }}" style="display:flex; gap:0.75rem; align-items:center; text-decoration:none; color:inherit; width:100%;">
+                    <div class="activity-icon">
+                        <span class="material-symbols-outlined" style="color: {{ item.color }};">{{ item.icon }}</span>
+                    </div>
+                    <div class="activity-details">
+                        <p><strong>{{ item.user }}</strong> {{ item.action }}</p>
+                        <span>{{ item.time.strftime('%b %d, %Y %I:%M %p') if item.time else '' }}</span>
+                    </div>
+                </a>
+            </li>
+            {% else %}
+            <li><p>No recent activity yet.</p></li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+<div class="quick-actions-section">
+    <h2>Quick Actions</h2>
+    <div class="quick-actions-grid">
+        <a href="{{ url_for('admin.create_quiz') }}" class="action-card">
+            <span class="material-symbols-outlined">add_box</span>
+            <span>Create New Quiz</span>
+        </a>
+        <a href="{{ url_for('admin.videos') }}" class="action-card">
+            <span class="material-symbols-outlined">upload_file</span>
+            <span>Upload Video</span>
+        </a>
+        <a href="{{ url_for('admin.papers') }}" class="action-card highlight">
+            <span class="material-symbols-outlined">rate_review</span>
+            <span>Review Pending Papers</span>
+        </a>
+        <a href="{{ url_for('admin.materials') }}" class="action-card">
+            <span class="material-symbols-outlined">library_add</span>
+            <span>Add Study Material</span>
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const ctx = document.getElementById('userChart');
+new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: {{ day_labels|tojson }},
+        datasets: [{
+            label: 'New Users',
+            data: {{ daily_users|tojson }},
+            borderColor: '#0058be',
+            backgroundColor: 'rgba(0, 88, 190, 0.1)',
+            fill: true,
+            tension: 0.3
+        }]
+    },
+    options: {
+        responsive: true,
+        scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+    }
+});
+</script>
+{% endblock %}

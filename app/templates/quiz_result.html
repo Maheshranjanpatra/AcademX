@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% block title %}Results: {{ attempt.quiz.title }}{% endblock %}
+
+{% block content %}
+<main class="max-w-[840px] mx-auto w-full px-margin-mobile md:px-margin-desktop py-lg space-y-lg">
+
+  <!-- Score Summary Header -->
+  <section class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg card-shadow text-center space-y-md">
+    <h1 class="font-display text-headline-lg-mobile md:text-headline-lg text-on-surface">Quiz Completed!</h1>
+
+    <div class="inline-flex flex-col items-center justify-center bg-surface-container-low border border-outline-variant rounded-xl p-md min-w-[200px]">
+      <span class="font-display text-display font-bold text-primary">
+        {{ attempt.score }} / {{ attempt.total_questions }}
+      </span>
+      <span class="font-label-md text-label-md text-on-surface-variant font-medium mt-xs">
+        {% if attempt.total_questions > 0 %}
+          {{ ((attempt.score / attempt.total_questions) * 100) | round(1) }}% Accuracy
+        {% else %}
+          0%
+        {% endif %}
+      </span>
+    </div>
+
+    <div>
+      <a href="{{ url_for('quiz.list_quizzes') }}"
+         class="inline-flex items-center gap-xs font-label-md text-label-md text-primary hover:text-primary-container transition-colors">
+        <span class="material-symbols-outlined text-[18px]">arrow_back</span>
+        Back to all quizzes
+      </a>
+    </div>
+  </section>
+
+  <!-- Answer Breakdown -->
+  <section class="space-y-md">
+    <h2 class="font-headline-md text-headline-md text-on-surface">Review Answers</h2>
+
+    {% for q in questions %}
+    {% set user_choice = attempt.responses.get(q.id|string) %}
+    {% set is_correct = (user_choice == q.correct_option) %}
+
+    <article class="bg-surface-container-lowest border rounded-xl p-md card-shadow space-y-md {{ 'border-secondary' if is_correct else 'border-error' }}">
+      <div class="flex items-start justify-between gap-sm">
+        <div class="flex items-start gap-sm">
+          <span class="font-bold text-xs rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 mt-0.5 {{ 'bg-secondary text-on-secondary' if is_correct else 'bg-error text-on-error' }}">
+            {{ loop.index }}
+          </span>
+          <h3 class="font-headline-md text-body-lg text-on-surface font-semibold">
+            {{ q.question_text }}
+          </h3>
+        </div>
+
+        {% if is_correct %}
+        <span class="bg-secondary-container text-on-secondary-container font-label-md text-xs px-2.5 py-1 rounded-full flex items-center gap-1 font-semibold flex-shrink-0">
+          <span class="material-symbols-outlined text-[14px]">check</span> Correct
+        </span>
+        {% else %}
+        <span class="bg-error-container text-on-error-container font-label-md text-xs px-2.5 py-1 rounded-full flex items-center gap-1 font-semibold flex-shrink-0">
+          <span class="material-symbols-outlined text-[14px]">close</span> Incorrect
+        </span>
+        {% endif %}
+      </div>
+
+      <!-- Options Review -->
+      <div class="space-y-sm pl-8">
+        {% for opt_key, opt_val in [('a', q.option_a), ('b', q.option_b), ('c', q.option_c), ('d', q.option_d)] %}
+
+        {% set is_this_correct = (opt_key == q.correct_option) %}
+        {% set is_this_user_choice = (opt_key == user_choice) %}
+
+        <div class="flex items-center gap-md p-sm rounded-lg border font-body-md text-body-md
+                    {% if is_this_correct %}
+                      bg-secondary-container/20 border-secondary text-on-surface
+                    {% elif is_this_user_choice and not is_correct %}
+                      bg-error-container/20 border-error text-on-surface
+                    {% else %}
+                      bg-surface border-outline-variant text-on-surface-variant opacity-70
+                    {% endif %}">
+          <span class="font-label-md text-label-md uppercase font-bold text-primary">
+            {{ opt_key }}.
+          </span>
+          <span class="flex-grow">{{ opt_val }}</span>
+
+          {% if is_this_correct %}
+            <span class="font-label-md text-xs text-secondary font-bold flex items-center gap-1">
+              <span class="material-symbols-outlined text-[16px]">check_circle</span> Correct Option
+            </span>
+          {% elif is_this_user_choice %}
+            <span class="font-label-md text-xs text-error font-bold flex items-center gap-1">
+              <span class="material-symbols-outlined text-[16px]">cancel</span> Your Choice
+            </span>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+
+      <!-- Explanation section if present -->
+      {% if q.explanation %}
+      <div class="ml-8 p-sm rounded-lg bg-surface-container-low border border-outline-variant space-y-xs">
+        <span class="font-label-md text-xs font-bold text-primary flex items-center gap-1">
+          <span class="material-symbols-outlined text-[16px]">info</span> Explanation
+        </span>
+        <p class="font-body-md text-label-md text-on-surface-variant">
+          {{ q.explanation }}
+        </p>
+      </div>
+      {% endif %}
+
+    </article>
+    {% endfor %}
+  </section>
+
+</main>
+{% endblock %}

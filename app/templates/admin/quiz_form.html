@@ -1,0 +1,65 @@
+{% extends "admin/layout.html" %}
+
+{% block title %}{{ 'Edit Quiz' if quiz else 'Create Quiz' }} - Nymora Admin{% endblock %}
+{% block page_title %}{{ 'Edit Quiz' if quiz else 'Create New Quiz' }}{% endblock %}
+
+{% block content %}
+<div class="admin-card" style="max-width: 600px;">
+    <form method="POST" action="">
+        {{ form.hidden_tag() if form }}
+
+        <!-- Title -->
+        <div class="form-group">
+            {{ form.title.label(class="form-label") }}
+            {{ form.title(class="form-input", value=quiz.title if quiz else '') }}
+            {% if form and form.title.errors %}
+                <div class="field-error">{{ form.title.errors[0] }}</div>
+            {% endif %}
+        </div>
+
+        <!-- Subject -->
+        <div class="form-group">
+            {{ form.subject.label(class="form-label") }}
+            {{ form.subject(class="form-input", value=quiz.subject if quiz else '') }}
+            {% if form and form.subject.errors %}
+                <div class="field-error">{{ form.subject.errors[0] }}</div>
+            {% endif %}
+        </div>
+
+        <!-- Quiz Type -->
+        <div class="form-group">
+            {{ form.quiz_type.label(class="form-label") }}
+            {{ form.quiz_type(class="form-input") }}
+            {% if form and form.quiz_type.errors %}
+                <div class="field-error">{{ form.quiz_type.errors[0] }}</div>
+            {% endif %}
+        </div>
+
+        <!-- Description -->
+        <div class="form-group">
+            {{ form.description.label(class="form-label") }}
+            {{ form.description(class="form-input", rows="4") }}
+            {% if form and form.description.errors %}
+                <div class="field-error">{{ form.description.errors[0] }}</div>
+            {% endif %}
+        </div>
+
+        <!-- Display all form errors -->
+        {% if form and form.errors %}
+            <div class="alert alert-error" style="background: #fee2e2; padding: 0.75rem; border-radius: 0.5rem; color: #991b1b; margin-bottom: 1rem;">
+                <strong>Please fix the following errors:</strong>
+                <ul style="margin-top: 0.25rem; list-style: disc; padding-left: 1.5rem;">
+                {% for field, errors in form.errors.items() %}
+                    <li>{{ field }}: {{ errors[0] }}</li>
+                {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+        <div class="flex gap-2 mt-4">
+            <button type="submit" class="btn btn-primary">Save Quiz</button>
+            <a href="{{ url_for('admin.quizzes') }}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

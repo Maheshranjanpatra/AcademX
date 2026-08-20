@@ -1,0 +1,605 @@
+
+   /*NYMORA ARCHITECTURAL AUTHENTICATION STYLESHEET
+   Design System: Classical Academic Excellence x Modern Interactive Pol */
+
+:root {
+    --font-heading: 'Playfair Display', Georgia, serif;
+    --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-mono: 'Source Code Pro', monospace;
+
+    --color-bg-start: #f7f3ee;
+    --color-bg-end: #e8e2d9;
+    --color-card-glass: rgba(255, 253, 250, 0.92);
+
+    --color-text-primary: #1c1c1e;
+    --color-text-secondary: #4a4a5a;
+    --color-text-muted: #7a7a8a;
+
+    --color-accent-blue: #0058be;
+    --color-accent-blue-light: #f5f8ff;
+    --color-accent-gold: #b8860b;
+    --color-badge-bg: #f0ece3;
+
+    --color-border-warm: #d4cdc2;
+    --color-border-card: #e6dfd6;
+
+    --shadow-card-floating: 0 20px 60px -20px rgba(28, 28, 30, 0.22);
+    --shadow-button-hover: 0 12px 28px -8px rgba(0, 88, 190, 0.25);
+    --shadow-squircle: 0 6px 16px rgba(184, 134, 11, 0.15);
+}
+   /*Base Layout & Atmosphere Se*/
+
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.nymora-page-wrapper {
+    position: relative;
+    min-height: 100vh;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--color-bg-start) 0%, var(--color-bg-end) 100%);
+    font-family: var(--font-body);
+    color: var(--color-text-primary);
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Central Halo Glow Effect */
+.nymora-page-wrapper::before {
+    content: '';
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    top: 50%;
+    right: 25%;
+    transform: translate(50%, -50%);
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.7) 0%, rgba(247, 243, 238, 0) 70%);
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Animated Background Orbs */
+.nymora-bg-orb {
+    position: absolute;
+    border-radius: 50%;
+    background: var(--color-accent-gold);
+    opacity: 0.04;
+    filter: blur(80px);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.nymora-bg-orb-1 {
+    width: 400px;
+    height: 400px;
+    top: -100px;
+    left: -100px;
+    animation: orbDrift 30s ease-in-out infinite alternate;
+}
+
+.nymora-bg-orb-2 {
+    width: 350px;
+    height: 350px;
+    bottom: -80px;
+    right: -80px;
+    animation: orbDrift 40s ease-in-out infinite alternate-reverse;
+}
+
+.nymora-bg-orb-3 {
+    width: 250px;
+    height: 250px;
+    top: 40%;
+    left: 30%;
+    animation: orbDrift 50s ease-in-out infinite alternate;
+}
+
+@keyframes orbDrift {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(40px, 50px) scale(1.15); }
+}
+
+/* Layout Container */
+.nymora-container {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 1120px;
+    padding: 2rem;
+    box-sizing: border-box;
+    gap: 3rem;
+}
+   /*Left Side: Hero & Typographic Watermark (6 */
+
+.nymora-hero-side {
+    flex: 1 1 60%;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-right: 2rem;
+    user-select: none;
+    animation: heroFadeIn 0.8s ease-out forwards;
+}
+
+.nymora-watermark-content {
+    position: relative;
+    z-index: 2;
+    max-width: 520px;
+}
+
+.nymora-watermark-emblem {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.06;
+    animation: emblemFloat 8s ease-in-out infinite alternate;
+}
+
+@keyframes emblemFloat {
+    0% { transform: translate(-50%, -50%) scale(1); }
+    100% { transform: translate(-50%, -52%) scale(1.02); }
+}
+
+/* Outer Ring */
+.nymora-emblem-ring {
+    position: absolute;
+    width: 320px;
+    height: 320px;
+    border: 2px solid var(--color-text-primary);
+    border-radius: 50%;
+    opacity: 0.3;
+    animation: ringPulse 6s ease-in-out infinite alternate;
+}
+
+@keyframes ringPulse {
+    0% { transform: scale(1); opacity: 0.3; }
+    100% { transform: scale(1.05); opacity: 0.15; }
+}
+
+/* "Hi" Text */
+.nymora-watermark-text {
+    font-family: var(--font-heading);
+    font-style: italic;
+    font-weight: 700;
+    font-size: 7rem;
+    color: var(--color-text-primary);
+    letter-spacing: -0.04em;
+    line-height: 1;
+    text-shadow: 0 4px 30px rgba(0, 0, 0, 0.02);
+    position: relative;
+    z-index: 2;
+}
+
+/* Flourish under "Hi" */
+.nymora-emblem-flourish {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    color: var(--color-text-primary);
+    opacity: 0.5;
+    margin-top: -0.25rem;
+    position: relative;
+    z-index: 2;
+}
+
+/* QUOTE – stays serif */
+.nymora-quote {
+    font-family: var(--font-heading);
+    font-style: italic;
+    font-weight: 600;
+    font-size: 2.75rem;
+    line-height: 1.25;
+    color: var(--color-text-primary);
+    margin: 0 0 1.5rem 0;
+    letter-spacing: 0.01em;
+    opacity: 0.88;
+    position: relative;
+    z-index: 2;
+}
+
+.nymora-hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 1rem;
+    position: relative;
+    z-index: 2;
+}
+
+.nymora-hero-badge-line {
+    width: 40px;
+    height: 2px;
+    background-color: var(--color-accent-gold);
+}
+
+.nymora-hero-badge-text {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.25em;
+    color: var(--color-accent-gold);
+    font-weight: 500;
+}
+   /*Right Side: Login Card (4*/
+
+.nymora-card-side {
+    flex: 0 0 420px;
+    display: flex;
+    justify-content: center;
+    perspective: 1000px;
+}
+
+.nymora-auth-card {
+    width: 100%;
+    max-width: 420px;
+    background: var(--color-card-glass);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--color-border-card);
+    border-radius: 20px;
+    padding: 2.5rem 2rem;
+    box-shadow: var(--shadow-card-floating), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    box-sizing: border-box;
+    transform-style: preserve-3d;
+    transition: transform 0.15s cubic-bezier(0.2, 0, 0.2, 1), box-shadow 0.3s ease;
+    animation: cardEntrance 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.nymora-card-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+/* A. Brand */
+.nymora-brand-title {
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 1.5rem;
+    letter-spacing: 0.02em;
+    color: var(--color-text-primary);
+}
+
+/* B. Decorative Divider */
+.nymora-divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    width: 100%;
+    margin: 0.5rem 0 1.25rem 0;
+}
+
+.nymora-divider-line {
+    width: 64px;
+    height: 2px;
+    background-color: var(--color-border-warm);
+    border-radius: 1px;
+}
+
+.nymora-divider-asterisk {
+    color: var(--color-accent-gold);
+    font-size: 0.75rem;
+    line-height: 1;
+}
+
+/* C. Headline */
+.nymora-headline {
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 2rem;
+    line-height: 1.2;
+    color: var(--color-text-primary);
+    margin: 0 0 0.625rem 0;
+    letter-spacing: -0.02em;
+}
+
+/* D. Subtext */
+.nymora-subtext {
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: var(--color-text-secondary);
+    margin: 0 0 1.25rem 0;
+    max-width: 90%;
+    font-weight: 400;
+}
+
+/* E. Badges */
+.nymora-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    background-color: var(--color-badge-bg);
+    color: var(--color-text-secondary);
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.35rem 0.75rem;
+    border-radius: 9999px;
+    letter-spacing: 0.01em;
+}
+
+.nymora-stat-num {
+    font-family: var(--font-mono);
+    font-weight: 500;
+    color: var(--color-text-primary);
+}
+
+.nymora-badges-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+
+/* F. Google Button & Animations */
+.nymora-action-container {
+    width: 100%;
+    margin-bottom: 1.25rem;
+}
+
+.nymora-google-btn {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border-radius: 12px;
+    border: 2px solid var(--color-border-warm);
+    background-color: #ffffff;
+    text-decoration: none;
+    box-sizing: border-box;
+    cursor: pointer;
+    overflow: hidden;
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+                box-shadow 0.4s ease,
+                border-color 0.3s ease,
+                background-color 0.3s ease;
+    transform: translateZ(0);
+}
+
+/* Hover: Pops towards the screen */
+.nymora-google-btn:hover {
+    border-color: var(--color-accent-blue);
+    background-color: var(--color-accent-blue-light);
+    transform: translateY(-4px) scale(1.04);
+    box-shadow: 0 15px 35px -10px rgba(0, 88, 190, 0.35);
+}
+
+.nymora-google-btn:focus-visible {
+    outline: 2px solid var(--color-accent-blue);
+    outline-offset: 2px;
+}
+
+.nymora-btn-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.875rem;
+    width: 100%;
+    transition: opacity 0.3s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.nymora-btn-text {
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    letter-spacing: -0.01em;
+}
+
+.nymora-google-svg {
+    flex-shrink: 0;
+}
+
+   /*Click / Loading State Modificati */
+
+.nymora-google-btn.is-loading {
+    pointer-events: none;
+    transform: translateY(0) scale(0.98);
+    box-shadow: none;
+    border-color: var(--color-border-warm);
+    background-color: #fcfbfa;
+}
+
+.nymora-google-btn.is-loading .nymora-btn-content {
+    opacity: 0;
+    transform: translateY(15px) scale(0.9);
+}
+
+/* Spinner Styles */
+.nymora-btn-spinner {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transform: translateY(-15px) scale(0.8);
+    transition: opacity 0.3s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.nymora-google-btn.is-loading .nymora-btn-spinner {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+.nymora-spinner-svg {
+    width: 24px;
+    height: 24px;
+    animation: rotateSpinner 2s linear infinite;
+}
+
+.nymora-spinner-path {
+    stroke: var(--color-accent-blue);
+    stroke-linecap: round;
+    animation: dashSpinner 1.5s ease-in-out infinite;
+}
+
+@keyframes rotateSpinner {
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes dashSpinner {
+    0% { stroke-dasharray: 1, 150; stroke-dashoffset: 0; }
+    50% { stroke-dasharray: 90, 150; stroke-dashoffset: -35; }
+    100% { stroke-dasharray: 90, 150; stroke-dashoffset: -124; }
+}
+
+
+/* G. Footer & Terms */
+.nymora-card-footer p {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    margin: 0;
+    line-height: 1.5;
+}
+
+.nymora-legal-link {
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.nymora-legal-link:hover {
+    color: var(--color-accent-blue);
+    border-bottom-color: var(--color-accent-blue);
+}
+   /*Animati */
+
+@keyframes heroFadeIn {
+    from { opacity: 0; transform: translateX(-20px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes cardEntrance {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes squircleScale {
+    0% { transform: scale(0.8); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.nymora-squircle-wrapper {
+    width: 64px;
+    height: 64px;
+    border-radius: 28%;
+    border: 2px solid var(--color-accent-gold);
+    overflow: hidden;
+    box-shadow: var(--shadow-squircle);
+    background-color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: squircleScale 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.nymora-squircle-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.nymora-card-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+}
+/*Responsive Adaptati */
+
+@media (max-width: 1024px) {
+    .nymora-container {
+        flex-direction: column;
+        justify-content: center;
+        gap: 2rem;
+    }
+
+    .nymora-hero-side {
+        flex: 0 0 auto;
+        padding-right: 0;
+        text-align: center;
+        align-items: center;
+    }
+
+    .nymora-quote {
+        font-size: 2rem;
+    }
+
+    .nymora-watermark-emblem {
+        display: none;
+    }
+
+    .nymora-card-side {
+        flex: 0 0 100%;
+        width: 100%;
+        max-width: 480px;
+    }
+}
+
+@media (max-width: 480px) {
+    .nymora-page-wrapper {
+        padding: 1rem 0;
+    }
+
+    .nymora-container {
+        padding: 1rem;
+    }
+
+    .nymora-hero-side {
+        display: none;
+    }
+
+    .nymora-auth-card {
+        padding: 1.75rem 1.25rem;
+        border-radius: 16px;
+    }
+
+    .nymora-squircle-wrapper {
+        width: 48px;
+        height: 48px;
+    }
+
+    .nymora-brand-title {
+        font-size: 1.25rem;
+    }
+
+    .nymora-headline {
+        font-size: 1.75rem;
+    }
+
+    .nymora-subtext {
+        font-size: 0.8125rem;
+    }
+
+    .nymora-badges-container {
+        flex-direction: column;
+        gap: 0.375rem;
+    }
+}

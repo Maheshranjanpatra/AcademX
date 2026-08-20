@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}Past Question Papers{% endblock %}
+
+{% block content %}
+<main class="max-w-[1280px] mx-auto w-full px-margin-mobile md:px-margin-desktop py-lg space-y-lg">
+
+  <!-- Header -->
+  <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-md">
+    <div>
+      <h1 class="font-display text-headline-lg-mobile md:text-headline-lg text-on-surface">Past Papers</h1>
+      <p class="font-body-md text-body-md text-on-surface-variant mt-xs">
+        Browse and download previous examination papers for study practice.
+      </p>
+    </div>
+    <a href="{{ url_for('paper.upload') }}"
+       class="bg-primary text-on-primary hover:bg-surface-tint font-label-md text-label-md px-md py-sm rounded-lg shadow-sm transition-all flex items-center gap-xs self-start md:self-auto">
+      <span class="material-symbols-outlined text-[20px]">upload_file</span>
+      Upload Paper
+    </a>
+  </div>
+
+  <!-- Search & Filter Bar -->
+  <form method="get" action="{{ url_for('paper.list_papers') }}" class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md card-shadow flex flex-col md:flex-row gap-md items-center">
+    <div class="relative w-full flex-grow">
+      <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">search</span>
+      <input type="text" name="q" value="{{ request.args.get('q', '') }}" placeholder="Search by subject or year..."
+             class="w-full pl-10 pr-md py-sm bg-surface border border-outline-variant rounded-lg font-body-md text-body-md text-on-surface focus:outline-none focus:border-primary">
+    </div>
+
+    <div class="flex items-center gap-sm w-full md:w-auto">
+      <select name="exam_type" onchange="this.form.submit()" class="bg-surface border border-outline-variant rounded-lg px-md py-sm font-body-md text-body-md text-on-surface w-full md:w-auto">
+        <option value="">All Exam Types</option>
+        <option value="internal" {% if request.args.get('exam_type') == 'internal' %}selected{% endif %}>Internal Exam</option>
+        <option value="semester" {% if request.args.get('exam_type') == 'semester' %}selected{% endif %}>Semester Exam</option>
+      </select>
+
+      {% if request.args.get('q') or request.args.get('exam_type') %}
+      <a href="{{ url_for('paper.list_papers') }}" class="text-error font-label-md text-xs hover:underline flex-shrink-0">
+        Clear
+      </a>
+      {% endif %}
+    </div>
+  </form>
+
+  <!-- Papers List Grid -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-md">
+    {% for paper in papers %}
+    <article class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md card-shadow card-hover-shadow transition-all duration-300 flex flex-col justify-between gap-md">
+      <div class="space-y-sm">
+        <div class="flex items-center justify-between gap-sm">
+          <span class="bg-primary-fixed text-on-primary-fixed font-label-md text-xs px-2.5 py-1 rounded-full font-semibold">
+            {{ paper.subject }}
+          </span>
+          <span class="bg-surface-container text-on-surface-variant font-label-md text-xs px-2 py-0.5 rounded capitalize">
+            {{ "Internal" if paper.exam_type == "internal" else "Semester" if paper.exam_type == "semester" else paper.exam_type }}
+          </span>
+        </div>
+
+        <h2 class="font-headline-md text-headline-md text-on-surface font-semibold">
+          {{ paper.subject }} ({{ paper.year }})
+        </h2>
+
+        <p class="font-body-md text-xs text-on-surface-variant flex items-center gap-1">
+          <span class="material-symbols-outlined text-[16px]">calendar_today</span>
+          Year: {{ paper.year }}
+        </p>
+      </div>
+
+      <div class="pt-sm border-t border-surface-variant flex items-center justify-between">
+        <a href="{{ url_for('static', filename=paper.file_path) }}" target="_blank" rel="noopener noreferrer"
+           class="w-full bg-surface-container-high text-primary hover:bg-primary hover:text-on-primary transition-all rounded-lg px-md py-sm font-label-md text-label-md flex items-center justify-center gap-xs shadow-sm">
+          <span class="material-symbols-outlined text-[18px]">download</span>
+          View Paper
+        </a>
+      </div>
+    </article>
+    {% else %}
+    <div class="col-span-full bg-surface-container-lowest border border-outline-variant rounded-xl p-xl text-center space-y-xs">
+      <p class="font-body-md text-on-surface-variant">No past papers found matching your query.</p>
+    </div>
+    {% endfor %}
+  </div>
+
+</main>
+{% endblock %}

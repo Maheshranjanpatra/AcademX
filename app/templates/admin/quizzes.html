@@ -1,0 +1,55 @@
+{% extends "admin/layout.html" %}
+
+{% block title %}Quizzes - Nymora Admin{% endblock %}
+{% block page_title %}Quiz Management{% endblock %}
+
+{% block content %}
+<div class="admin-card">
+    <div class="table-header-actions">
+        <div class="search-filter-group">
+            <form method="GET" action="{{ url_for('admin.quizzes') }}" class="flex gap-2">
+                <input type="text" name="q" value="{{ request.args.get('q', '') }}" class="form-input" placeholder="Search quizzes...">
+                <button type="submit" class="btn btn-secondary">Search</button>
+            </form>
+        </div>
+        <a href="{{ url_for('admin.create_quiz') }}" class="btn btn-primary">+ Create New Quiz</a>
+    </div>
+
+    <div class="admin-table-container">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Subject</th>
+                    <th>Questions</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for quiz in quizzes %}
+                <tr>
+                    <td><strong>{{ quiz.title }}</strong></td>
+                    <td>{{ quiz.subject }}</td>
+                    <td>{{ quiz.questions.count() }}</td>
+                    <td>
+                    <td>
+                        <div class="flex gap-2">
+                            <a href="{{ url_for('admin.view_quiz_questions', quiz_id=quiz.id) }}" class="action-btn" title="View Questions">
+                                <span class="material-symbols-outlined">visibility</span>
+                            </a>
+                            <a href="{{ url_for('admin.add_quiz_question', quiz_id=quiz.id) }}" class="action-btn success">+ Question</a>
+                            <a href="{{ url_for('admin.edit_quiz', quiz_id=quiz.id) }}" class="action-btn">Edit</a>
+                            <form action="{{ url_for('admin.delete_quiz', quiz_id=quiz.id) }}" method="POST">
+                                <button type="submit" class="action-btn danger" data-confirm="Delete quiz and all its questions?">Delete</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="4" class="empty-state">No quizzes found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

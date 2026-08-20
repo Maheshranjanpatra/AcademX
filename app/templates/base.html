@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>{% block title %}Nymora{% endblock %} - Ask doubts anonymously. Learn effectively.</title>
+
+<!-- Favicon -->
+<link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.png') }}">
+
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600;700&family=Source+Code+Pro:wght@400;500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "surface-container-low": "#f2f3fd",
+          "surface": "#f9f9ff",
+          "on-primary-container": "#fefcff",
+          "tertiary-fixed": "#ffddb8",
+          "outline-variant": "#c2c6d6",
+          "surface-container-high": "#e6e7f2",
+          "inverse-surface": "#2e3038",
+          "on-secondary-container": "#006f64",
+          "on-background": "#191b23",
+          "surface-container": "#ecedf7",
+          "on-tertiary": "#ffffff",
+          "surface-dim": "#d8d9e3",
+          "on-surface": "#191b23",
+          "on-tertiary-fixed": "#2a1700",
+          "on-error": "#ffffff",
+          "on-tertiary-fixed-variant": "#653e00",
+          "tertiary": "#825100",
+          "on-secondary-fixed-variant": "#005048",
+          "on-surface-variant": "#424754",
+          "on-secondary": "#ffffff",
+          "on-error-container": "#93000a",
+          "on-tertiary-container": "#fffbff",
+          "background": "#f9f9ff",
+          "surface-container-highest": "#e1e2ec",
+          "secondary-fixed-dim": "#4fdbc8",
+          "primary-container": "#2170e4",
+          "inverse-primary": "#adc6ff",
+          "on-secondary-fixed": "#00201c",
+          "surface-container-lowest": "#ffffff",
+          "on-primary-fixed-variant": "#004395",
+          "outline": "#727785",
+          "error": "#ba1a1a",
+          "inverse-on-surface": "#eff0fa",
+          "primary": "#0058be",
+          "surface-bright": "#f9f9ff",
+          "tertiary-container": "#a36700",
+          "secondary-container": "#6df5e1",
+          "surface-variant": "#e1e2ec",
+          "error-container": "#ffdad6",
+          "primary-fixed-dim": "#adc6ff",
+          "on-primary": "#ffffff",
+          "tertiary-fixed-dim": "#ffb95f",
+          "primary-fixed": "#d8e2ff",
+          "on-primary-fixed": "#001a42",
+          "secondary-fixed": "#71f8e4",
+          "surface-tint": "#005ac2",
+          "secondary": "#006b5f"
+        },
+        borderRadius: { DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px" },
+        spacing: {
+          xs: "4px", xl: "64px", "margin-desktop": "48px", base: "8px",
+          "margin-mobile": "16px", gutter: "24px", lg: "40px", sm: "12px", md: "24px"
+        },
+        fontFamily: {
+          "body-md": ["Inter"], display: ["Poppins"], "label-md": ["Inter"],
+          "body-lg": ["Inter"], "headline-md": ["Poppins"],
+          "headline-lg-mobile": ["Poppins"], "headline-lg": ["Poppins"],
+          "math-block": ["Source Code Pro"]
+        },
+        fontSize: {
+          "body-md": ["16px", { lineHeight: "1.5", fontWeight: "400" }],
+          display: ["48px", { lineHeight: "1.2", letterSpacing: "-0.02em", fontWeight: "700" }],
+          "label-md": ["14px", { lineHeight: "1.4", letterSpacing: "0.01em", fontWeight: "500" }],
+          "body-lg": ["18px", { lineHeight: "1.6", fontWeight: "400" }],
+          "headline-md": ["24px", { lineHeight: "1.4", fontWeight: "600" }],
+          "headline-lg-mobile": ["24px", { lineHeight: "1.3", fontWeight: "600" }],
+          "headline-lg": ["32px", { lineHeight: "1.3", fontWeight: "600" }],
+          "math-block": ["16px", { lineHeight: "1.5", fontWeight: "400" }]
+        }
+      }
+    }
+  }
+</script>
+<!-- MathJax for rendering LaTeX math formulas -->
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']]
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+{% block extra_head %}{% endblock %}
+</head>
+<body class="bg-surface text-on-surface font-body-md min-h-screen flex flex-col selection:bg-primary-container selection:text-on-primary-container">
+
+<!-- Top Nav -->
+<header>
+  {% include "navbar.html" %}
+</header>
+
+<!-- Flash messages -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop pt-md w-full">
+      {% for category, message in messages %}
+        <div class="rounded-lg px-md py-sm mb-sm font-label-md text-label-md
+                    {{ 'bg-error-container text-on-error-container' if category == 'error' else 'bg-secondary-container text-on-secondary-container' }}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+<!-- Streak warning banner -->
+{% if streak_warning %}
+<div class="w-full bg-tertiary-fixed text-on-tertiary-fixed text-center py-2 px-md font-label-md text-label-md flex items-center justify-center gap-2 flex-wrap">
+  <span class="text-base">
+      <svg class="w-5 h-5 inline-block flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 9v4"/>
+          <path d="M12 17h.01"/>
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+      </svg>
+  </span>
+  <span>Your egg is at risk — complete a video today to keep your streak alive.</span>
+  <a href="{{ url_for('video.playlists') }}" class="underline font-semibold">Watch now →</a>
+</div>
+{% endif %}
+
+<main class="flex-grow">
+  {% block content %}{% endblock %}
+</main>
+
+<!-- Footer -->
+<footer>
+  {% include "footer.html" %}
+</footer>
+
+
+{#
+<!-- Animation Modal  -->
+{% set animation_video = session.pop('animation_video', None) %}
+{% if animation_video %}
+{% set animation_title = session.pop('animation_title', '') %}
+{% set animation_message = session.pop('animation_message', '') %}
+<div id="streak-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+    <div class="bg-surface-container-lowest rounded-2xl p-8 max-w-sm w-full text-center shadow-2xl animate-pop-in">
+        <div class="animation-video-wrapper w-48 h-48 mx-auto mb-4">
+            <video id="animationVideo" autoplay loop muted playsinline class="w-full h-full object-contain">
+                <source src="{{ url_for('static', filename='animations/' + animation_video + '.mp4') }}" type="video/mp4">
+            </video>
+            <div id="animationSpinner" class="animation-spinner">
+                <div class="animation-spinner-ring"></div>
+            </div>
+        </div>
+
+        <h2 class="font-display text-headline-md text-on-surface mb-2">
+            {{ animation_title }}
+        </h2>
+        <p class="font-body-md text-body-md text-on-surface-variant mb-6">
+            {{ animation_message }}
+        </p>
+
+        <button onclick="closeStreakModal()"
+                class="bg-primary text-on-primary font-label-md text-label-md px-6 py-2 rounded-lg hover:bg-surface-tint transition-all">
+            Got it
+        </button>
+    </div>
+</div>
+
+<script>
+    function closeStreakModal() {
+        const modal = document.getElementById('streak-modal');
+        if (modal) {
+            modal.style.opacity = '0';
+            modal.style.transition = 'opacity 0.3s ease';
+            setTimeout(() => modal.remove(), 300);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const modal = document.getElementById('streak-modal');
+        if (modal) {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) closeStreakModal();
+            });
+        }
+
+        const video = document.getElementById('animationVideo');
+        const spinner = document.getElementById('animationSpinner');
+        if (video && spinner) {
+            video.addEventListener('canplay', () => spinner.classList.add('hidden'));
+            if (video.readyState >= 3) spinner.classList.add('hidden');
+        }
+    });
+</script>
+{% endif %}
+#}
+
+<!-- ===== COMPLETION MODAL ===== -->
+{% set video_id = session.pop('completion_video_id', None) %}
+{% set video_title = session.pop('completion_video_title', None) %}
+{% if session.pop('show_completion_modal', None) %}
+<div id="completion-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+    <div class="bg-surface-container-lowest rounded-2xl p-8 max-w-sm w-full text-center shadow-2xl animate-pop-in">
+
+        <div class="flex justify-center mb-4">
+            <svg class="w-16 h-16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color: #b8860b;">
+                <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
+                <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
+                <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" />
+                <path d="M9 4v3" stroke-width="1" opacity="0.5" />
+                <path d="M15 4v3" stroke-width="1" opacity="0.5" />
+                <path d="M4 22h16" stroke-width="2.5" />
+                <path d="M6 18h12" stroke-width="2" />
+                <path d="M8 22l1.5-4h5l1.5 4" />
+                <path d="M12 15l-1 2h2l-1-2Z" fill="currentColor" stroke="none" />
+                <circle cx="20" cy="3" r="0.8" fill="currentColor" stroke="none" opacity="0.6" />
+                <circle cx="4" cy="3" r="0.8" fill="currentColor" stroke="none" opacity="0.6" />
+                <circle cx="21" cy="6" r="0.5" fill="currentColor" stroke="none" opacity="0.4" />
+                <circle cx="3" cy="6" r="0.5" fill="currentColor" stroke="none" opacity="0.4" />
+            </svg>
+        </div>
+
+        <h2 class="font-display text-headline-md text-on-surface mb-2">
+            Congratulations!
+        </h2>
+        <p class="font-body-md text-body-md text-on-surface-variant mb-1">
+            You completed <strong class="text-primary">{{ video_title }}</strong>.
+        </p>
+        <p class="font-body-md text-body-md text-on-surface-variant mb-6">
+            Keep the momentum going, or take a well-deserved break.
+        </p>
+
+        <div class="flex flex-col gap-3">
+            <!-- Have a break -->
+            <a href="{{ url_for('dashboard.home') }}"
+               class="flex items-center justify-center gap-3 w-full bg-secondary text-on-secondary font-label-md text-label-md px-6 py-2.5 rounded-lg hover:bg-secondary-fixed-dim transition-all">
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M17 8h1a4 4 0 0 1 0 8h-1"/>
+                    <path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V8z"/>
+                    <line x1="6" y1="2" x2="6" y2="4"/>
+                    <line x1="10" y1="2" x2="10" y2="4"/>
+                    <line x1="14" y1="2" x2="14" y2="4"/>
+                </svg>
+                Have a break
+            </a>
+
+            <!-- Be strong -->
+            <a href="{{ url_for('video.watch', video_id=video_id) }}"
+               class="flex items-center justify-center gap-3 w-full bg-primary text-on-primary font-label-md text-label-md px-6 py-2.5 rounded-lg hover:bg-surface-tint transition-all">
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10" fill="currentColor" fill-opacity="0.08" />
+                    <circle cx="12" cy="12" r="9" stroke-width="1.5" opacity="0.3" />
+                    <circle cx="12" cy="12" r="11" stroke-width="1" opacity="0.15" />
+                    <path d="M14 2L4 14h6l-2 9L20 10h-6l2-8Z" stroke-linejoin="round" />
+                </svg>
+                Be strong – keep watching
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const modal = document.getElementById('completion-modal');
+        if (modal) {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.style.opacity = '0';
+                    this.style.transition = 'opacity 0.3s ease';
+                    setTimeout(() => this.remove(), 300);
+                }
+            });
+        }
+    });
+</script>
+{% endif %}
+
+</body>
+</html>

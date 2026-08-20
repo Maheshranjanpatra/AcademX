@@ -1,0 +1,7 @@
+{% macro user_avatar(user, size='w-8 h-8') %}
+    <div class="{{ size }} rounded-full overflow-hidden border border-primary-fixed/20 bg-gray-100 flex-shrink-0">
+        <img src="{{ url_for('static', filename='images/profiles/' + (user.avatar or 'avatar7.png')) }}"
+             alt="{{ user.name }}"
+             class="w-full h-full object-cover">
+    </div>
+{% endmacro %}

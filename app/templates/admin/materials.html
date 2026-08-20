@@ -1,0 +1,103 @@
+{% extends "admin/layout.html" %}
+
+{% block title %}Study Materials - Nymora Admin{% endblock %}
+{% block page_title %}Study Materials Moderation{% endblock %}
+
+{% block content %}
+<!-- Status Tabs -->
+<div class="tabs-container">
+    <a href="{{ url_for('admin.materials', status='pending') }}" class="tab-btn {% if status_filter == 'pending' %}active{% endif %}">Pending ({{ pending_count }})</a>
+    <a href="{{ url_for('admin.materials', status='approved') }}" class="tab-btn {% if status_filter == 'approved' %}active{% endif %}">Approved ({{ approved_count }})</a>
+    <a href="{{ url_for('admin.materials', status='rejected') }}" class="tab-btn {% if status_filter == 'rejected' %}active{% endif %}">Rejected ({{ rejected_count }})</a>
+</div>
+
+<div class="admin-card">
+    <div class="table-header-actions">
+        <form method="GET" action="{{ url_for('admin.materials') }}" class="search-filter-group">
+            <input type="hidden" name="status" value="{{ status_filter }}">
+            <input type="text" name="search" value="{{ search }}" class="form-input" placeholder="Search materials...">
+            <select name="category" class="filter-select" onchange="this.form.submit()">
+                <option value="">All Categories</option>
+                {% for cat in categories %}
+                <option value="{{ cat }}" {% if cat == category %}selected{% endif %}>{{ cat }}</option>
+                {% endfor %}
+            </select>
+        </form>
+        <a href="{{ url_for('admin.add_material') }}" class="btn btn-primary">
+            <span class="material-symbols-outlined">add</span> Add Material
+        </a>
+    </div>
+
+    <div class="admin-table-container">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Category</th>
+                    <th>Uploader</th>
+                    <th>File</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in materials %}
+                <tr>
+                    <td><strong>{{ item.title }}</strong></td>
+                    <td><span class="status-badge info">{{ item.category or '—' }}</span></td>
+                    <td>{{ item.uploader.name if item.uploader else 'Unknown' }}</td>
+                    <td>
+                        {% if item.file_path %}
+                            <a href="{{ url_for('static', filename=item.file_path) }}" target="_blank" class="text-primary hover:underline">
+                                {{ item.file_path.split('/')[-1] }}
+                            </a>
+                        {% elif item.file_url %}
+                            <a href="{{ item.file_url }}" target="_blank" class="text-primary hover:underline">
+                                External Link
+                            </a>
+                        {% else %}
+                            <span class="text-muted">—</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span class="status-badge
+                            {% if item.status == 'pending' %}warning{% endif %}
+                            {% if item.status == 'approved' %}success{% endif %}
+                            {% if item.status == 'rejected' %}danger{% endif %}
+                        ">
+                            {{ item.status|title }}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="flex gap-2 flex-wrap">
+                            {% if item.status == 'pending' %}
+                            <form action="{{ url_for('admin.approve_material', material_id=item.id) }}" method="POST" style="display:inline;">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="action-btn success" title="Approve">
+                                    <span class="material-symbols-outlined">check</span>
+                                </button>
+                            </form>
+                            <form action="{{ url_for('admin.reject_material', material_id=item.id) }}" method="POST" style="display:inline;">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="action-btn danger" title="Reject">
+                                    <span class="material-symbols-outlined">close</span>
+                                </button>
+                            </form>
+                            {% endif %}
+                            <form action="{{ url_for('admin.delete_material', material_id=item.id) }}" method="POST" onsubmit="return confirm('Delete this material?');" style="display:inline;">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="action-btn danger" title="Delete">
+                                    <span class="material-symbols-outlined">delete</span>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="6" class="empty-state">No materials found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

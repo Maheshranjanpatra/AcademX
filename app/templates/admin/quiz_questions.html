@@ -1,0 +1,50 @@
+{% extends "admin/layout.html" %}
+
+{% block title %}Questions - {{ quiz.title }}{% endblock %}
+{% block page_title %}Questions for "{{ quiz.title }}"{% endblock %}
+
+{% block content %}
+<div class="admin-card">
+    <div class="table-header-actions">
+        <span class="text-muted">Total: {{ questions|length }} questions</span>
+        <a href="{{ url_for('admin.add_quiz_question', quiz_id=quiz.id) }}" class="btn btn-primary">
+            <span class="material-symbols-outlined">add</span> Add Question
+        </a>
+    </div>
+
+    <div class="admin-table-container">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Question</th>
+                    <th>Correct Option</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for q in questions %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ q.question_text[:80] }}{% if q.question_text|length > 80 %}…{% endif %}</td>
+                    <td><span class="status-badge success">{{ q.correct_option|upper }}</span></td>
+                    <td>
+                        <form action="{{ url_for('admin.delete_quiz_question', question_id=q.id) }}" method="POST" style="display:inline;">
+                            <button type="submit" class="action-btn danger" data-confirm="Delete this question?">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4" class="empty-state">No questions yet. Click <strong>"Add Question"</strong> to get started.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="mt-4">
+        <a href="{{ url_for('admin.quizzes') }}" class="btn btn-secondary">← Back to Quizzes</a>
+    </div>
+</div>
+{% endblock %}

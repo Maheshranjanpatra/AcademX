@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Q&A{% endblock %}
+
+{% block content %}
+<main class="max-w-[1280px] mx-auto w-full px-margin-mobile md:px-margin-desktop py-lg space-y-lg">
+
+  <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-md">
+    <div>
+      <h1 class="font-display text-headline-lg-mobile md:text-headline-lg text-on-surface">Questions</h1>
+      <p class="font-body-md text-body-md text-on-surface-variant mt-xs">Ask anonymously, get answers from peers.</p>
+    </div>
+    <a href="{{ url_for('qa.ask') }}"
+       class="bg-primary text-on-primary font-label-md text-label-md px-md py-sm rounded-lg hover:shadow-lg transition-all flex items-center gap-sm w-fit">
+      <span class="material-symbols-outlined text-[20px]">add</span> Ask a Question
+    </a>
+  </div>
+
+  <!-- Subject filter -->
+    <form method="get" class="flex items-center gap-sm">
+      <select name="subject" onchange="this.form.submit()"
+              class="rounded-lg border border-outline-variant bg-surface-container-lowest font-label-md text-label-md text-on-surface px-md py-sm">
+        <option value="">All Subjects</option>
+        {% for s in all_subjects %}
+          <option value="{{ s }}" {{ 'selected' if request.args.get('subject') == s }}>{{ s }}</option>
+        {% endfor %}
+      </select>
+    </form>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-md">
+    {% for q in questions %}
+    <article class="bg-surface-container-lowest border border-[#E2E8F0] rounded-xl p-md card-shadow card-hover-shadow transition-all duration-300 flex flex-col gap-sm">
+      <div class="flex items-center gap-sm">
+          {% if q.is_anonymous %}
+              <span class="bg-surface-container py-1 px-2 rounded font-label-md text-xs text-on-surface-variant flex items-center gap-1">
+                  <span class="material-symbols-outlined text-[14px]">visibility_off</span>
+                  {{ q.author.anonymous_id or 'Anonymous' }}
+              </span>
+          {% else %}
+              <span class="bg-primary-fixed text-on-primary-fixed py-1 px-2 rounded font-label-md text-xs">{{ q.author.name }}</span>
+          {% endif %}
+        <span class="text-on-surface-variant text-xs ml-auto">{{ q.subject }}</span>
+      </div>
+
+      <a href="{{ url_for('qa.view_question', question_id=q.id) }}"
+         class="font-headline-md text-body-lg font-semibold hover:text-primary transition-colors block truncate">{{ q.title }}</a>
+      <p class="font-body-md text-body-md text-on-surface-variant line-clamp-2">{{ q.body }}</p>
+
+      {% if q.tags %}
+      <div class="flex flex-wrap gap-xs">
+        {% for tag in q.tags %}
+        <span class="bg-surface-container text-on-surface-variant text-xs px-2 py-0.5 rounded-full">#{{ tag.name }}</span>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <div class="flex items-center gap-md text-on-surface-variant text-xs mt-auto pt-sm border-t border-surface-variant">
+        <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">chat_bubble_outline</span>{{ q.answers.count() }} Answers</span>
+        <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">arrow_upward</span>{{ q.upvotes }}</span>
+      </div>
+    </article>
+    {% else %}
+    <p class="text-on-surface-variant col-span-3">No questions yet — be the first to ask one.</p>
+    {% endfor %}
+  </div>
+</main>
+{% endblock %}

@@ -1,0 +1,66 @@
+{% extends "admin/layout.html" %}
+
+{% block title %}User Profile - {{ user.name }}{% endblock %}
+{% block page_title %}User Details{% endblock %}
+
+{% block content %}
+<div class="admin-card mb-4">
+    <div class="flex justify-between items-center" style="flex-wrap:wrap; gap:1rem;">
+        <div>
+            <h2>{{ user.name }}</h2>
+            <p class="text-muted">{{ user.email }}</p>
+            <p class="text-muted">Reg: {{ user.reg_num or 'N/A' }} | Dept: {{ user.department or 'N/A' }}</p>
+        </div>
+        <div class="flex gap-2" style="flex-wrap:wrap;">
+            <form action="{{ url_for('admin.toggle_admin', user_id=user.id) }}" method="POST">
+                <button type="submit" class="btn btn-secondary">
+                    {{ 'Demote to User' if user.is_admin else 'Promote to Admin' }}
+                </button>
+            </form>
+            <form action="{{ url_for('admin.toggle_user_status', user_id=user.id) }}" method="POST">
+                <button type="submit" class="btn btn-secondary">
+                    {{ 'Disable Account' if user.profile_complete else 'Enable Account' }}
+                </button>
+            </form>
+            <form action="{{ url_for('admin.delete_user', user_id=user.id) }}" method="POST" onsubmit="return confirm('Permanently delete user account?');">
+                <button type="submit" class="btn btn-danger">Delete User</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;" class="mb-4">
+    <div class="admin-card">
+        <p class="text-muted">Account Status</p>
+        <h3>
+            <span class="status-badge {{ 'active' if user.profile_complete else 'inactive' }}">
+                {{ 'Active' if user.profile_complete else 'Disabled' }}
+            </span>
+        </h3>
+    </div>
+    <div class="admin-card">
+        <p class="text-muted">Role</p>
+        <h3>{{ 'Admin' if user.is_admin else 'Standard User' }}</h3>
+    </div>
+    <div class="admin-card">
+        <p class="text-muted">Quizzes Attempted</p>
+        <h3>{{ user.quiz_attempts.count() if user.quiz_attempts else 0 }}</h3>
+    </div>
+    <div class="admin-card">
+        <p class="text-muted">Joined On</p>
+        <h3>{{ user.created_at.strftime('%b %d, %Y') }}</h3>
+    </div>
+</div>
+
+{% if stats %}
+<div class="admin-card">
+    <h3>Activity Stats</h3>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap:1rem;">
+        <div><p class="text-muted">Questions Asked</p><h4>{{ stats.questions }}</h4></div>
+        <div><p class="text-muted">Answers Given</p><h4>{{ stats.answers }}</h4></div>
+        <div><p class="text-muted">Videos Completed</p><h4>{{ stats.videos_completed }}</h4></div>
+        <div><p class="text-muted">Current Streak</p><h4>{{ stats.streak.current_streak if stats.streak else 0 }}</h4></div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

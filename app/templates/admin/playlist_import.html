@@ -1,0 +1,59 @@
+{% extends "admin/layout.html" %}
+
+{% block title %}Import Playlist - Nymora Admin{% endblock %}
+{% block page_title %}Import YouTube Playlist{% endblock %}
+
+{% block content %}
+<div class="admin-card" style="max-width: 700px;">
+    <p class="text-muted mb-4">
+        Paste a YouTube playlist URL (e.g., <code>https://www.youtube.com/playlist?list=PLDzvuf9Uf4FOIgEc-DddeTBdxqdmwc066</code>)
+        and we'll automatically fetch all videos and add them to <strong>{{ playlist.title }}</strong>.
+    </p>
+
+    <form method="POST" action="{{ url_for('admin.import_playlist_videos', playlist_id=playlist.id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <div class="form-group">
+            <label class="form-label">YouTube Playlist URL</label>
+            <input type="url" name="playlist_url" class="form-input"
+                   placeholder="https://www.youtube.com/playlist?list=..." required>
+        </div>
+
+        <div class="flex gap-2">
+            <button type="submit" class="btn btn-primary">Fetch & Import Videos</button>
+            <a href="{{ url_for('admin.videos') }}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<div class="admin-card mt-4">
+    <h3>Current Videos in this Playlist</h3>
+    <div class="admin-table-container">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Title</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for video in playlist.videos %}
+                <tr>
+                    <td>{{ video.order_index or loop.index }}</td>
+                    <td>{{ video.title }}</td>
+                    <td>
+                        <form action="{{ url_for('admin.delete_video', video_id=video.id) }}" method="POST" style="display:inline;">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="action-btn danger" data-confirm="Delete this video?">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="3" class="empty-state">No videos in this playlist yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

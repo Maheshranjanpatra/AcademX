@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block title %}{{ video.title }} - {{ playlist.title }}{% endblock %}
+
+{% block content %}
+<main class="max-w-[1280px] mx-auto w-full px-margin-mobile md:px-margin-desktop py-lg">
+
+  <!-- Navigation -->
+  <nav class="mb-md flex items-center gap-xs font-label-md text-xs text-on-surface-variant">
+    <a href="{{ url_for('video.playlists') }}" class="hover:text-primary transition-colors">Playlists</a>
+    <span class="material-symbols-outlined text-[14px]">chevron_right</span>
+    <span class="text-on-surface font-medium truncate">{{ playlist.title }}</span>
+  </nav>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-lg">
+
+    <!-- Primary Video Player Section -->
+    <section class="lg:col-span-2 space-y-md">
+      <div class="relative w-full aspect-video bg-black rounded-xl overflow-hidden card-shadow">
+        {% if video.youtube_url %}
+        <iframe
+          class="absolute top-0 left-0 w-full h-full border-0"
+          src="{{ video.youtube_url }}"
+          title="{{ video.title }}"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen>
+        </iframe>
+        {% else %}
+        <div class="flex items-center justify-center h-full text-on-primary">
+          <p class="font-body-md">Video URL missing.</p>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Video Details & Completion Action -->
+      <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md card-shadow space-y-md">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-md border-b border-surface-variant pb-md">
+          <div>
+            <span class="bg-primary-fixed text-on-primary-fixed font-label-md text-xs px-2.5 py-1 rounded-full font-semibold inline-block mb-xs">
+              {{ playlist.subject or "General" }}
+            </span>
+            <h1 class="font-headline-md text-headline-md text-on-surface font-semibold">
+              {{ video.title }}
+            </h1>
+          </div>
+
+          <!-- Mark Complete / Incomplete -->
+          <div class="flex-shrink-0">
+              {% if is_completed %}
+                  <form method="post" action="{{ url_for('video.toggle_complete', video_id=video.id) }}">
+                      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                      <button type="submit" class="bg-secondary-container text-on-secondary-container hover:bg-secondary-container/80 transition-all rounded-lg px-md py-sm font-label-md text-label-md flex items-center gap-xs">
+                          <span class="material-symbols-outlined text-[20px]">undo</span>
+                          Mark as Incomplete
+                      </button>
+                  </form>
+              {% else %}
+                  <form method="post" action="{{ url_for('video.toggle_complete', video_id=video.id) }}">
+                      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                      <button type="submit" class="bg-primary text-on-primary hover:bg-surface-tint transition-all rounded-lg px-md py-sm font-label-md text-label-md shadow-sm flex items-center gap-xs">
+                          <span class="material-symbols-outlined text-[20px]">done</span>
+                          Mark as Complete
+                      </button>
+                  </form>
+              {% endif %}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Playlist Sidebar Navigation -->
+    <aside class="space-y-sm">
+      <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md card-shadow space-y-sm">
+        <div class="border-b border-surface-variant pb-xs">
+          <h2 class="font-headline-md text-body-lg text-on-surface font-semibold">
+            {{ playlist.title }}
+          </h2>
+          <p class="font-label-md text-xs text-on-surface-variant mt-0.5">
+            {{ playlist.videos|length }} Total Videos
+          </p>
+        </div>
+
+        <!-- Video Item Links -->
+        <div class="space-y-xs max-h-[500px] overflow-y-auto pr-1">
+          {% for item in playlist.videos %}
+          {% set is_current = (item.id == video.id) %}
+          {% set item_completed = item.id in completed_video_ids %}
+
+          <a href="{{ url_for('video.watch', video_id=item.id) }}"
+             class="flex items-center gap-sm p-sm rounded-lg border transition-all duration-200
+                    {% if is_current %}
+                      bg-primary-fixed/30 border-primary text-primary font-semibold
+                    {% else %}
+                      bg-surface border-outline-variant text-on-surface hover:bg-surface-container-low
+                    {% endif %}">
+
+            <span class="font-label-md text-xs w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0
+                         {% if item_completed %} bg-secondary text-on-secondary {% elif is_current %} bg-primary text-on-primary {% else %} bg-surface-container-high text-on-surface-variant {% endif %}">
+              {% if item_completed %}
+                <span class="material-symbols-outlined text-[14px]">check</span>
+              {% elif is_current %}
+                <span class="material-symbols-outlined text-[14px]">play_arrow</span>
+              {% else %}
+                {{ loop.index }}
+              {% endif %}
+            </span>
+
+            <span class="font-body-md text-label-md line-clamp-2 flex-grow">
+              {{ item.title }}
+            </span>
+          </a>
+          {% endfor %}
+        </div>
+      </div>
+    </aside>
+
+  </div>
+</main>
+{% endblock %}

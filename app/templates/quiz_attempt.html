@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}Attempt: {{ quiz.title }}{% endblock %}
+
+{% block content %}
+<main class="max-w-[840px] mx-auto w-full px-margin-mobile md:px-margin-desktop py-lg space-y-lg">
+
+  <!-- Header Banner -->
+  <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md card-shadow space-y-xs">
+    <div class="flex items-center gap-sm">
+      <span class="bg-primary-fixed text-on-primary-fixed font-label-md text-xs px-2.5 py-1 rounded-full font-semibold">
+        {{ quiz.subject or "General" }}
+      </span>
+      <span class="font-label-md text-xs text-on-surface-variant">
+        {{ questions|length }} Questions
+      </span>
+    </div>
+    <h1 class="font-display text-headline-md text-on-surface">{{ quiz.title }}</h1>
+    {% if quiz.description %}
+    <p class="font-body-md text-body-md text-on-surface-variant">{{ quiz.description }}</p>
+    {% endif %}
+  </div>
+
+  <!-- Quiz Form -->
+  <form method="post" action="{{ url_for('quiz.attempt', quiz_id=quiz.id) }}" class="space-y-lg">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
+    {% for q in questions %}
+    <article class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md card-shadow space-y-md">
+      <div class="flex items-start gap-sm">
+        <span class="bg-primary text-on-primary font-bold text-xs rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 mt-0.5">
+          {{ loop.index }}
+        </span>
+        <h2 class="font-headline-md text-body-lg text-on-surface font-semibold">
+          {{ q.question_text }}
+        </h2>
+      </div>
+
+      <!-- Options -->
+      <div class="space-y-sm pl-8">
+        {% for opt_key, opt_val in [('a', q.option_a), ('b', q.option_b), ('c', q.option_c), ('d', q.option_d)] %}
+        <label class="flex items-center gap-md p-sm rounded-lg border border-outline-variant bg-surface hover:bg-surface-container-low cursor-pointer transition-colors group">
+          <input type="radio"
+                 name="question_{{ q.id }}"
+                 value="{{ opt_key }}"
+                 class="w-4 h-4 text-primary border-outline-variant focus:ring-primary" required/>
+          <span class="font-label-md text-label-md uppercase font-bold text-primary group-hover:text-primary-container">
+            {{ opt_key }}.
+          </span>
+          <span class="font-body-md text-body-md text-on-surface">
+            {{ opt_val }}
+          </span>
+        </label>
+        {% endfor %}
+      </div>
+    </article>
+    {% endfor %}
+
+    <!-- Submit Action -->
+    <div class="flex justify-end pt-md">
+      <button type="submit"
+              class="bg-primary text-on-primary hover:bg-surface-tint font-label-md text-label-md px-xl py-sm rounded-lg shadow-sm hover:shadow-md transition-all flex items-center gap-sm">
+        Submit Quiz
+        <span class="material-symbols-outlined text-[20px]">check_circle</span>
+      </button>
+    </div>
+  </form>
+
+</main>
+{% endblock %}

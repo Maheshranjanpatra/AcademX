@@ -1,0 +1,25 @@
+{% extends "admin/layout.html" %}
+
+{% block title %}Playlist Form - Nymora Admin{% endblock %}
+{% block page_title %}{{ 'Edit Playlist' if playlist else 'New Playlist' }}{% endblock %}
+
+{% block content %}
+<div class="admin-card" style="max-width: 600px;">
+    <form method="POST" action="">
+        {{ form.hidden_tag() if form }}
+        <div class="form-group">
+            <label class="form-label">Playlist Title</label>
+            <input type="text" name="title" class="form-input" value="{{ playlist.title if playlist else '' }}" required>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Subject</label>
+            <input type="text" name="subject" class="form-input" value="{{ playlist.subject if playlist else '' }}" required>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Description</label>
+            <textarea name="description" class="form-textarea" rows="4">{{ playlist.description if playlist else '' }}</textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Save Playlist</button>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Video Playlists{% endblock %}
+
+{% block content %}
+<main class="max-w-[1280px] mx-auto w-full px-margin-mobile md:px-margin-desktop py-lg space-y-lg">
+
+  <!-- Header -->
+  <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-md">
+    <div>
+      <h1 class="font-display text-headline-lg-mobile md:text-headline-lg text-on-surface">Curated Video Courses</h1>
+      <p class="font-body-md text-body-md text-on-surface-variant mt-xs">
+        Structured playlist modules organized by course subject and topic.
+      </p>
+    </div>
+  </div>
+
+  <!--  Quote -->
+  <div class="bg-surface-container-lowest border-l-4 border-primary rounded-r-xl p-lg my-6 shadow-sm">
+      <blockquote class="font-serif text-xl italic text-on-surface-variant leading-relaxed">
+          “You may deceive the whole world, but never betray your own soul.
+          The mirror of truth reflects only what you dare to show it.”
+      </blockquote>
+      <p class="text-right text-sm text-on-surface-variant mt-2 font-medium">— Nymora</p>
+  </div>
+
+  <!-- Playlists Grid -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-md">
+    {% for playlist in playlists %}
+    <article class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md card-shadow card-hover-shadow transition-all duration-300 flex flex-col justify-between gap-md">
+      <div class="space-y-sm">
+        <div class="flex items-center justify-between gap-sm">
+          <span class="bg-primary-fixed text-on-primary-fixed font-label-md text-xs px-2.5 py-1 rounded-full font-semibold">
+            {{ playlist.subject or "General" }}
+          </span>
+          <span class="font-label-md text-xs text-on-surface-variant flex items-center gap-1">
+            <span class="material-symbols-outlined text-[16px]">play_circle</span>
+            {{ playlist.videos|length }} {{ "Video" if playlist.videos|length == 1 else "Videos" }}
+          </span>
+        </div>
+
+        <h2 class="font-headline-md text-headline-md text-on-surface font-semibold">
+          {{ playlist.title }}
+        </h2>
+
+        {% if playlist.description %}
+        <p class="font-body-md text-body-md text-on-surface-variant line-clamp-3">
+          {{ playlist.description }}
+        </p>
+        {% endif %}
+      </div>
+
+      <div class="pt-sm border-t border-surface-variant flex items-center justify-between">
+        {% if playlist.videos|length > 0 %}
+        <a href="{{ url_for('video.watch', video_id=playlist.videos[0].id) }}"
+           class="w-full bg-primary text-on-primary hover:bg-surface-tint transition-all rounded-lg px-md py-sm font-label-md text-label-md flex items-center justify-center gap-xs shadow-sm">
+          Start Watching
+          <span class="material-symbols-outlined text-[18px]">play_arrow</span>
+        </a>
+        {% else %}
+        <button disabled class="w-full bg-surface-container text-on-surface-variant opacity-60 rounded-lg px-md py-sm font-label-md text-label-md flex items-center justify-center gap-xs cursor-not-allowed">
+          No Videos Yet
+        </button>
+        {% endif %}
+      </div>
+    </article>
+    {% else %}
+    <div class="col-span-full bg-surface-container-lowest border border-outline-variant rounded-xl p-xl text-center">
+      <p class="font-body-md text-on-surface-variant">No video playlists available yet.</p>
+    </div>
+    {% endfor %}
+  </div>
+
+</main>
+{% endblock %}
