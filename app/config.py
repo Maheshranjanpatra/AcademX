@@ -3,11 +3,20 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+def _normalize_db_url(url: str | None) -> str | None:
+    if not url:
+        return url
+    if url.startswith("postgres://"):
+        return url.replace("postgres://", "postgresql+psycopg://", 1)
+    if url.startswith("postgresql://") and "+psycopg" not in url:
+        return url.replace("postgresql://", "postgresql+psycopg://", 1)
+    return url
+
 class Config:
     SECRET_KEY = os.environ.get("SECRET_KEY", "dev-key-change-this")
 
     # PostgreSQL Database URL
-    SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL")
+    SQLALCHEMY_DATABASE_URI = _normalize_db_url(os.environ.get("DATABASE_URL"))
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # Google OAuth
