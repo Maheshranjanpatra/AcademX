@@ -1,0 +1,125 @@
+Nymora/
+│
+├── app/
+│   ├── __init__.py
+│   ├── config.py
+│   ├── extensions.py
+│   │
+│   ├── forms/
+│   │   ├── __init__.py
+│   │   ├── auth.py
+│   │   ├── admin_login.py
+│   │   ├── qa.py
+│   │   ├── quiz.py
+│   │   ├── material.py
+│   │   ├── admin.py
+│   │   └── paper.py
+│   │
+│   ├── models/
+│   │   ├── __init__.py
+│   │   ├── user.py
+│   │   ├── streak.py
+│   │   ├── question.py
+│   │   ├── quiz.py
+│   │   ├── video.py
+│   │   ├── paper.py
+│   │   └── material.py
+│   │
+│   ├── routes/
+│   │   ├── __init__.py
+│   │   ├── admin.py
+│   │   ├── auth.py
+│   │   ├── dashboard.py
+│   │   ├── qa.py
+│   │   ├── pages.py
+│   │   ├── quiz.py
+│   │   ├── video.py
+│   │   ├── paper.py
+│   │   └── materials.py
+│   │
+│   ├── static/
+│   │   ├── uploads/
+│   │   │   ├── papers/
+│   │   │   └── materials/
+│   │   ├── css/
+│   │   │   ├── admin_dashboard.css
+│   │   │   ├── admin_login.css
+│   │   │   ├── admin.css
+│   │   │   ├── auth_login.css
+│   │   │   └── style.css
+│   │   ├── js/
+│   │   │   ├── admin_dashboard.js
+│   │   │   ├── admin_login.js
+│   │   │   ├── auth_login.js
+│   │   │   ├── admin.js
+│   │   │   └── landing.js
+│   │   ├── images/
+│   │   │   └── nymora.jpg
+│   │   ├── profiles/
+│   │   │   ├── avatar1.png
+│   │   │   ├── avatar2.png
+│   │   │   │      ........
+│   │   │   └── avatar10.png
+│   │   └── animations/
+│   │       ├── lay_egg.mp4
+│   │       ├── egg_crack_02.mp4
+│   │       ├── egg_crack_01.mp4
+│   │       ├── egg_hatch.mp4
+│   │       ├── kill_egg.mp4
+│   │       └── sad_bird.mp4
+│   │
+│   ├── templates/
+│   │   ├── about.html
+│   │   ├── auth_complete_profile.html
+│   │   ├── auth_login.html
+│   │   ├── base.html
+│   │   ├── contact.html
+│   │   ├── dashboard.html
+│   │   ├── footer.html
+│   │   ├── index.html
+│   │   ├── macros.html
+│   │   ├── materials_list.html
+│   │   ├── navbar.html
+│   │   ├── paper_list.html
+│   │   ├── paper_upload.html
+│   │   ├── policy.html
+│   │   ├── qa_list.html
+│   │   ├── qa_detail.html
+│   │   ├── qa_ask.html
+│   │   ├── quiz_list.html
+│   │   ├── quiz_attempt.html
+│   │   ├── quiz_result.html
+│   │   ├── video_playlists.html
+│   │   ├── video_watch.html
+│   │   └── admin/
+│   │       ├── audit.html
+│   │       ├── bulk_import.html
+│   │       ├── login.html
+│   │       ├── layout.html
+│   │       ├── dashboard.html
+│   │       ├── users.html
+│   │       ├── user_detail.html
+│   │       ├── playlist_import.html
+│   │       ├── papers.html
+│   │       ├── qa.html
+│   │       ├── quizzes.html
+│   │       ├── quiz_form.html
+│   │       ├── question_form.html
+│   │       ├── videos.html
+│   │       ├── playlist_form.html
+│   │       ├── video_form.html
+│   │       ├── materials.html
+│   │       └── settings.html
+│   │
+│   └── utils/
+│       ├── __init__.py
+│       ├── validators.py
+│       ├── decorators.py
+│       ├── youtube.py
+│       └── helpers.py
+│
+├── migrations/
+├── tests/
+├── .env
+├── requirements.txt
+└── run.py
