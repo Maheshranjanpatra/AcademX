@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+{% from 'macros.html' import user_avatar %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<main class="max-w-[1280px] mx-auto w-full px-margin-mobile md:px-margin-desktop py-lg space-y-xl">
+
+  <section class="grid grid-cols-1 md:grid-cols-12 gap-gutter">
+    <div class="col-span-12 md:col-span-4 bg-surface-container-lowest border border-outline-variant rounded-xl card-shadow p-md">
+        <div class="flex items-center gap-md mb-md">
+            {{ user_avatar(current_user, 'w-16 h-16') }}
+            <div>
+                <h2 class="font-headline-md text-headline-md text-on-surface">{{ current_user.name }}</h2>
+                <p class="font-label-md text-label-md text-primary font-bold">{{ current_user.department }}</p>
+            </div>
+        </div>
+      <div class="space-y-sm font-label-md text-label-md text-on-surface-variant">
+        <div class="flex justify-between border-b border-surface-variant pb-xs">
+          <span>Reg No.</span>
+          <span class="text-on-surface font-mono">{{ current_user.reg_num }}</span>
+        </div>
+        <div class="flex justify-between pb-xs">
+          <span>Email</span>
+          <span class="text-on-surface">{{ current_user.email }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Welcome Hero -->
+    <div class="col-span-12 md:col-span-8 bg-surface-container-lowest border border-outline-variant rounded-xl card-shadow overflow-hidden relative">
+      <div class="absolute inset-0 bg-gradient-to-br from-primary-fixed to-surface-container-low opacity-50"></div>
+      <div class="relative z-10 flex flex-col justify-center h-full p-lg space-y-md">
+        <div class="inline-flex items-center gap-xs bg-primary-container text-on-primary-container px-sm py-xs rounded-full font-label-md text-label-md w-fit">
+          <span class="material-symbols-outlined text-[16px]">school</span>
+          <span>Welcome back</span>
+        </div>
+        <h1 class="font-display text-headline-lg-mobile md:text-display text-on-surface">Ready to solve something today?</h1>
+        <a href="{{ url_for('qa.ask') }}" class="bg-primary text-on-primary font-label-md text-label-md px-md py-sm rounded-lg hover:shadow-lg transition-all flex items-center gap-sm w-fit">
+          Ask a Question <span class="material-symbols-outlined">arrow_forward</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="space-y-md">
+    <h3 class="font-headline-md text-headline-md text-on-surface flex items-center gap-sm">
+      <span class="material-symbols-outlined">dashboard</span> Study Center
+    </h3>
+
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-gutter">
+      <!-- My Questions -->
+      <a href="{{ url_for('qa.list_questions') }}" class="col-span-12 md:col-span-3 bg-surface-container-lowest border border-outline-variant rounded-xl p-md card-shadow flex flex-col gap-md group hover:border-primary transition-colors">
+        <div class="w-12 h-12 rounded-lg bg-surface-container-low flex items-center justify-center text-primary group-hover:bg-primary-fixed transition-colors">
+          <span class="material-symbols-outlined text-[24px]">help_center</span>
+        </div>
+        <div>
+          <h4 class="font-headline-md text-on-surface text-[18px]">My Questions</h4>
+          <p class="font-label-md text-label-md text-on-surface-variant mt-xs">Track your open inquiries</p>
+        </div>
+        <div class="mt-auto flex items-center justify-between border-t border-surface-variant pt-sm">
+          <span class="font-label-md text-label-md text-secondary font-bold">{{ total_questions }} Asked</span>
+          <span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">arrow_outward</span>
+        </div>
+      </a>
+
+      <!-- My Answers -->
+      <a href="{{ url_for('qa.list_questions') }}" class="col-span-12 md:col-span-3 bg-surface-container-lowest border border-outline-variant rounded-xl p-md card-shadow flex flex-col gap-md group hover:border-secondary transition-colors">
+        <div class="w-12 h-12 rounded-lg bg-surface-container-low flex items-center justify-center text-secondary group-hover:bg-secondary-fixed transition-colors">
+          <span class="material-symbols-outlined text-[24px]">forum</span>
+        </div>
+        <div>
+          <h4 class="font-headline-md text-on-surface text-[18px]">My Answers</h4>
+          <p class="font-label-md text-label-md text-on-surface-variant mt-xs">Help peers &amp; build reputation</p>
+        </div>
+        <div class="mt-auto flex items-center justify-between border-t border-surface-variant pt-sm">
+          <span class="font-label-md text-label-md text-on-surface-variant"><span class="text-tertiary font-bold">{{ total_answers }}</span> total</span>
+          <span class="material-symbols-outlined text-outline group-hover:text-secondary transition-colors">arrow_outward</span>
+        </div>
+      </a>
+
+      <!-- Quizzes -->
+      <a href="{{ url_for('quiz.list_quizzes') }}" class="col-span-12 md:col-span-6 bg-surface-container-lowest border border-outline-variant rounded-xl p-md card-shadow flex gap-md group hover:border-primary transition-colors relative overflow-hidden">
+        <div class="w-12 h-12 rounded-lg bg-surface-container-low flex items-center justify-center text-primary group-hover:bg-primary-fixed transition-colors flex-shrink-0 z-10">
+          <span class="material-symbols-outlined text-[24px]">quiz</span>
+        </div>
+        <div class="flex-grow z-10 flex flex-col justify-between">
+          <div>
+            <h4 class="font-headline-md text-on-surface text-[18px]">Quizzes</h4>
+            <p class="font-label-md text-label-md text-on-surface-variant mt-xs">Test your knowledge on recent topics.</p>
+          </div>
+        </div>
+      </a>
+
+      {#
+      {% if grieving %}
+      <div class="col-span-12 bg-surface-container-lowest border border-error/30 rounded-xl p-md flex items-center gap-md">
+        <video autoplay loop muted playsinline class="w-16 h-16 object-contain flex-shrink-0">
+          <source src="{{ url_for('static', filename='animations/sad_bird.mp4') }}" type="video/mp4">
+        </video>
+        <div>
+          <h4 class="font-headline-md text-on-surface text-[16px]">Your nest is empty</h4>
+          <p class="font-label-md text-label-md text-on-surface-variant">Complete a video today to start a new egg.</p>
+        </div>
+      </div>
+      {% endif %}
+      #}
+      <!-- Playlist Progress -->
+      <div class="col-span-12 bg-surface-dim border-l-4 border-primary rounded-r-xl p-md">
+        <h4 class="font-headline-md text-on-surface text-[18px] mb-sm flex items-center gap-sm">
+          <span class="material-symbols-outlined text-primary">featured_play_list</span> Playlist Progress
+        </h4>
+        {% for item in playlist_progress %}
+        <a href="{{ url_for('video.playlists') }}" class="block bg-surface-container-lowest rounded-lg p-sm font-math-block text-math-block text-on-surface-variant flex items-center justify-between border border-outline-variant shadow-sm mb-sm hover:border-primary transition-colors">
+          <span>{{ item.playlist.title }}</span>
+          <div class="flex gap-xs overflow-x-auto max-w-full py-1 playlist-dots-scroll">
+            {% for i in range(item.total) %}
+              <span class="w-6 h-2 rounded-full flex-shrink-0 {{ 'bg-secondary' if i < item.done else 'bg-surface-container-high' }}"></span>
+            {% endfor %}
+          </div>
+        </a>
+        {% else %}
+        <p class="font-label-md text-label-md text-on-surface-variant">No playlists started yet — <a href="{{ url_for('video.playlists') }}" class="text-primary hover:underline">browse playlists</a> to begin.</p>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  <!-- Recent Questions -->
+  <section class="space-y-md">
+    <div class="flex items-center justify-between">
+      <h3 class="font-headline-md text-headline-md text-on-surface">Recent Questions from Others</h3>
+      <a href="{{ url_for('qa.list_questions') }}" class="font-label-md text-label-md text-primary hover:text-primary-container transition-colors">View all →</a>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-md">
+      {% for q in recent_questions %}
+      <article class="bg-surface-container-lowest border border-[#E2E8F0] rounded-xl p-md card-shadow card-hover-shadow transition-all duration-300">
+        <div class="flex items-center gap-sm mb-xs">
+          {% if q.is_anonymous %}
+            <span class="bg-surface-container py-1 px-2 rounded font-label-md text-xs text-on-surface-variant flex items-center gap-1">
+              <span class="material-symbols-outlined text-[14px]">visibility_off</span> Anonymous
+            </span>
+          {% else %}
+            <span class="bg-primary-fixed text-on-primary-fixed py-1 px-2 rounded font-label-md text-xs">{{ q.author.name }}</span>
+          {% endif %}
+        </div>
+        <a href="{{ url_for('qa.view_question', question_id=q.id) }}" class="font-headline-md text-body-lg font-semibold hover:text-primary transition-colors block truncate">{{ q.title }}</a>
+      </article>
+      {% else %}
+      <p class="text-on-surface-variant col-span-3">No questions yet.</p>
+      {% endfor %}
+    </div>
+  </section>
+
+</main>
+{% endblock %}

@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block extra_head %}
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<script src="{{ url_for('static', filename='js/landing.js') }}" defer></script>
+{% endblock %}
+
+{% block content %}
+<main class="nymora-body">
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-dot-pattern"></div>
+        <div class="hero-shape shape-1"></div>
+        <div class="hero-shape shape-2"></div>
+        <div class="hero-shape shape-3"></div>
+
+        <div class="hero-content fade-in-up">
+            <h1 class="hero-title">
+                Seek Knowledge. <br>
+                Ask Boldly, <span class="text-gradient-anonymously">anonymously.</span>
+            </h1>
+            <p class="hero-subtext">
+                Welcome to Nymora. A quiet sanctuary for academic inquiry where curiosity thrives without judgment. Explore rigorous discussions and share your expertise.
+            </p>
+            <div class="hero-actions">
+                <a href="{{ url_for('auth.login') }}" class="btn btn-solid">Join the Discussion</a>
+                <a href="{{ url_for('qa.list_questions') }}" class="btn btn-outline">Browse Questions</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content Layout -->
+    <div class="layout-container">
+        <div class="layout-grid">
+
+            <!-- Left Column: Recent Questions -->
+            <div class="main-column fade-in-up">
+                <h2 class="section-title font-heading">Recent Inquiries</h2>
+
+                <div class="questions-list">
+                    {% for q in recent_questions %}
+                    <a href="{{ url_for('qa.view_question', question_id=q.id) }}" class="card-elegant">
+                        <div class="card-meta">
+                            <span>{{ q.created_at.strftime('%b %d, %Y') }}</span>
+                            {% if q.is_anonymous %}
+                                <span class="badge-anon">Anonymous</span>
+                            {% else %}
+                                <span>{{ q.author.name }}</span>
+                            {% endif %}
+                        </div>
+                        <h3 class="card-title font-heading">{{ q.title }}</h3>
+                        <p class="card-preview">
+                            {{ q.body | truncate(120) }}
+                        </p>
+                        <div class="card-footer-meta">
+                            <span class="answer-count">
+                                {{ q.answers.count() }} Answer(s)
+                            </span>
+                        </div>
+                    </a>
+                    {% else %}
+                    <div class="card-elegant empty-state">
+                        <p>No inquiries found. Be the first to ask a question.</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Right Column: Sidebar -->
+            <aside class="sidebar fade-in-up" style="transition-delay: 0.2s;">
+
+                <!-- Highlight Box -->
+                <div class="sidebar-widget widget-highlight">
+                    <div class="emoji">
+                        <svg class="w-8 h-8 text-primary flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                            <line x1="1" y1="1" x2="23" y2="23"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="font-heading">100% Anonymous</h3>
+                        <p class="widget-subtext">
+                            Ask anything. Your identity is hidden to all users.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Stats Box -->
+                <div class="sidebar-widget">
+                    <h3 class="font-heading widget-title">Nymora So Far</h3>
+                    <div class="stat-group">
+                        <div class="stat-number stat-primary">{{ total_questions }}</div>
+                        <div class="stat-label">Questions Asked</div>
+                    </div>
+                    <div>
+                        <div class="stat-number stat-secondary">{{ total_students }}</div>
+                        <div class="stat-label">Scholars Joined</div>
+                    </div>
+                </div>
+
+                <!-- Popular Playlists -->
+                <div class="sidebar-widget">
+                    <h3 class="font-heading widget-title">Popular Curations</h3>
+                    <div class="playlists-list">
+                        {% for p in popular_playlists %}
+                        <a href="{{ url_for('video.playlists') }}" class="playlist-item">
+                            <span class="playlist-name">{{ p.title }}</span>
+                            <span class="chevron">→</span>
+                        </a>
+                        {% else %}
+                        <p class="widget-subtext">No playlists curated yet.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+
+            </aside>
+        </div>
+    </div>
+</main>
+{% endblock %}

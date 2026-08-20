@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Upload Study Material{% endblock %}
+
+{% block content %}
+<main class="max-w-[640px] mx-auto w-full px-margin-mobile md:px-margin-desktop py-lg">
+  <h1 class="font-display text-headline-lg-mobile md:text-headline-lg text-on-surface mb-md">Upload Study Material</h1>
+  <p class="font-body-md text-body-md text-on-surface-variant mb-md">
+    Share your notes, handouts, or links. Your submission will be reviewed by an admin before becoming public.
+  </p>
+
+  <form method="post" enctype="multipart/form-data" class="bg-surface-container-lowest border border-outline-variant rounded-xl card-shadow p-md space-y-md">
+    {{ form.hidden_tag() }}
+
+    <div>
+      {{ form.title.label(class="font-label-md text-label-md text-on-surface-variant block mb-xs") }}
+      {{ form.title(class="w-full rounded-lg border border-outline-variant px-md py-sm font-body-md text-body-md", placeholder="e.g. Calculus Notes") }}
+      {% for err in form.title.errors %}<p class="text-error text-xs mt-1">{{ err }}</p>{% endfor %}
+    </div>
+
+    <div>
+      {{ form.subject.label(class="font-label-md text-label-md text-on-surface-variant block mb-xs") }}
+      {{ form.subject(class="w-full rounded-lg border border-outline-variant px-md py-sm font-body-md text-body-md", placeholder="e.g. Mathematics") }}
+      {% for err in form.subject.errors %}<p class="text-error text-xs mt-1">{{ err }}</p>{% endfor %}
+    </div>
+
+    <div>
+      {{ form.category.label(class="font-label-md text-label-md text-on-surface-variant block mb-xs") }}
+      {{ form.category(class="w-full rounded-lg border border-outline-variant px-md py-sm font-body-md text-body-md") }}
+      {% for err in form.category.errors %}<p class="text-error text-xs mt-1">{{ err }}</p>{% endfor %}
+    </div>
+
+    <div>
+      {{ form.description.label(class="font-label-md text-label-md text-on-surface-variant block mb-xs") }}
+      {{ form.description(class="w-full rounded-lg border border-outline-variant px-md py-sm font-body-md text-body-md", rows=4) }}
+      {% for err in form.description.errors %}<p class="text-error text-xs mt-1">{{ err }}</p>{% endfor %}
+    </div>
+
+    <div>
+      {{ form.file.label(class="font-label-md text-label-md text-on-surface-variant block mb-xs") }}
+      {{ form.file(class="w-full rounded-lg border border-outline-variant px-md py-sm font-body-md text-body-md") }}
+      <p class="font-label-md text-xs text-on-surface-variant mt-1">Accepted: PDF, JPG, JPEG, DOCX (Max 26MB)</p>
+      {% for err in form.file.errors %}<p class="text-error text-xs mt-1">{{ err }}</p>{% endfor %}
+    </div>
+
+    <div>
+      {{ form.file_url.label(class="font-label-md text-label-md text-on-surface-variant block mb-xs") }}
+      {{ form.file_url(class="w-full rounded-lg border border-outline-variant px-md py-sm font-body-md text-body-md", placeholder="https://example.com/resource.pdf") }}
+      <p class="font-label-md text-xs text-on-surface-variant mt-1">Or provide an external link (if not uploading a file).</p>
+      {% for err in form.file_url.errors %}<p class="text-error text-xs mt-1">{{ err }}</p>{% endfor %}
+    </div>
+
+    <button type="submit" class="bg-primary text-on-primary font-label-md text-label-md px-md py-sm rounded-lg hover:shadow-lg transition-all flex items-center gap-sm">
+      Upload <span class="material-symbols-outlined">upload</span>
+    </button>
+  </form>
+</main>
+{% endblock %}

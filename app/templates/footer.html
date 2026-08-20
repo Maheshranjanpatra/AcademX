@@ -1,0 +1,22 @@
+<footer class="bg-on-primary-fixed border-t border-primary-fixed/10 w-full py-xl mt-auto">
+  <div class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop flex flex-col md:flex-row justify-between items-start gap-md">
+
+    <!-- Brand -->
+    <div>
+      <div class="font-serif text-2xl font-bold text-primary-fixed mb-2 tracking-tight hover:text-secondary-fixed transition-colors duration-300">
+        Nymora
+      </div>
+      <p class="font-body-md text-body-md text-primary-fixed-dim max-w-sm">
+        © 2026 Nymora University Study Platform. Academic Rigor, Accessible Learning.
+      </p>
+    </div>
+
+    <nav class="flex flex-col sm:flex-row gap-gutter">
+      <a class="footer-link text-primary-fixed-dim hover:text-secondary-fixed transition-colors font-label-md text-label-md" href="{{ url_for('paper.list_papers') }}">PYQs</a>
+      <a class="footer-link text-primary-fixed-dim hover:text-secondary-fixed transition-colors font-label-md text-label-md" href="{{ url_for('pages.about') }}">About Us</a>
+      <a class="footer-link text-primary-fixed-dim hover:text-secondary-fixed transition-colors font-label-md text-label-md" href="{{ url_for('pages.contact') }}">Contact</a>
+      <a class="footer-link text-primary-fixed-dim hover:text-secondary-fixed transition-colors font-label-md text-label-md" href="{{ url_for('pages.policy') }}">Privacy Policy</a>
+    </nav>
+
+  </div>
+</footer>

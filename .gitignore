@@ -1,0 +1,6 @@
+.env
+.env
+venv/
+temp_migrate.db
+local.db
+__pycache__/

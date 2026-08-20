@@ -1,0 +1,30 @@
+{% extends "admin/layout.html" %}
+
+{% block title %}Add Video - Nymora Admin{% endblock %}
+{% block page_title %}Add Video to Playlist{% endblock %}
+
+{% block content %}
+<div class="admin-card" style="max-width: 600px;">
+    <form method="POST" action="">
+        {{ form.hidden_tag() if form }}
+        <div class="form-group">
+            <label class="form-label">Video Title</label>
+            <input type="text" name="title" class="form-input" required>
+        </div>
+        <div class="form-group">
+            <label class="form-label">YouTube Embed URL</label>
+            <input type="url" name="youtube_url" class="form-input"
+                   placeholder="https://www.youtube-nocookie.com/embed/videoseries?list=..." required>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Order Index</label>
+            <input type="number" name="order_index" class="form-input" value="1">
+        </div>
+        <div class="form-group">
+            <label class="form-label">Duration (Seconds)</label>
+            <input type="number" name="duration_seconds" class="form-input" value="0">
+        </div>
+        <button type="submit" class="btn btn-primary">Add Video</button>
+    </form>
+</div>
+{% endblock %}

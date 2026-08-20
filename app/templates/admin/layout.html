@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Admin Dashboard{% endblock %} | Nymora</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_dashboard.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <img src="{{ url_for('static', filename='images/nymora.jpg') }}" alt="Nymora Logo" class="logo-img">
+                <span class="logo-text">Nymora</span>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="{{ url_for('admin.dashboard') }}" class="nav-item {% if request.endpoint == 'admin.dashboard' %}active{% endif %}">
+                    <span class="material-symbols-outlined">dashboard</span>
+                    <span class="nav-label">Dashboard</span>
+                </a>
+                <a href="{{ url_for('admin.users') }}" class="nav-item {% if request.endpoint == 'admin.users' %}active{% endif %}">
+                    <span class="material-symbols-outlined">group</span>
+                    <span class="nav-label">Users</span>
+                </a>
+                <a href="{{ url_for('admin.papers') }}" class="nav-item {% if request.endpoint == 'admin.papers' %}active{% endif %}">
+                    <span class="material-symbols-outlined">description</span>
+                    <span class="nav-label">Papers</span>
+                    {% if sidebar_pending_papers %}
+                    <span class="badge badge-pending">{{ sidebar_pending_papers }}</span>
+                    {% endif %}
+                </a>
+                <a href="{{ url_for('admin.qa') }}" class="nav-item {% if request.endpoint == 'admin.qa' %}active{% endif %}">
+                    <span class="material-symbols-outlined">forum</span>
+                    <span class="nav-label">Q&A</span>
+                </a>
+                <a href="{{ url_for('admin.quizzes') }}" class="nav-item {% if request.endpoint == 'admin.quizzes' %}active{% endif %}">
+                    <span class="material-symbols-outlined">quiz</span>
+                    <span class="nav-label">Quizzes</span>
+                </a>
+                <a href="{{ url_for('admin.videos') }}" class="nav-item {% if request.endpoint == 'admin.videos' %}active{% endif %}">
+                    <span class="material-symbols-outlined">play_circle</span>
+                    <span class="nav-label">Videos</span>
+                </a>
+                <a href="{{ url_for('admin.materials') }}" class="nav-item {% if request.endpoint == 'admin.materials' %}active{% endif %}">
+                    <span class="material-symbols-outlined">auto_stories</span>
+                    <span class="nav-label">Materials</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="{{ url_for('admin.dashboard') }}" class="nav-item">
+                    <span class="material-symbols-outlined">settings</span>
+                    <span class="nav-label">Settings</span>
+                </a>
+                <a href="{{ url_for('auth.admin_logout') }}" class="nav-item">
+                      <span class="material-symbols-outlined">logout</span>
+                      <span class="nav-label">Logout</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Topbar -->
+            <header class="topbar">
+                <div class="topbar-left">
+                    <button id="sidebar-toggle" class="icon-btn"><span class="material-symbols-outlined">menu</span></button>
+                    <!-- Back button -->
+                    <button onclick="history.back()" class="icon-btn" title="Go back">
+                        <span class="material-symbols-outlined">arrow_back</span>
+                    </button>
+                    <h1 class="page-title">{% block page_title %}Dashboard{% endblock %}</h1>
+                </div>
+                <div class="topbar-center">
+                    <div class="search-bar">
+                        <span class="material-symbols-outlined">search</span>
+                        <input type="text" placeholder="Global search...">
+                    </div>
+                </div>
+                <div class="topbar-right">
+                    <button id="theme-toggle" class="icon-btn"><span class="material-symbols-outlined" id="theme-icon">dark_mode</span></button>
+                    <button class="icon-btn notification-btn">
+                        <span class="material-symbols-outlined">notifications</span>
+                        <span class="notification-dot"></span>
+                    </button>
+                    <div class="profile-dropdown">
+                        <img src="https://ui-avatars.com/api/?name=Admin&background=0058be&color=fff" alt="Admin" class="avatar">
+                    </div>
+                </div>
+            </header>
+
+            <!-- Flash Messages -->
+            <div class="flash-messages">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+            </div>
+
+            <!-- Content Block -->
+            <div class="content-wrapper">
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+    </div>
+    <script src="{{ url_for('static', filename='js/admin_dashboard.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

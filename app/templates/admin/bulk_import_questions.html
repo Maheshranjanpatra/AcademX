@@ -1,0 +1,51 @@
+{% extends "admin/layout.html" %}
+
+{% block title %}Import Questions - Nymora Admin{% endblock %}
+{% block page_title %}Import Questions for "{{ quiz.title }}"{% endblock %}
+
+{% block content %}
+<div class="admin-card" style="max-width: 700px;">
+    <p class="text-muted mb-4">
+        Upload a CSV file with the following columns:
+    </p>
+
+    <div class="admin-table-container mb-4" style="font-size: 0.85rem;">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Column Name</th>
+                    <th>Required</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td><code>question_text</code></td><td>✅ Yes</td><td>The question text</td></tr>
+                <tr><td><code>option_a</code></td><td>✅ Yes</td><td>Option A</td></tr>
+                <tr><td><code>option_b</code></td><td>✅ Yes</td><td>Option B</td></tr>
+                <tr><td><code>option_c</code></td><td>✅ Yes</td><td>Option C</td></tr>
+                <tr><td><code>option_d</code></td><td>✅ Yes</td><td>Option D</td></tr>
+                <tr><td><code>correct_option</code></td><td>✅ Yes</td><td>Answer (a, b, c, or d)</td></tr>
+                <tr><td><code>explanation</code></td><td>❌ No</td><td>Optional explanation</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <a href="{{ url_for('static', filename='samples/questions_template.csv') }}" class="btn btn-secondary mb-4">
+        Download Sample CSV
+    </a>
+
+    <form action="{{ url_for('admin.process_bulk_import_questions', quiz_id=quiz.id) }}" method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <div class="form-group">
+            <label class="form-label">Select CSV File</label>
+            <input type="file" name="file" class="form-input" accept=".csv" required>
+        </div>
+
+        <div class="flex gap-2">
+            <button type="submit" class="btn btn-primary">Upload & Import</button>
+            <a href="{{ url_for('admin.quizzes') }}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends "admin/layout.html" %}
+
+{% block title %}Audit Log - Nymora Admin{% endblock %}
+{% block page_title %}System Audit Log{% endblock %}
+
+{% block content %}
+<div class="admin-card">
+    <div class="admin-table-container">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Admin User</th>
+                    <th>Action</th>
+                    <th>Timestamp</th>
+                    <th>Details</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in audit_logs %}
+                <tr>
+                    <td><strong>{{ log.user.name }}</strong></td>
+                    <td><span class="status-badge info">{{ log.action }}</span></td>
+                    <td>{{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                    <td><small class="text-muted">{{ log.details }}</small></td>
+                </tr>
+                {% else %}
+                <tr><td colspan="4" class="empty-state">No audit logs available.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

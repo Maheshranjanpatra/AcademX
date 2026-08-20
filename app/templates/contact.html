@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Contact{% endblock %}
+
+{% block content %}
+<section class="max-w-[560px] mx-auto px-margin-mobile md:px-margin-desktop py-xl">
+  <h1 class="font-display text-headline-lg-mobile md:text-headline-lg text-on-surface mb-xs">Get in Touch</h1>
+  <p class="font-body-md text-body-md text-on-surface-variant mb-md">
+    Have a question, found a bug, or just want to say hi? Fill this out and it'll open in your email app, ready to send.
+  </p>
+
+  <form id="contactForm" class="bg-surface-container-lowest border border-outline-variant rounded-xl card-shadow p-md space-y-md">
+    <div>
+      <label class="font-label-md text-label-md text-on-surface-variant block mb-xs">Your Name</label>
+      <input type="text" id="contactName" required class="w-full rounded-lg border border-outline-variant px-md py-sm font-body-md text-body-md"/>
+    </div>
+    <div>
+      <label class="font-label-md text-label-md text-on-surface-variant block mb-xs">Your Query</label>
+      <textarea id="contactQuery" rows="6" required class="w-full rounded-lg border border-outline-variant px-md py-sm font-body-md text-body-md"></textarea>
+    </div>
+    <button type="submit" class="bg-primary text-on-primary font-label-md text-label-md px-md py-sm rounded-lg hover:shadow-lg transition-all flex items-center gap-sm">
+      Send via Email <span class="material-symbols-outlined text-[18px]">send</span>
+    </button>
+  </form>
+</section>
+
+<script>
+  document.getElementById('contactForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    const name = document.getElementById('contactName').value.trim();
+    const query = document.getElementById('contactQuery').value.trim();
+    const subject = encodeURIComponent(`Nymora Query from ${name}`);
+    const body = encodeURIComponent(`${query}\n\n— ${name}`);
+    window.location.href = `mailto:nymora.app@gmail.com?subject=${subject}&body=${body}`;
+  });
+</script>
+{% endblock %}

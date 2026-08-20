@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% block title %}{{ question.title }}{% endblock %}
+
+{% block content %}
+<main class="max-w-[840px] mx-auto w-full px-margin-mobile md:px-margin-desktop py-lg space-y-lg">
+
+  <!-- Question -->
+  <article class="bg-surface-container-lowest border border-outline-variant rounded-xl card-shadow p-md space-y-sm">
+    <div class="flex items-center gap-sm">
+      {% if question.is_anonymous %}
+        <span class="bg-surface-container py-1 px-2 rounded font-label-md text-xs text-on-surface-variant flex items-center gap-1">
+          <span class="material-symbols-outlined text-[14px]">visibility_off</span>
+          {{ question.author.anonymous_id if question.author.anonymous_id else 'Anonymous' }}
+        </span>
+      {% else %}
+        <span class="bg-primary-fixed text-on-primary-fixed py-1 px-2 rounded font-label-md text-xs">{{ question.author.name }}</span>
+      {% endif %}
+      <span class="text-on-surface-variant text-xs">{{ question.subject }}</span>
+      {% if question.is_resolved %}
+        <span class="bg-secondary-container text-on-secondary-container py-1 px-2 rounded font-label-md text-xs ml-auto">Resolved</span>
+      {% endif %}
+    </div>
+
+    <h1 class="font-display text-headline-md text-on-surface">{{ question.title }}</h1>
+    <p class="font-body-md text-body-md text-on-surface-variant whitespace-pre-line">{{ question.body }}</p>
+
+    {% if question.math_content %}
+    <div class="math-container p-sm rounded font-math-block text-math-block text-on-surface">
+      {{ question.math_content }}
+    </div>
+    {% endif %}
+
+    {% if question.tags %}
+    <div class="flex flex-wrap gap-xs">
+      {% for tag in question.tags %}
+      <span class="bg-surface-container text-on-surface-variant text-xs px-2 py-0.5 rounded-full">#{{ tag.name }}</span>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="flex items-center gap-md pt-sm border-t border-surface-variant">
+      <form method="post" action="{{ url_for('qa.upvote_question', question_id=question.id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <button type="submit" class="flex items-center gap-1 text-on-surface-variant hover:text-primary transition-colors font-label-md text-label-md">
+          <span class="material-symbols-outlined text-[18px]">arrow_upward</span> {{ question.upvotes }}
+        </button>
+      </form>
+      <span class="flex items-center gap-1 text-on-surface-variant font-label-md text-label-md">
+        <span class="material-symbols-outlined text-[18px]">chat_bubble_outline</span> {{ answers|length }} Answers
+      </span>
+    </div>
+  </article>
+
+  <!-- Answers -->
+  <section class="space-y-md">
+    <h2 class="font-headline-md text-headline-md text-on-surface">Answers</h2>
+
+    {% for a in answers %}
+    <article class="bg-surface-container-lowest border rounded-xl p-md card-shadow space-y-sm
+                     {{ 'border-secondary' if a.is_best_answer else 'border-outline-variant' }}">
+      <div class="flex items-center gap-sm">
+        {% if a.is_anonymous %}
+          <span class="bg-surface-container py-1 px-2 rounded font-label-md text-xs text-on-surface-variant flex items-center gap-1">
+            <span class="material-symbols-outlined text-[14px]">visibility_off</span>
+            {{ a.author.anonymous_id if a.author.anonymous_id else 'Anonymous' }}
+          </span>
+        {% else %}
+          <span class="bg-primary-fixed text-on-primary-fixed py-1 px-2 rounded font-label-md text-xs">{{ a.author.name }}</span>
+        {% endif %}
+        {% if a.is_best_answer %}
+          <span class="bg-secondary text-on-secondary py-1 px-2 rounded font-label-md text-xs flex items-center gap-1">
+            <span class="material-symbols-outlined text-[14px]">verified</span> Best Answer
+          </span>
+        {% endif %}
+      </div>
+
+      <p class="font-body-md text-body-md text-on-surface-variant whitespace-pre-line">{{ a.body }}</p>
+
+      {% if current_user.is_authenticated and current_user.is_admin and not a.is_best_answer %}
+      <form method="post" action="{{ url_for('qa.mark_best_answer', answer_id=a.id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <button type="submit" class="font-label-md text-label-md text-primary hover:underline">Mark as best answer</button>
+      </form>
+      {% endif %}
+    </article>
+    {% else %}
+    <p class="text-on-surface-variant">No answers yet — be the first to help.</p>
+    {% endfor %}
+  </section>
+
+  <!-- Answer form -->
+  {% if current_user.is_authenticated %}
+  <section class="bg-surface-container-lowest border border-outline-variant rounded-xl card-shadow p-md">
+    <h3 class="font-headline-md text-on-surface text-[18px] mb-sm">Your Answer</h3>
+    <form method="post" action="{{ url_for('qa.answer_question', question_id=question.id) }}" class="space-y-sm">
+      {{ form.hidden_tag() }}
+      {{ form.body(rows=4, class="w-full rounded-lg border border-outline-variant px-md py-sm font-body-md text-body-md") }}
+      {% for err in form.body.errors %}<p class="text-error text-xs mt-1">{{ err }}</p>{% endfor %}
+
+      <div class="flex items-center gap-sm">
+        {{ form.is_anonymous(class="rounded border-outline-variant") }}
+        {{ form.is_anonymous.label(class="font-label-md text-label-md text-on-surface-variant") }}
+      </div>
+
+      <button type="submit" class="bg-primary text-on-primary font-label-md text-label-md px-md py-sm rounded-lg hover:shadow-lg transition-all">
+        Post Answer
+      </button>
+    </form>
+  </section>
+  {% else %}
+  <p class="font-label-md text-label-md text-on-surface-variant">
+    <a href="{{ url_for('auth.login') }}" class="text-primary hover:underline">Log in</a> to post an answer.
+  </p>
+  {% endif %}
+
+</main>
+{% endblock %}

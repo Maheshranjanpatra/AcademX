@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}About{% endblock %}
+
+{% block content %}
+<section class="max-w-[900px] mx-auto px-margin-mobile md:px-margin-desktop py-xl space-y-xl">
+
+  <div class="text-center space-y-sm">
+    <h1 class="font-display text-headline-lg-mobile md:text-display text-on-surface">About Nymora</h1>
+    <p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto">
+      Nymora is a study space built for university students, starting with mathematics — a place to ask doubts without fear of judgment, and actually learn.
+    </p>
+  </div>
+
+  <!-- Highlights -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+    <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md card-shadow flex gap-sm hover:-translate-y-1 hover:shadow-md transition-all">
+      <span class="material-symbols-outlined text-primary text-[28px]">visibility_off</span>
+      <div>
+        <h3 class="font-headline-md text-[17px] text-on-surface">Genuine Anonymity</h3>
+        <p class="font-body-md text-body-md text-on-surface-variant mt-1">Ask your "basic" question without your name attached. No judgment, no hesitation.</p>
+      </div>
+    </div>
+    <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md card-shadow flex gap-sm hover:-translate-y-1 hover:shadow-md transition-all">
+      <span class="material-symbols-outlined text-primary text-[28px]">forum</span>
+      <div>
+        <h3 class="font-headline-md text-[17px] text-on-surface">Real Doubt-Solving</h3>
+        <p class="font-body-md text-body-md text-on-surface-variant mt-1">Peer-to-peer Q&A where any student can help, not just the "toppers."</p>
+      </div>
+    </div>
+    <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md card-shadow flex gap-sm hover:-translate-y-1 hover:shadow-md transition-all">
+      <span class="material-symbols-outlined text-primary text-[28px]">quiz</span>
+      <div>
+        <h3 class="font-headline-md text-[17px] text-on-surface">Quizzes That Test You</h3>
+        <p class="font-body-md text-body-md text-on-surface-variant mt-1">Topic-wise and exam-pattern quizzes, with explanations — not just a score.</p>
+      </div>
+    </div>
+    <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md card-shadow flex gap-sm hover:-translate-y-1 hover:shadow-md transition-all">
+      <span class="material-symbols-outlined text-primary text-[28px]">auto_stories</span>
+      <div>
+        <h3 class="font-headline-md text-[17px] text-on-surface">Study &amp; Exam Materials</h3>
+        <p class="font-body-md text-body-md text-on-surface-variant mt-1">Notes, syllabi, and previous year papers — verified before they go public.</p>
+      </div>
+    </div>
+    <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md card-shadow flex gap-sm hover:-translate-y-1 hover:shadow-md transition-all">
+      <span class="material-symbols-outlined text-primary text-[28px]">play_circle</span>
+      <div>
+        <h3 class="font-headline-md text-[17px] text-on-surface">Curated Yt Playlists — Ad‑Free </h3>
+        <p class="font-body-md text-body-md text-on-surface-variant mt-1">
+          Watch right on Nymora with <strong>zero ads</strong> and no distractions.
+          <strong>Track your progress</strong> video by video — and it's <strong>completely free</strong> for every student.
+        </p>
+      </div>
+    </div>
+    <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md card-shadow flex gap-sm hover:-translate-y-1 hover:shadow-md transition-all">
+      <span class="material-symbols-outlined text-primary text-[28px]">groups</span>
+      <div>
+        <h3 class="font-headline-md text-[17px] text-on-surface">Collaborative Learning</h3>
+        <p class="font-body-md text-body-md text-on-surface-variant mt-1">Engage with a community of curious minds — share insights, learn together, and grow collectively.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Meet the founder -->
+  <div class="bg-gradient-to-br from-primary-fixed/40 to-secondary-fixed/20 border border-outline-variant rounded-xl p-lg text-center space-y-sm">
+    <div class="w-20 h-20 rounded-full bg-primary mx-auto flex items-center justify-center text-on-primary font-display text-headline-md font-bold">M</div>
+    <h2 class="font-headline-md text-headline-md text-on-surface">Meet the Founder</h2>
+    <p class="font-body-md text-body-md text-on-surface-variant max-w-lg mx-auto">
+      Nymora is built and maintained by <a href="https://mahesh-portfolio-v1.netlify.app">Mahesh Ranjan Patra</a>, a Mathematics student at Pondicherry University. It started from a simple, familiar feeling — hesitating to ask a doubt out loud — and grew into a small effort to make that easier for other students too.
+    </p>
+    <a href="{{ url_for('pages.contact') }}" class="inline-flex items-center gap-xs bg-primary text-on-primary hover:bg-surface-tint transition-all rounded-lg px-md py-sm font-label-md text-label-md mt-sm">
+      <span class="material-symbols-outlined text-[18px]">mail</span> Get in Touch
+    </a>
+  </div>
+
+</section>
+{% endblock %}

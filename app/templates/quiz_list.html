@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Quizzes{% endblock %}
+
+{% block content %}
+<main class="max-w-[1280px] mx-auto w-full px-margin-mobile md:px-margin-desktop py-lg space-y-lg">
+
+  <!-- Header -->
+  <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-md">
+    <div>
+      <h1 class="font-display text-headline-lg-mobile md:text-headline-lg text-on-surface">Practice Quizzes</h1>
+      <p class="font-body-md text-body-md text-on-surface-variant mt-xs">
+        Test your understanding on subject topics or practice previous year questions.
+      </p>
+    </div>
+  </div>
+
+  <!-- Quiz Cards Grid -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-md">
+    {% for quiz in quizzes %}
+    <article class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md card-shadow card-hover-shadow transition-all duration-300 flex flex-col justify-between gap-md">
+      <div class="space-y-sm">
+        <div class="flex items-center justify-between gap-sm">
+          <span class="bg-primary-fixed text-on-primary-fixed font-label-md text-xs px-2.5 py-1 rounded-full font-semibold">
+            {{ quiz.subject or "General" }}
+          </span>
+          <span class="bg-surface-container text-on-surface-variant font-label-md text-xs px-2 py-0.5 rounded capitalize">
+            {{ quiz.quiz_type }}
+          </span>
+        </div>
+
+        <h2 class="font-headline-md text-headline-md text-on-surface font-semibold">
+          {{ quiz.title }}
+        </h2>
+
+        {% if quiz.description %}
+        <p class="font-body-md text-body-md text-on-surface-variant line-clamp-3">
+          {{ quiz.description }}
+        </p>
+        {% endif %}
+      </div>
+
+      <div class="pt-sm border-t border-surface-variant flex items-center justify-between">
+        <span class="font-label-md text-xs text-on-surface-variant flex items-center gap-1">
+          <span class="material-symbols-outlined text-[16px]">help_outline</span>
+          {{ quiz.questions.count() }} Questions
+        </span>
+
+        <a href="{{ url_for('quiz.attempt', quiz_id=quiz.id) }}"
+           class="bg-primary text-on-primary hover:bg-surface-tint transition-all rounded-lg px-md py-sm font-label-md text-label-md flex items-center gap-xs shadow-sm">
+          Start Quiz
+          <span class="material-symbols-outlined text-[18px]">play_arrow</span>
+        </a>
+      </div>
+    </article>
+    {% else %}
+    <div class="col-span-3 bg-surface-container-lowest border border-outline-variant rounded-xl p-xl text-center">
+      <p class="font-body-md text-on-surface-variant">No quizzes available right now. Check back soon!</p>
+    </div>
+    {% endfor %}
+  </div>
+
+</main>
+{% endblock %}

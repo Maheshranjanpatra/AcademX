@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Upload Question Paper{% endblock %}
+
+{% block content %}
+<main class="max-w-[640px] mx-auto w-full px-margin-mobile md:px-margin-desktop py-lg">
+
+  <h1 class="font-display text-headline-lg-mobile md:text-headline-lg text-on-surface mb-md">
+    Upload Previous Year Paper
+  </h1>
+
+  <form method="post" enctype="multipart/form-data" class="bg-surface-container-lowest border border-outline-variant rounded-xl card-shadow p-md space-y-md">
+    {{ form.hidden_tag() }}
+
+    <div>
+      {{ form.subject.label(class="font-label-md text-label-md text-on-surface-variant block mb-xs") }}
+      {{ form.subject(class="w-full rounded-lg border border-outline-variant px-md py-sm font-body-md text-body-md", placeholder="e.g. Mathematics II") }}
+      {% for err in form.subject.errors %}<p class="text-error text-xs mt-1">{{ err }}</p>{% endfor %}
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+      <div>
+        {{ form.exam_type.label(class="font-label-md text-label-md text-on-surface-variant block mb-xs") }}
+        {{ form.exam_type(class="w-full rounded-lg border border-outline-variant px-md py-sm font-body-md text-body-md bg-surface-container-lowest") }}
+        {% for err in form.exam_type.errors %}<p class="text-error text-xs mt-1">{{ err }}</p>{% endfor %}
+      </div>
+
+      <div>
+        {{ form.year.label(class="font-label-md text-label-md text-on-surface-variant block mb-xs") }}
+        {{ form.year(class="w-full rounded-lg border border-outline-variant px-md py-sm font-body-md text-body-md", placeholder="2023-24") }}
+        {% for err in form.year.errors %}<p class="text-error text-xs mt-1">{{ err }}</p>{% endfor %}
+      </div>
+    </div>
+
+    <div>
+      {{ form.file.label(class="font-label-md text-label-md text-on-surface-variant block mb-xs") }}
+      {{ form.file(class="w-full rounded-lg border border-outline-variant px-md py-sm font-body-md text-body-md bg-surface-container-low cursor-pointer") }}
+      <p class="font-label-md text-xs text-on-surface-variant mt-1">Accepted formats: PDF, JPG, PNG (Max 10MB)</p>
+      {% for err in form.file.errors %}<p class="text-error text-xs mt-1">{{ err }}</p>{% endfor %}
+    </div>
+
+    <button type="submit" class="bg-primary text-on-primary font-label-md text-label-md px-md py-sm rounded-lg hover:shadow-lg transition-all flex items-center gap-sm">
+      Upload Paper <span class="material-symbols-outlined">upload</span>
+    </button>
+  </form>
+</main>
+{% endblock %}

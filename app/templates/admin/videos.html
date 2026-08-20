@@ -1,0 +1,51 @@
+{% extends "admin/layout.html" %}
+
+{% block title %}Video Playlists - Nymora Admin{% endblock %}
+{% block page_title %}Video Playlists{% endblock %}
+
+{% block content %}
+<div class="admin-card">
+    <div class="table-header-actions">
+        <form method="GET" action="{{ url_for('admin.videos') }}" class="search-filter-group">
+            <input type="text" name="q" value="{{ request.args.get('q', '') }}" class="form-input" placeholder="Search playlists...">
+        </form>
+        <a href="{{ url_for('admin.create_playlist') }}" class="btn btn-primary">+ Create Playlist</a>
+    </div>
+
+    <div class="admin-table-container">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Playlist Title</th>
+                    <th>Subject</th>
+                    <th>Videos Count</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for playlist in playlists %}
+                <tr>
+                    <td><strong>{{ playlist.title }}</strong></td>
+                    <td>{{ playlist.subject }}</td>
+                    <td>{{ playlist.videos|length }}</td>
+                    <td>
+                        <div class="flex gap-2">
+                            <a href="{{ url_for('admin.import_playlist_videos', playlist_id=playlist.id) }}" class="action-btn" title="Import from YouTube">
+                                <span class="material-symbols-outlined">youtube_activity</span>
+                            </a>
+                            <a href="{{ url_for('admin.add_video', playlist_id=playlist.id) }}" class="action-btn success">+ Video</a>
+                            <a href="{{ url_for('admin.edit_playlist', playlist_id=playlist.id) }}" class="action-btn">Edit</a>
+                            <form action="{{ url_for('admin.delete_playlist', playlist_id=playlist.id) }}" method="POST">
+                                <button type="submit" class="action-btn danger" data-confirm="Delete playlist?">Delete</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="4" class="empty-state">No video playlists found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

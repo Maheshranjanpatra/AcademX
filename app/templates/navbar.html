@@ -1,0 +1,134 @@
+{% from 'macros.html' import user_avatar %}
+<header class="bg-on-primary-fixed border-b border-primary-fixed/10 shadow-sm w-full sticky top-0 z-50">
+  <div class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop flex justify-between items-center h-16 md:h-20">
+
+    <!-- Logo -->
+    <a href="{{ url_for('dashboard.home') if current_user.is_authenticated else url_for('auth.index') }}" class="flex items-center gap-3 group">
+      <img src="{{ url_for('static', filename='images/nymora.jpg') }}"
+           alt="Nymora"
+           class="h-10 w-10 md:h-12 md:w-12 rounded-[30%] object-cover transition-all duration-300 group-hover:scale-105 group-hover:shadow-lg border border-white/10" />
+      <span class="font-serif text-xl md:text-2xl font-black tracking-tight text-primary-fixed drop-shadow-sm group-hover:text-secondary-fixed transition-colors duration-300">
+        Nymora
+      </span>
+    </a>
+
+    <!-- Navigation (desktop) -->
+    <nav class="hidden md:flex gap-4 items-center">
+      {% if current_user.is_authenticated %}
+        <a class="nav-link {{ 'nav-link-active' if request.endpoint == 'dashboard.home' else '' }}" href="{{ url_for('dashboard.home') }}">
+          <span class="material-symbols-outlined text-[18px]">dashboard</span> Dashboard
+        </a>
+      {% else %}
+        <a class="nav-link {{ 'nav-link-active' if request.endpoint == 'auth.index' else '' }}" href="{{ url_for('auth.index') }}">
+          <span class="material-symbols-outlined text-[18px]">home</span> Home
+        </a>
+      {% endif %}
+
+      <a class="nav-link {{ 'nav-link-active' if request.blueprint == 'qa' else '' }}" href="{{ url_for('qa.list_questions') }}">
+        <span class="material-symbols-outlined text-[18px]">forum</span> Q&amp;A
+      </a>
+      <a class="nav-link {{ 'nav-link-active' if request.blueprint == 'video' else '' }}" href="{{ url_for('video.playlists') }}">
+        <span class="material-symbols-outlined text-[18px]">play_circle</span> Playlists
+      </a>
+      <a class="nav-link {{ 'nav-link-active' if request.blueprint == 'quiz' else '' }}" href="{{ url_for('quiz.list_quizzes') }}">
+        <span class="material-symbols-outlined text-[18px]">quiz</span> Quizzes
+      </a>
+      <a class="nav-link {{ 'nav-link-active' if request.blueprint == 'materials' else '' }}" href="{{ url_for('materials.list_materials') }}">
+        <span class="material-symbols-outlined text-[18px]">auto_stories</span> Study Materials
+      </a>
+      <a class="nav-link {{ 'nav-link-active' if request.endpoint == 'materials.my_uploads' else '' }}" href="{{ url_for('materials.my_uploads') }}">
+        <span class="material-symbols-outlined text-[18px]">upload_file</span> My Uploads
+      </a>
+    </nav>
+
+    <!-- Right actions -->
+    <div class="flex items-center gap-2 md:gap-2.5">
+        <!-- Mobile menu -->
+        <button id="mobile-menu-toggle" class="md:hidden text-primary-fixed-dim hover:text-secondary-fixed transition-colors p-1">
+          <span class="material-symbols-outlined text-[28px]">menu</span>
+        </button>
+
+        <!-- Admin button -->
+        {% if not current_user.is_authenticated %}
+        <a href="{{ url_for('auth.admin_login') }}"
+           class="hidden md:flex items-center gap-1.5 border border-primary-fixed-dim/50 hover:bg-primary-fixed/10 text-primary-fixed-dim hover:text-secondary-fixed transition-all rounded-[8px] px-3 py-1.5 font-label-md text-label-md font-medium">
+            <span class="material-symbols-outlined text-[18px]">admin_panel_settings</span>
+            Admin
+        </a>
+        {% endif %}
+
+        {% if current_user.is_authenticated %}
+            <div class="flex items-center gap-1.5">
+                {{ user_avatar(current_user, 'w-7 h-7 md:w-8 md:h-8') }}
+                <a href="{{ url_for('dashboard.home') }}" class="hidden md:block text-primary-fixed-dim hover:text-secondary-fixed transition-colors font-label-md text-label-md">
+                    {{ current_user.name.split(' ')[0] }}
+                </a>
+            </div>
+            <!-- Logout button -->
+            <a href="{{ url_for('auth.logout') }}" class="bg-primary-fixed/10 hover:bg-primary-fixed/20 transition-all rounded-[8px] px-3 py-1.5 font-label-md text-label-md text-primary-fixed flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-[18px]">logout</span>
+                <span class="hidden sm:inline">Logout</span>
+            </a>
+        {% else %}
+            <!-- Login button -->
+            <a href="{{ url_for('auth.login') }}" class="bg-primary text-on-primary hover:bg-surface-tint hover:shadow-md hover:-translate-y-0.5 transition-all rounded-[8px] px-4 py-1.5 font-label-md text-label-md shadow-sm flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-[18px]">login</span>
+                <span>Login</span>
+            </a>
+        {% endif %}
+    </div>
+  </div>
+
+  <!-- Mobile Navigation -->
+  <div id="mobile-nav" class="md:hidden bg-on-primary-fixed/95 backdrop-blur-sm border-t border-primary-fixed/10 px-4 py-3 hidden">
+    <div class="flex flex-col gap-3">
+      {% if current_user.is_authenticated %}
+        <a class="nav-link" href="{{ url_for('dashboard.home') }}">
+          <span class="material-symbols-outlined text-[20px]">dashboard</span> Dashboard
+        </a>
+      {% else %}
+        <a class="nav-link" href="{{ url_for('auth.index') }}">
+          <span class="material-symbols-outlined text-[20px]">home</span> Home
+        </a>
+      {% endif %}
+
+      <a class="nav-link" href="{{ url_for('qa.list_questions') }}">
+        <span class="material-symbols-outlined text-[20px]">forum</span> Q&amp;A
+      </a>
+      <a class="nav-link" href="{{ url_for('video.playlists') }}">
+        <span class="material-symbols-outlined text-[20px]">play_circle</span> Playlists
+      </a>
+      <a class="nav-link" href="{{ url_for('quiz.list_quizzes') }}">
+        <span class="material-symbols-outlined text-[20px]">quiz</span> Quizzes
+      </a>
+      <a class="nav-link" href="{{ url_for('materials.list_materials') }}">
+        <span class="material-symbols-outlined text-[20px]">auto_stories</span> Study Materials
+      </a>
+      <a class="nav-link" href="{{ url_for('materials.my_uploads') }}">
+        <span class="material-symbols-outlined text-[20px]">upload_file</span> My Uploads
+      </a>
+
+      {% if current_user.is_authenticated %}
+        <a class="nav-link" href="{{ url_for('auth.logout') }}">
+          <span class="material-symbols-outlined text-[20px]">logout</span> Logout
+        </a>
+      {% else %}
+        <a class="nav-link" href="{{ url_for('auth.admin_login') }}">
+          <span class="material-symbols-outlined text-[20px]">admin_panel_settings</span> Admin
+        </a>
+      {% endif %}
+    </div>
+  </div>
+</header>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const toggleBtn = document.getElementById('mobile-menu-toggle');
+    const mobileNav = document.getElementById('mobile-nav');
+    if (toggleBtn && mobileNav) {
+      toggleBtn.addEventListener('click', function() {
+        mobileNav.classList.toggle('hidden');
+      });
+    }
+  });
+</script>
