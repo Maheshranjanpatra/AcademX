@@ -16,3 +16,7 @@ def contact():
 @pages_bp.route("/policy")
 def policy():
     return render_template("policy.html")
+
+@pages_bp.route("/offline")
+def offline():
+    return render_template("offline.html")
