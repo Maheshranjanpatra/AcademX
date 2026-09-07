@@ -108,9 +108,9 @@ def callback():
     email = user_info["email"]
 
     # @pondiuni.ac.in
-    if not email.endswith('@pondiuni.ac.in'):
-        flash("Only @pondiuni.ac.in email addresses are allowed to sign in.", "error")
-        return redirect(url_for("auth.login"))
+    # if not email.endswith('@pondiuni.ac.in'):
+    #     flash("Only @pondiuni.ac.in email addresses are allowed to sign in.", "error")
+    #     return redirect(url_for("auth.login"))
 
     google_sub = user_info["sub"]
     name = user_info["name"]
