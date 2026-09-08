@@ -305,16 +305,15 @@
     // Register Service Worker
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('/static/sw.js')
-            .then(reg => console.log('SW registered:', reg))
-            .catch(err => console.log('SW registration failed:', err));
+            .then(reg => console.log('✅ SW registered:', reg))
+            .catch(err => console.log('❌ SW registration failed:', err));
     }
 
-    // Show PWA install prompt (browser native)
+    // Show PWA install prompt
     let deferredPrompt;
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         deferredPrompt = e;
-        // Show install button (optional)
         const installBtn = document.getElementById('install-btn');
         if (installBtn) {
             installBtn.style.display = 'flex';
@@ -322,9 +321,9 @@
                 deferredPrompt.prompt();
                 deferredPrompt.userChoice.then((choiceResult) => {
                     if (choiceResult.outcome === 'accepted') {
-                        console.log('User installed PWA');
+                        console.log('✅ User installed PWA');
                     } else {
-                        console.log('User dismissed install');
+                        console.log('❌ User dismissed install');
                     }
                     deferredPrompt = null;
                     installBtn.style.display = 'none';
