@@ -32,7 +32,7 @@
       </select>
 
       {% if request.args.get('q') or request.args.get('category') %}
-      <a href="{{ url_for('materials.list_materials') }}" class="text-error font-label-md text-xs hover:underline flex-shrink-0">
+      <a href="{{ material.file_path }}" target="_blank">
         Clear
       </a>
       {% endif %}
