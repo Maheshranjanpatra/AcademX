@@ -76,15 +76,16 @@
                 <span>Login</span>
             </a>
         {% endif %}
+
+        <!-- ✅ Install Button (PWA) -->
+        <button id="install-btn" 
+                class="hidden md:flex items-center gap-1.5 border border-primary-fixed-dim/50 hover:bg-primary-fixed/10 text-primary-fixed-dim hover:text-secondary-fixed transition-all rounded-[8px] px-3 py-1.5 font-label-md text-label-md font-medium"
+                style="display:none;">
+            <span class="material-symbols-outlined text-[18px]">download</span>
+            Install
+        </button>
     </div>
   </div>
-  <!-- Install button PWA -->
-  <button id="install-btn" 
-        class="hidden md:flex items-center gap-1.5 border border-primary-fixed-dim/50 hover:bg-primary-fixed/10 text-primary-fixed-dim hover:text-secondary-fixed transition-all rounded-[8px] px-3 py-1.5 font-label-md text-label-md font-medium"
-        style="display:none;">
-      <span class="material-symbols-outlined text-[18px]">download</span>
-    Install
-  </button>
 
   <!-- Mobile Navigation -->
   <div id="mobile-nav" class="md:hidden bg-on-primary-fixed/95 backdrop-blur-sm border-t border-primary-fixed/10 px-4 py-3 hidden">
@@ -130,6 +131,7 @@
 
 <script>
   document.addEventListener('DOMContentLoaded', function() {
+    // Mobile menu toggle
     const toggleBtn = document.getElementById('mobile-menu-toggle');
     const mobileNav = document.getElementById('mobile-nav');
     if (toggleBtn && mobileNav) {
@@ -137,5 +139,34 @@
         mobileNav.classList.toggle('hidden');
       });
     }
+
+    // PWA Install Button
+    let deferredPrompt;
+    const installBtn = document.getElementById('install-btn');
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      if (installBtn) {
+        installBtn.style.display = 'flex';
+        installBtn.addEventListener('click', () => {
+          deferredPrompt.prompt();
+          deferredPrompt.userChoice.then((choiceResult) => {
+            if (choiceResult.outcome === 'accepted') {
+              console.log('✅ User installed PWA');
+            } else {
+              console.log('❌ User dismissed install');
+            }
+            deferredPrompt = null;
+            installBtn.style.display = 'none';
+          });
+        });
+      }
+    });
+
+    window.addEventListener('appinstalled', () => {
+      console.log('✅ PWA installed successfully');
+      if (installBtn) installBtn.style.display = 'none';
+    });
   });
 </script>
