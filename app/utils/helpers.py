@@ -5,14 +5,13 @@ from flask import current_app
 from werkzeug.utils import secure_filename
 from app.utils.validators import YOUTUBE_ID_RE
 
-cloudinary.config(
-    cloud_name=os.environ.get('CLOUDINARY_CLOUD_NAME'),
-    api_key=os.environ.get('CLOUDINARY_API_KEY'),
-    api_secret=os.environ.get('CLOUDINARY_API_SECRET')
-)
-
 def save_file(file_storage, subfolder):
-    """Upload to Cloudinary instead of local storage."""
+    """Upload file to Cloudinary and return the secure URL."""
+    cloudinary.config(
+        cloud_name=current_app.config['CLOUDINARY_CLOUD_NAME'],
+        api_key=current_app.config['CLOUDINARY_API_KEY'],
+        api_secret=current_app.config['CLOUDINARY_API_SECRET']
+    )
     result = cloudinary.uploader.upload(file_storage, folder=f"nymora/{subfolder}")
     return result['secure_url'] 
 
@@ -22,20 +21,6 @@ def extract_youtube_id(value):
         return None
     match = YOUTUBE_ID_RE.search(value)
     return match.group(1) if match else None
-
-
-def save_file(file_storage, subfolder):
-    """Saves an uploaded file under static/uploads/<subfolder>/ with a safe
-    filename. Returns a path RELATIVE to the static folder (e.g.
-    'uploads/papers/foo.pdf') — pass this straight into
-    url_for('static', filename=...) or store it in the DB as-is."""
-    filename = secure_filename(file_storage.filename)
-    relative_path = os.path.join("uploads", subfolder, filename)
-    absolute_dir = os.path.join(current_app.static_folder, "uploads", subfolder)
-    os.makedirs(absolute_dir, exist_ok=True)
-    file_storage.save(os.path.join(absolute_dir, filename))
-    return relative_path
-
 
 def get_streak_animation(streak):
     """Maps a Streak object's state to the dashboard animation filename.
