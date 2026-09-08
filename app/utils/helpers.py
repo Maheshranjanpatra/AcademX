@@ -1,8 +1,20 @@
 import os
+import cloudinary
+import cloudinary.uploader
 from flask import current_app
 from werkzeug.utils import secure_filename
 from app.utils.validators import YOUTUBE_ID_RE
 
+cloudinary.config(
+    cloud_name=os.environ.get('CLOUDINARY_CLOUD_NAME'),
+    api_key=os.environ.get('CLOUDINARY_API_KEY'),
+    api_secret=os.environ.get('CLOUDINARY_API_SECRET')
+)
+
+def save_file(file_storage, subfolder):
+    """Upload to Cloudinary instead of local storage."""
+    result = cloudinary.uploader.upload(file_storage, folder=f"nymora/{subfolder}")
+    return result['secure_url'] 
 
 def extract_youtube_id(value):
     """Extracts an 11-char YouTube ID from a raw ID or full URL. Returns None if not found."""
@@ -89,3 +101,4 @@ def get_animation_copy(stage, done=None, total=None):
     if done is not None and total is not None and stage in ("lay_egg", "egg_crack_01", "egg_crack_02", "egg_hatch"):
         message += f" ({done}/{total} videos watched)"
     return title, message
+
