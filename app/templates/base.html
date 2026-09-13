@@ -1,10 +1,16 @@
 <!DOCTYPE html>
 <html class="light" lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>{% block title %}Nymora{% endblock %} - Ask doubts anonymously. Learn effectively.</title>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>{% block title %}Nymora{% endblock %} - Ask doubts anonymously. Learn effectively.</title>
 
+  <!-- PWA MANIFEST — MUST BE HERE -->
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <meta name="theme-color" content="#0058be">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/icon-192.png') }}">
 <!-- Favicon -->
 <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.png') }}">
 
@@ -295,12 +301,6 @@
 {% endif %}
 
   <!-- PWA Manifest & Service Worker -->
-<link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
-<meta name="theme-color" content="#0058be">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="apple-touch-icon" href="{{ url_for('static', filename='images/nymora.jpg') }}">
-
 <script>
     // Register Service Worker
     if ('serviceWorker' in navigator) {
