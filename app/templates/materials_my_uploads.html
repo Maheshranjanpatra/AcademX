@@ -27,15 +27,17 @@
       <p class="font-body-md text-body-md text-on-surface-variant">{{ material.category or "Document" }}</p>
       <p class="font-body-md text-xs text-on-surface-variant">Uploaded: {{ material.uploaded_at.strftime('%b %d, %Y') }}</p>
       {% if material.status == 'approved' %}
-        <a href="{{ url_for('static', filename='uploads/materials/' + material.file_path.split('/')[-1]) if material.file_path else material.file_url }}" target="_blank" class="text-primary hover:underline">View Material</a>
+        <a href="{{ material.file_path if material.file_path else material.file_url }}" target="_blank" class="text-primary hover:underline">View Material</a>
       {% elif material.status == 'rejected' %}
         <p class="text-error text-sm">Rejected. Please contact admin for details.</p>
       {% else %}
-        <p class="text-on-surface-variant text-sm">
-            <svg class="w-4 h-4 inline-block mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <p class="text-on-surface-variant text-sm flex items-center gap-1">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="10"/>
             <polyline points="12 6 12 12 16 14"/>
-        </svg> Awaiting admin review…</p>
+          </svg>
+          Awaiting admin review…
+        </p>
       {% endif %}
     </div>
     {% else %}
