@@ -12,6 +12,10 @@
         Access lecture notes, syllabus guides, reference PDFs, and course materials.
       </p>
     </div>
+    <a href="{{ url_for('materials.upload_material') }}" class="bg-primary text-on-primary px-md py-sm rounded-lg shadow-sm transition-all flex items-center gap-xs self-start md:self-auto">
+      <span class="material-symbols-outlined text-[20px]">upload_file</span>
+      Upload Material
+    </a>
   </div>
 
   <!-- Search & Filter Controls -->
@@ -32,16 +36,13 @@
       </select>
 
       {% if request.args.get('q') or request.args.get('category') %}
-      <a href="{{ material.file_path }}" target="_blank" class="text-error font-label-md text-xs hover:underline flex-shrink-0">
+      <a href="{{ url_for('materials.list_materials') }}" class="text-error font-label-md text-xs hover:underline flex-shrink-0">
         Clear
       </a>
       {% endif %}
     </div>
   </form>
-  <div class="flex justify-between items-center">
-      <h1>Study Materials & Handouts</h1>
-      <a href="{{ url_for('materials.upload_material') }}" class="bg-primary text-on-primary px-md py-sm rounded-lg">Upload Material</a>
-  </div>
+
   <!-- Materials Grid -->
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-md">
     {% for material in materials %}
@@ -67,17 +68,17 @@
         {% endif %}
 
         <div class="font-body-md text-xs text-on-surface-variant flex items-center gap-md pt-xs">
-          {% if material.created_at %}
+          {% if material.uploaded_at %}
           <span class="flex items-center gap-1">
             <span class="material-symbols-outlined text-[16px]">schedule</span>
-            {{ material.created_at.strftime('%b %d, %Y') }}
+            {{ material.uploaded_at.strftime('%b %d, %Y') }}
           </span>
           {% endif %}
         </div>
       </div>
 
       <div class="pt-sm border-t border-surface-variant flex items-center justify-between">
-        {% set file_target = material.file_url if material.file_url else url_for('static', filename=material.file_path) if material.file_path else '#' %}
+        {% set file_target = material.file_url if material.file_url else material.file_path if material.file_path else '#' %}
         <a href="{{ file_target }}" target="_blank" rel="noopener noreferrer"
            class="w-full bg-surface-container-high text-primary hover:bg-primary hover:text-on-primary transition-all rounded-lg px-md py-sm font-label-md text-label-md flex items-center justify-center gap-xs shadow-sm">
           <span class="material-symbols-outlined text-[18px]">menu_book</span>
