@@ -27,7 +27,7 @@ A free, anonymous study platform for university students. Built with Flask.
 
 ## Local Setup
 
-\`\`\`bash
+\`\`\` bash
 git clone https://github.com/Maheshranjanpatra/Nymora.git
 cd Nymora
 python -m venv venv
