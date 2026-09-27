@@ -6,14 +6,20 @@ from werkzeug.utils import secure_filename
 from app.utils.validators import YOUTUBE_ID_RE
 
 def save_file(file_storage, subfolder):
-    """Upload file to Cloudinary and return the secure URL."""
+    """Uploads a file to Cloudinary and returns the secure public URL.
+    This ensures files persist across Render redeploys (which wipe local disk)."""
     cloudinary.config(
         cloud_name=current_app.config['CLOUDINARY_CLOUD_NAME'],
         api_key=current_app.config['CLOUDINARY_API_KEY'],
         api_secret=current_app.config['CLOUDINARY_API_SECRET']
     )
-    result = cloudinary.uploader.upload(file_storage, folder=f"nymora/{subfolder}")
-    return result['secure_url'] 
+    result = cloudinary.uploader.upload(
+        file_storage,
+        folder=f"nymora/{subfolder}",
+        quality="auto:good",
+        fetch_format="auto",
+    )
+    return result['secure_url']
 
 def extract_youtube_id(value):
     """Extracts an 11-char YouTube ID from a raw ID or full URL. Returns None if not found."""
