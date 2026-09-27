@@ -28,14 +28,14 @@ A free, anonymous study platform for university students. Built with Flask.
 ## Local Setup
 
 \`\`\`bash
-- git clone https://github.com/Maheshranjanpatra/Nymora.git
-- cd Nymora
-- python -m venv venv
-- source venv/bin/activate
-- pip install -r requirements.txt
-- cp .env.example .env  # Add your credentials
-- flask db upgrade
-- python run.py
+git clone https://github.com/Maheshranjanpatra/Nymora.git
+cd Nymora
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+cp .env.example .env  # Add your credentials
+flask db upgrade
+python run.py
 \`\`\`
 
 ## Environment Variables
@@ -58,6 +58,4 @@ YOUTUBE_API_KEY=  # Optional
 **Mahesh Ranjan Patra** — Mathematics student, Pondicherry University
 [Portfolio](https://mahesh-portfolio-v1.netlify.app)
 
-## License
 
-MIT
