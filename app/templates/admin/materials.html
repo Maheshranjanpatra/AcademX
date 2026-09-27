@@ -4,7 +4,6 @@
 {% block page_title %}Study Materials Moderation{% endblock %}
 
 {% block content %}
-<!-- Status Tabs -->
 <div class="tabs-container">
     <a href="{{ url_for('admin.materials', status='pending') }}" class="tab-btn {% if status_filter == 'pending' %}active{% endif %}">Pending ({{ pending_count }})</a>
     <a href="{{ url_for('admin.materials', status='approved') }}" class="tab-btn {% if status_filter == 'approved' %}active{% endif %}">Approved ({{ approved_count }})</a>
@@ -48,8 +47,8 @@
                     <td>{{ item.uploader.name if item.uploader else 'Unknown' }}</td>
                     <td>
                         {% if item.file_path %}
-                            <a href="{{ url_for('static', filename=item.file_path) }}" target="_blank" class="text-primary hover:underline">
-                                {{ item.file_path.split('/')[-1] }}
+                            <a href="{{ item.file_path }}" target="_blank" class="text-primary hover:underline">
+                                View File
                             </a>
                         {% elif item.file_url %}
                             <a href="{{ item.file_url }}" target="_blank" class="text-primary hover:underline">
