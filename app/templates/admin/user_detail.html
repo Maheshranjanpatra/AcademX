@@ -13,16 +13,19 @@
         </div>
         <div class="flex gap-2" style="flex-wrap:wrap;">
             <form action="{{ url_for('admin.toggle_admin', user_id=user.id) }}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <button type="submit" class="btn btn-secondary">
                     {{ 'Demote to User' if user.is_admin else 'Promote to Admin' }}
                 </button>
             </form>
             <form action="{{ url_for('admin.toggle_user_status', user_id=user.id) }}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <button type="submit" class="btn btn-secondary">
                     {{ 'Disable Account' if user.profile_complete else 'Enable Account' }}
                 </button>
             </form>
             <form action="{{ url_for('admin.delete_user', user_id=user.id) }}" method="POST" onsubmit="return confirm('Permanently delete user account?');">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <button type="submit" class="btn btn-danger">Delete User</button>
             </form>
         </div>
