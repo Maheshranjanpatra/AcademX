@@ -19,71 +19,76 @@
 </form>
 
 <form method="POST" action="{{ url_for('admin.batch_paper_action') }}">
-<div class="admin-table-container dashboard-card mt-4">
-    <div class="table-header-actions">
-        {% if tab == 'pending' %}
-        <button type="submit" name="action" value="approve" class="btn btn-primary" onclick="return confirm('Approve selected papers?');">
-            <span class="material-symbols-outlined">done_all</span> Batch Approve
-        </button>
-        <button type="submit" name="action" value="reject" class="btn btn-danger" onclick="return confirm('Reject selected papers?');">
-            <span class="material-symbols-outlined">delete_sweep</span> Batch Reject
-        </button>
-        {% endif %}
-        <button type="submit" name="action" value="delete" class="btn btn-danger" onclick="return confirm('Permanently delete selected papers?');">
-            <span class="material-symbols-outlined">delete_forever</span> Batch Delete
-        </button>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="admin-table-container dashboard-card mt-4">
+        <div class="table-header-actions">
+            {% if tab == 'pending' %}
+            <button type="submit" name="action" value="approve" class="btn btn-primary" onclick="return confirm('Approve selected papers?');">
+                <span class="material-symbols-outlined">done_all</span> Batch Approve
+            </button>
+            <button type="submit" name="action" value="reject" class="btn btn-danger" onclick="return confirm('Reject selected papers?');">
+                <span class="material-symbols-outlined">delete_sweep</span> Batch Reject
+            </button>
+            {% endif %}
+            <button type="submit" name="action" value="delete" class="btn btn-danger" onclick="return confirm('Permanently delete selected papers?');">
+                <span class="material-symbols-outlined">delete_forever</span> Batch Delete
+            </button>
+        </div>
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th><input type="checkbox" onclick="document.querySelectorAll('.paper-checkbox').forEach(cb => cb.checked = this.checked)"></th>
+                    <th>Subject</th>
+                    <th>Year</th>
+                    <th>Uploader</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for paper in papers %}
+                <tr>
+                    <td><input type="checkbox" name="paper_ids" value="{{ paper.id }}" class="paper-checkbox"></td>
+                    <td><strong>{{ paper.subject }}</strong></td>
+                    <td>{{ paper.year or '—' }}</td>
+                    <td>{{ paper.uploader.name if paper.uploader else 'Unknown' }}</td>
+                    <td>{{ paper.uploaded_at.strftime('%b %d, %Y') if paper.uploaded_at else '—' }}</td>
+                    <td>
+                        {% if paper.status == 'pending' %}
+                        <button type="button" class="action-btn success" title="Approve"
+                            onclick="document.getElementById('approve-{{ paper.id }}').submit();">
+                            <span class="material-symbols-outlined">check</span>
+                        </button>
+                        <button type="button" class="action-btn danger" title="Reject"
+                            onclick="document.getElementById('reject-{{ paper.id }}').submit();">
+                            <span class="material-symbols-outlined">close</span>
+                        </button>
+                        {% endif %}
+                        {% if paper.file_path %}
+                        <a href="{{ paper.file_path }}" target="_blank" class="action-btn" title="View PDF">
+                            <span class="material-symbols-outlined">picture_as_pdf</span>
+                        </a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" style="text-align:center; padding:2rem;">No papers found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
-    <table class="admin-table">
-        <thead>
-            <tr>
-                <th><input type="checkbox" onclick="document.querySelectorAll('.paper-checkbox').forEach(cb => cb.checked = this.checked)"></th>
-                <th>Subject</th>
-                <th>Year</th>
-                <th>Uploader</th>
-                <th>Date</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for paper in papers %}
-            <tr>
-                <td><input type="checkbox" name="paper_ids" value="{{ paper.id }}" class="paper-checkbox"></td>
-                <td><strong>{{ paper.subject }}</strong></td>
-                <td>{{ paper.year or '—' }}</td>
-                <td>{{ paper.uploader.name if paper.uploader else 'Unknown' }}</td>
-                <td>{{ paper.uploaded_at.strftime('%b %d, %Y') if paper.uploaded_at else '—' }}</td>
-                <td>
-                    {% if paper.status == 'pending' %}
-                    <button type="button" class="action-btn success" title="Approve"
-                        onclick="document.getElementById('approve-{{ paper.id }}').submit();">
-                        <span class="material-symbols-outlined">check</span>
-                    </button>
-                    <button type="button" class="action-btn danger" title="Reject"
-                        onclick="document.getElementById('reject-{{ paper.id }}').submit();">
-                        <span class="material-symbols-outlined">close</span>
-                    </button>
-                    {% endif %}
-                    {% if paper.file_path %}
-                    <a href="{{ url_for('static', filename='uploads/papers/' + paper.file_path.split('/')[-1]) }}" target="_blank" class="action-btn" title="View PDF">
-                        <span class="material-symbols-outlined">picture_as_pdf</span>
-                    </a>
-                    {% endif %}
-                </td>
-            </tr>
-            {% else %}
-            <tr>
-                <td colspan="6" style="text-align:center; padding:2rem;">No papers found.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
 </form>
 
 {% for paper in papers %}
 {% if paper.status == 'pending' %}
-<form id="approve-{{ paper.id }}" action="{{ url_for('admin.approve_paper', paper_id=paper.id) }}" method="POST" style="display:none;"></form>
-<form id="reject-{{ paper.id }}" action="{{ url_for('admin.reject_paper', paper_id=paper.id) }}" method="POST" style="display:none;"></form>
+<form id="approve-{{ paper.id }}" action="{{ url_for('admin.approve_paper', paper_id=paper.id) }}" method="POST" style="display:none;">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+</form>
+<form id="reject-{{ paper.id }}" action="{{ url_for('admin.reject_paper', paper_id=paper.id) }}" method="POST" style="display:none;">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+</form>
 {% endif %}
 {% endfor %}
 {% endblock %}
