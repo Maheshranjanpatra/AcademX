@@ -14,8 +14,9 @@ def save_file(file_storage, subfolder):
     result = cloudinary.uploader.upload(
         file_storage,
         folder=f"nymora/{subfolder}",
-        quality="auto:good",
-        fetch_format="auto",
+        quality="auto:good",    
+        fetch_format="auto",    
+        flags="lossy", 
     )
     return result['secure_url']
 
