@@ -32,7 +32,6 @@
                     <td>{{ quiz.subject }}</td>
                     <td>{{ quiz.questions.count() }}</td>
                     <td>
-                    <td>
                         <div class="flex gap-2">
                             <a href="{{ url_for('admin.view_quiz_questions', quiz_id=quiz.id) }}" class="action-btn" title="View Questions">
                                 <span class="material-symbols-outlined">visibility</span>
@@ -40,6 +39,7 @@
                             <a href="{{ url_for('admin.add_quiz_question', quiz_id=quiz.id) }}" class="action-btn success">+ Question</a>
                             <a href="{{ url_for('admin.edit_quiz', quiz_id=quiz.id) }}" class="action-btn">Edit</a>
                             <form action="{{ url_for('admin.delete_quiz', quiz_id=quiz.id) }}" method="POST">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                 <button type="submit" class="action-btn danger" data-confirm="Delete quiz and all its questions?">Delete</button>
                             </form>
                         </div>
