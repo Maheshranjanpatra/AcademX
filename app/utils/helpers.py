@@ -1,8 +1,6 @@
-import os
 import cloudinary
 import cloudinary.uploader
 from flask import current_app
-from werkzeug.utils import secure_filename
 from app.utils.validators import YOUTUBE_ID_RE
 
 def save_file(file_storage, subfolder):
