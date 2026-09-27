@@ -36,8 +36,8 @@
                             <a href="{{ url_for('admin.add_video', playlist_id=playlist.id) }}" class="action-btn success">+ Video</a>
                             <a href="{{ url_for('admin.edit_playlist', playlist_id=playlist.id) }}" class="action-btn">Edit</a>
                             <form action="{{ url_for('admin.delete_playlist', playlist_id=playlist.id) }}" method="POST">
-                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                 <button type="submit" class="action-btn danger" data-confirm="Delete playlist?">Delete</button>
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="action-btn danger" data-confirm="Delete playlist?">Delete</button>
                             </form>
                         </div>
                     </td>
