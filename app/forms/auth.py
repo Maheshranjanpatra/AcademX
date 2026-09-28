@@ -17,7 +17,7 @@ VALID_DEPARTMENTS = {
     'BIO': 'Biology',
     'ECO': 'Economics',
     'ENG': 'English',
-
+    'STA': 'Statistics',
 }
 """
 VALID_DEGREES = {
