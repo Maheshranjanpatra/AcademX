@@ -25,7 +25,7 @@ class Config:
 
     # Uploads
     UPLOAD_FOLDER = os.path.join(os.getcwd(), "app", "static", "uploads")
-    MAX_CONTENT_LENGTH = 26 * 1024 * 1024 #26 MB
+    MAX_CONTENT_LENGTH = 10 * 1024 * 1024 #26 MB
 
     # YouTube API
     YOUTUBE_API_KEY = os.environ.get("YOUTUBE_API_KEY")
