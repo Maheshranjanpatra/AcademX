@@ -21,7 +21,7 @@ class MaterialUploadForm(FlaskForm):
         validators=[DataRequired(), Length(max=150)]
     )
     subject = StringField(
-        "Subject / Course Code",
+        "Course Code",
         validators=[DataRequired(), Length(max=80)]
     )
     category = SelectField(
@@ -30,7 +30,8 @@ class MaterialUploadForm(FlaskForm):
             ("Notes", "Lecture Notes"),
             ("Syllabus", "Syllabus"),
             ("Lab Manual", "Lab Manual"),
-            ("Handout", "Handout / Reference"),
+            ("Reference", "Reference"),
+            ("Textbook","Textbook"),
             ("Other", "Other")
         ],
         validators=[DataRequired()]
