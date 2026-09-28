@@ -11,8 +11,8 @@ def validate_file_size(form, field):
         file.seek(0, 2)
         size = file.tell()
         file.seek(0)
-        if size > 26 * 1024 * 1024:
-            raise ValidationError("File size must be less than 26MB.")
+        if size > 10 * 1024 * 1024:
+            raise ValidationError("File size must be less than 10MB.")
 
 
 class MaterialUploadForm(FlaskForm):
