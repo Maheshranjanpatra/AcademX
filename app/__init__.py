@@ -48,6 +48,9 @@ def create_app(config_class=Config):
     app.register_blueprint(admin_bp, url_prefix="/admin")
     app.register_blueprint(dashboard_bp, url_prefix="/dashboard")
 
+    from app.utils.helpers import get_file_url
+    app.jinja_env.filters["file_url"] = get_file_url
+    
     # GLOBAL BEFORE_REQUEST
     @app.before_request
     def enforce_profile_completion():
