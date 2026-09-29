@@ -92,6 +92,12 @@ def create_app(config_class=Config):
         return {"streak_warning": False}
 
     return app
+
+    @app.context_processor
+    def inject_upload_limit():
+        return {
+            "MAX_UPLOAD_MB": current_app.config["MAX_CONTENT_LENGTH"] // (1024 * 1024)
+    }
     
     # ERROR HANDLERS
     @app.errorhandler(500)
