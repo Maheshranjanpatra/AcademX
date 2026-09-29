@@ -96,8 +96,8 @@ def create_app(config_class=Config):
     @app.context_processor
     def inject_upload_limit():
         return {
-            "MAX_UPLOAD_MB": current_app.config["MAX_CONTENT_LENGTH"] // (1024 * 1024)
-    }
+            "MAX_UPLOAD_MB": app.config["MAX_CONTENT_LENGTH"] // (1024 * 1024)
+        }
     
     # ERROR HANDLERS
     @app.errorhandler(500)
