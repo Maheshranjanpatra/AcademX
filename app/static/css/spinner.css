@@ -1,64 +1,77 @@
- /* NYMORA SPINNER — ANONYMOUS SCHOLAR */
+/* ==========================================================================
+   NYMORA OVERLAY — Data Burst Spinner + Animated Phrase + Gilded Bar
+   ========================================================================== */
 
-.nymora-spinner {
-    display: inline-block;
-    width: 64px;
-    height: 64px;
-    color: #0058be;
-    animation: nymora-breathe 3.2s ease-in-out infinite;
-    will-change: transform;
+:root {
+    --n-burst-teal:      #006b5f;
+    --n-burst-teal-soft: #3d9a8c;
+    --n-burst-navy:      #0058be;
+    --n-burst-navy-soft: #6a9ee6;
+    --n-burst-amber:     #ffb95f;
+    --n-burst-amber-deep:#d68a2a;
+
+    --n-parchment-1: #f7f3ee;
+    --n-parchment-2: #e8e2d9;
+    --n-warm-border: #d4cdc2;
+    --n-ink:         #1c1c1e;
+    --n-on-variant:  #424754;
 }
 
-.nymora-spinner svg {
-    width: 100%;
-    height: 100%;
-    overflow: visible;
+html.dark {
+    --n-parchment-1: #14161e;
+    --n-parchment-2: #0a0c14;
+    --n-warm-border: #2a2d3a;
+    --n-ink:         #eff0fa;
+    --n-on-variant:  #a5a9b8;
 }
 
-/* Subtle natural "breathing" — like a scholar quietly watching */
-@keyframes nymora-breathe {
-    0%, 100% { transform: scale(1); }
-    50%      { transform: scale(1.045); }
-}
+/* ==========================================================================
+   FULL-PAGE OVERLAY
+   ========================================================================== */
 
-/* Glow softly flickers, like a candle behind parchment */
-.nymora-spinner .scholar-glow {
-    animation: nymora-glow 3.2s ease-in-out infinite;
-    transform-origin: 50px 50px;
-}
-
-@keyframes nymora-glow {
-    0%, 100% { opacity: 0.82; }
-    50%      { opacity: 1; }
-}
-
-/* ===== Size variants ===== */
-.nymora-spinner-sm { width: 24px; height: 24px; }
-.nymora-spinner-md { width: 40px; height: 40px; }
-.nymora-spinner-lg { width: 72px; height: 72px; }
-.nymora-spinner-xl { width: 108px; height: 108px; }
-
-/* ===== Color variants ===== */
-.nymora-spinner-teal  { color: #006b5f; }
-.nymora-spinner-gold  { color: #b8860b; }
-.nymora-spinner-white { color: #ffffff; }
-
-/* ===== Full-page overlay ===== */
 .nymora-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(249, 249, 255, 0.88);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    flex-direction: column;
-    gap: 1.25rem;
+    gap: 1.5rem;
     z-index: 9999;
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.28s ease;
+
+    background:
+        radial-gradient(900px 520px at 50% -10%, #fffaf2 0%, transparent 60%),
+        radial-gradient(1200px 700px at 50% 110%, #f0e9dc 0%, transparent 55%),
+        linear-gradient(180deg, var(--n-parchment-1) 0%, var(--n-parchment-2) 100%);
+}
+
+html.dark .nymora-overlay {
+    background:
+        radial-gradient(900px 520px at 50% -10%, #1a1f2e 0%, transparent 60%),
+        radial-gradient(1200px 700px at 50% 110%, #0a0c14 0%, transparent 55%),
+        linear-gradient(180deg, var(--n-parchment-1) 0%, var(--n-parchment-2) 100%);
+}
+
+.nymora-overlay::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.5;
+    background-image:
+        radial-gradient(rgba(28,28,30,.028) 1px, transparent 1px),
+        radial-gradient(rgba(28,28,30,.018) 1px, transparent 1px);
+    background-size: 3px 3px, 7px 7px;
+    background-position: 0 0, 2px 3px;
+}
+
+html.dark .nymora-overlay::before {
+    background-image:
+        radial-gradient(rgba(255,255,255,.02) 1px, transparent 1px),
+        radial-gradient(rgba(255,255,255,.012) 1px, transparent 1px);
 }
 
 .nymora-overlay.active {
@@ -66,32 +79,260 @@
     pointer-events: all;
 }
 
-html.dark .nymora-overlay {
-    background: rgba(20, 22, 30, 0.88);
+/* Hide the bar in nav mode */
+.nymora-overlay:not(.is-upload) .nymora-bar {
+    display: none;
 }
 
-.nymora-overlay-text {
-    font-family: 'Inter', sans-serif;
-    font-size: 0.85rem;
-    font-weight: 500;
-    color: #424754;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    animation: nymora-text-fade 2.4s ease-in-out infinite;
+/* Slightly smaller burst in upload mode */
+.nymora-overlay.is-upload .nymora-burst {
+    width: 100px;
+    height: 100px;
 }
 
-html.dark .nymora-overlay-text {
-    color: #a5a9b8;
-}
+/* ==========================================================================
+   DATA BURST SPINNER
+   ========================================================================== */
 
-@keyframes nymora-text-fade {
-    0%, 100% { opacity: 0.55; }
-    50%      { opacity: 1; }
-}
-
-/* ===== Inline button spinner ===== */
-.btn.is-loading {
-    pointer-events: none;
-    opacity: 0.8;
+.nymora-burst {
     position: relative;
+    width: 130px;
+    height: 130px;
+    z-index: 1;
+    transition: width 0.3s ease, height 0.3s ease;
+}
+
+.nymora-burst .burst-rays {
+    position: absolute;
+    inset: 0;
+    animation: n-burst-rotate 9s linear infinite;
+}
+
+.nymora-burst .burst-rays i {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 2px;
+    height: 20px;
+    margin-left: -1px;
+    margin-top: -10px;
+    border-radius: 2px;
+    animation: n-ray-pulse 2s ease-in-out infinite;
+}
+
+.nymora-burst .burst-rays i:nth-child(3n+1) {
+    background: linear-gradient(to top, transparent 0%, var(--n-burst-teal-soft) 55%, var(--n-burst-teal) 100%);
+}
+.nymora-burst .burst-rays i:nth-child(3n+2) {
+    background: linear-gradient(to top, transparent 0%, var(--n-burst-amber) 55%, var(--n-burst-amber-deep) 100%);
+}
+.nymora-burst .burst-rays i:nth-child(3n) {
+    background: linear-gradient(to top, transparent 0%, var(--n-burst-navy-soft) 55%, var(--n-burst-navy) 100%);
+}
+
+.nymora-burst .burst-rays i:nth-child(1)  { --a:   0deg; animation-delay: 0s;    }
+.nymora-burst .burst-rays i:nth-child(2)  { --a:  30deg; animation-delay: -.17s; }
+.nymora-burst .burst-rays i:nth-child(3)  { --a:  60deg; animation-delay: -.34s; }
+.nymora-burst .burst-rays i:nth-child(4)  { --a:  90deg; animation-delay: -.51s; }
+.nymora-burst .burst-rays i:nth-child(5)  { --a: 120deg; animation-delay: -.68s; }
+.nymora-burst .burst-rays i:nth-child(6)  { --a: 150deg; animation-delay: -.85s; }
+.nymora-burst .burst-rays i:nth-child(7)  { --a: 180deg; animation-delay: -1.02s; }
+.nymora-burst .burst-rays i:nth-child(8)  { --a: 210deg; animation-delay: -1.19s; }
+.nymora-burst .burst-rays i:nth-child(9)  { --a: 240deg; animation-delay: -1.36s; }
+.nymora-burst .burst-rays i:nth-child(10) { --a: 270deg; animation-delay: -1.53s; }
+.nymora-burst .burst-rays i:nth-child(11) { --a: 300deg; animation-delay: -1.70s; }
+.nymora-burst .burst-rays i:nth-child(12) { --a: 330deg; animation-delay: -1.87s; }
+
+.nymora-burst .burst-core {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 74px;
+    height: 74px;
+    margin: -37px 0 0 -37px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 50% 30%, #ffffff 0%, #fbf9f5 70%, #f3efe7 100%);
+    border: 1px solid var(--n-warm-border);
+    display: grid;
+    place-items: center;
+    z-index: 5;
+    box-shadow:
+        0 1px 2px  rgba(28,28,30,.06),
+        0 4px 10px rgba(28,28,30,.05),
+        inset 0 1px 0 rgba(255,255,255,.9);
+    animation: n-core-breathe 3s ease-in-out infinite;
+    overflow: hidden;
+}
+
+.nymora-burst .burst-core svg {
+    width: 64px;
+    height: 64px;
+    display: block;
+    filter: drop-shadow(0 1px 0 rgba(28,28,30,.08));
+}
+
+@keyframes n-burst-rotate {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes n-core-breathe {
+    0%, 100% {
+        transform: scale(.97);
+        border-color: var(--n-warm-border);
+        box-shadow:
+            0 1px 2px  rgba(28,28,30,.05),
+            0 3px 8px  rgba(28,28,30,.04),
+            inset 0 1px 0 rgba(255,255,255,.9);
+    }
+    50% {
+        transform: scale(1.04);
+        border-color: #bdb3a3;
+        box-shadow:
+            0 2px 3px  rgba(28,28,30,.09),
+            0 8px 18px rgba(28,28,30,.08),
+            inset 0 1px 0 rgba(255,255,255,.95);
+    }
+}
+
+@keyframes n-ray-pulse {
+    0%, 100% {
+        transform: rotate(var(--a)) translateY(-52px) scaleY(.55);
+        opacity: .30;
+    }
+    50% {
+        transform: rotate(var(--a)) translateY(-52px) scaleY(1.4);
+        opacity: 1;
+    }
+}
+
+/* ==========================================================================
+   ANIMATED PHRASE
+   ========================================================================== */
+
+.nymora-phrase {
+    position: relative;
+    z-index: 1;
+    font-family: Georgia, "Times New Roman", serif;
+    font-style: italic;
+    font-size: 22px;
+    letter-spacing: .03em;
+    color: var(--n-on-variant);
+    text-align: center;
+    line-height: 1;
+    margin: 0;
+    padding: 0 1rem;
+}
+
+.nymora-phrase .char {
+    display: inline-block;
+}
+
+.nymora-phrase .char.is-dot {
+    color: var(--n-burst-teal);
+    animation: n-dot-focus 1.6s ease-in-out infinite;
+    animation-delay: calc(var(--di, 0) * 0.16s);
+}
+
+@keyframes n-dot-focus {
+    0%, 100% { transform: translateY(0);    opacity: .5; }
+    40%      { transform: translateY(-8px); opacity: 1; }
+}
+
+/* ==========================================================================
+   GILDED DUOTONE PROGRESS BAR
+   ========================================================================== */
+
+.nymora-bar {
+    --p: 0;
+    position: relative;
+    z-index: 1;
+    width: min(420px, 80vw);
+    margin-top: 0.5rem;
+}
+
+.nymora-bar .bar-head {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-bottom: 10px;
+    min-height: 22px;
+}
+
+.nymora-bar .pct-num {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 15px;
+    font-variant-numeric: tabular-nums;
+    color: var(--n-ink);
+    letter-spacing: -.01em;
+    transition: color .35s ease;
+}
+
+.nymora-bar .bar-body {
+    position: relative;
+    height: 10px;
+    background: var(--n-parchment-2);
+    border-radius: 999px;
+    box-shadow: inset 0 1px 2px rgba(28,28,30,.06);
+}
+
+html.dark .nymora-bar .bar-body {
+    background: rgba(255,255,255,0.08);
+}
+
+.nymora-bar .fill {
+    height: 100%;
+    width: calc(var(--p) * 100%);
+    border-radius: 999px;
+    background-image: linear-gradient(90deg, var(--n-burst-teal) 0%, var(--n-burst-navy) 100%);
+    background-size: 420px 100%;
+    background-repeat: no-repeat;
+    transition: width .12s linear, background-image .4s ease;
+}
+
+.nymora-bar .tip {
+    position: absolute;
+    top: 50%;
+    left: calc(var(--p) * 100%);
+    width: 15px;
+    height: 15px;
+    margin-top: -7.5px;
+    margin-left: -7.5px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 38% 32%, #ffcf86 0%, var(--n-burst-amber-deep) 70%);
+    box-shadow:
+        0 1px 4px rgba(28,28,30,.28),
+        0 0 0 2px rgba(247,243,238,.9);
+    transition: left .12s linear, opacity .3s ease;
+}
+
+html.dark .nymora-bar .tip {
+    box-shadow:
+        0 1px 4px rgba(0,0,0,.5),
+        0 0 0 2px rgba(20,22,30,.9);
+}
+
+/* Done state */
+.nymora-bar.is-done .pct-num {
+    color: var(--n-burst-teal);
+}
+
+.nymora-bar.is-done .fill {
+    background-image: linear-gradient(90deg, var(--n-burst-teal) 0%, var(--n-burst-teal-soft) 100%);
+}
+
+.nymora-bar.is-done .tip {
+    opacity: 0;
+}
+
+/* Error state */
+.nymora-bar.is-error .fill {
+    background-image: linear-gradient(90deg, #b91c1c 0%, #dc2626 100%);
+}
+
+.nymora-bar.is-error .pct-num {
+    color: #b91c1c;
+}
+
+.nymora-bar.is-error .tip {
+    opacity: 0;
 }
