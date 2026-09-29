@@ -2,25 +2,22 @@
 <header class="bg-on-primary-fixed border-b border-primary-fixed/10 shadow-sm w-full sticky top-0 z-50">
   <div class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop flex justify-between items-center h-16 md:h-20">
 
-    <!-- Logo -->
+   <!-- Logo -->
     <a href="{{ url_for('dashboard.home') if current_user.is_authenticated else url_for('auth.index') }}"
        class="flex items-center gap-3 group">
-      <span class="
-        inline-flex items-center justify-center
-        h-10 w-10 md:h-12 md:w-12
-        aspect-square
-        rounded-2xl md:rounded-[1.1rem]
-        bg-primary-fixed/10
-        p-1.5 md:p-2
-        shadow-sm
-        transition-all duration-300
-        group-hover:scale-105
-        group-hover:bg-primary-fixed/20
-      ">
-        <img src="{{ url_for('static', filename='images/nymora.jpg') }}"
-             alt="Nymora"
-             class="h-full w-full object-contain" />
-      </span>
+    
+      <img src="{{ url_for('static', filename='images/nymora.jpg') }}"
+           alt="Nymora"
+           class="
+             h-10 w-10 md:h-12 md:w-12
+             rounded-2xl md:rounded-[1.1rem]
+             object-cover
+             shadow-sm
+             border border-primary-fixed/10
+             transition-all duration-300
+             group-hover:scale-105
+             group-hover:shadow-lg" />
+    
       <span class="font-serif text-xl md:text-2xl font-black tracking-tight text-primary-fixed drop-shadow-sm group-hover:text-secondary-fixed transition-colors duration-300">
         Nymora
       </span>
