@@ -245,6 +245,9 @@
 </script>
 {% endif %}
 
+<!-- ===== Custom Spinner ===== -->
+<script src="{{ url_for('static', filename='js/spinner.js') }}"></script>
+    
 <!-- ===== Page-specific scripts ===== -->
 {% block scripts %}{% endblock %}
 
@@ -280,9 +283,6 @@
         }
     });
 </script>
-
-<!-- ===== Custom Spinner ===== -->
-<script src="{{ url_for('static', filename='js/spinner.js') }}"></script>
 
 </body>
 </html>
