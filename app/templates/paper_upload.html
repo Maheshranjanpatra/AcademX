@@ -73,7 +73,7 @@ paperFileInput.addEventListener('change', function(e) {
   info.style.display = 'block';
 
   if (file.size > PAPER_MAX_SIZE) {
-    info.innerHTML = `File is too large (${sizeMB} MB). Max allowed is 10 MB.`;
+    info.innerHTML = `File is too large (${sizeMB} MB). Max allowed is {{ MAX_UPLOAD_MB }} MB.`;
     info.style.color = '#b91c1c';
     paperSubmitBtn.disabled = true;
     paperSubmitBtn.style.opacity = '0.5';
