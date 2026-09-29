@@ -27,7 +27,8 @@
       <p class="font-body-md text-body-md text-on-surface-variant">{{ material.category or "Document" }}</p>
       <p class="font-body-md text-xs text-on-surface-variant">Uploaded: {{ material.uploaded_at.strftime('%b %d, %Y') }}</p>
       {% if material.status == 'approved' %}
-        <a href="{{ material.file_path if material.file_path else material.file_url }}" target="_blank" class="text-primary hover:underline">View Material</a>
+        {% set link_target = material.file_url if material.file_url else material.file_path %}
+        <a href="{{ link_target | file_url }}" target="_blank" class="text-primary hover:underline">View Material</a>
       {% elif material.status == 'rejected' %}
         <p class="text-error text-sm">Rejected. Please contact admin for details.</p>
       {% else %}
