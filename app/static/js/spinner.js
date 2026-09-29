@@ -1,7 +1,6 @@
-// NYMORA SPINNER — GLOBAL HELPERS
+// NYMORA SPINNER — ANONYMOUS SCHOLAR
 
 (function() {
-    // Inject the full-page overlay once
     function ensureOverlay() {
         if (document.getElementById('nymoraOverlay')) return;
 
@@ -10,22 +9,34 @@
         overlay.className = 'nymora-overlay';
         overlay.innerHTML = `
             <div class="nymora-spinner nymora-spinner-lg">
-                <svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
-                    <rect class="spinner-squircle" x="6" y="6" width="48" height="48" rx="14"
-                          fill="none" stroke="currentColor" stroke-width="3"
-                          stroke-dasharray="90 40" />
-                    <g class="spinner-eye">
-                        <path d="M18 30 Q30 19 42 30 Q30 41 18 30 Z"
-                              fill="none" stroke="currentColor" stroke-width="2"
-                              stroke-linejoin="round"/>
-                        <circle cx="30" cy="30" r="3" fill="currentColor"/>
-                        <line x1="16" y1="44" x2="44" y2="16"
-                              stroke="currentColor" stroke-width="2.5"
-                              stroke-linecap="round"/>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+                    <defs>
+                        <filter id="nymoraGlow" x="-50%" y="-50%" width="200%" height="200%">
+                            <feGaussianBlur stdDeviation="1.6" result="blur"/>
+                            <feMerge>
+                                <feMergeNode in="blur"/>
+                                <feMergeNode in="SourceGraphic"/>
+                            </feMerge>
+                        </filter>
+                    </defs>
+
+                    <g class="scholar-glow" fill="none" stroke="currentColor" stroke-width="2.6"
+                       stroke-linecap="round" stroke-linejoin="round"
+                       filter="url(#nymoraGlow)">
+
+                        <path d="M 14,39 Q 50,47 86,39"/>
+                        <path d="M 32,40 Q 32,16 50,16 Q 68,16 68,40"/>
+                        <path d="M 33,33 L 67,33"/>
+
+                        <circle cx="37" cy="62" r="9.5"/>
+                        <circle cx="63" cy="62" r="9.5"/>
+
+                        <path d="M 46.5,60 Q 50,57.5 53.5,60"/>
+
                     </g>
                 </svg>
             </div>
-            <div class="nymora-overlay-text">Just a moment…</div>
+            <div class="nymora-overlay-text" id="nymoraOverlayText">Just a moment…</div>
         `;
         document.body.appendChild(overlay);
     }
@@ -34,17 +45,14 @@
         show: function(text) {
             ensureOverlay();
             const overlay = document.getElementById('nymoraOverlay');
-            if (text) {
-                overlay.querySelector('.nymora-overlay-text').textContent = text;
-            }
+            const label = document.getElementById('nymoraOverlayText');
+            if (text && label) label.textContent = text;
             overlay.classList.add('active');
         },
         hide: function() {
             const overlay = document.getElementById('nymoraOverlay');
             if (overlay) overlay.classList.remove('active');
         },
-
-        /* Attach a loading state to any button */
         button: function(btn, loading) {
             if (!btn) return;
             if (loading) btn.classList.add('is-loading');
@@ -52,21 +60,19 @@
         }
     };
 
-    // Auto-show overlay when any form is submitted (except AJAX-handled ones)
     document.addEventListener('DOMContentLoaded', function() {
+        // Auto-show on regular form submits (skip AJAX-opted-out forms)
         document.querySelectorAll('form:not([data-no-spinner])').forEach(form => {
             form.addEventListener('submit', function() {
-                // Skip forms that are already using AJAX
                 if (form.dataset.ajax === 'true') return;
                 window.NymoraSpinner.show();
             });
         });
 
-        // Auto-show overlay on internal link clicks
+        // Auto-show on internal link clicks
         document.querySelectorAll('a[href]:not([target="_blank"]):not([href^="#"]):not([href^="mailto"]):not([data-no-spinner])').forEach(link => {
-            link.addEventListener('click', function(e) {
+            link.addEventListener('click', function() {
                 const href = this.getAttribute('href');
-                // Only same-origin navigation
                 if (href && !href.startsWith('http') && !href.startsWith('//')) {
                     window.NymoraSpinner.show();
                 }
