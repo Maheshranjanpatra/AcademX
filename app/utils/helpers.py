@@ -111,3 +111,33 @@ def get_animation_copy(stage, done=None, total=None):
         message += f" ({done}/{total} videos watched)"
     return title, message
 
+def get_file_url(key, expires_in=604800):
+    """Generate a presigned URL for a B2 file.
+    Default expiry: 7 days (604800 seconds)."""
+    if not key:
+        return None
+
+    if key.startswith("http://") or key.startswith("https://"):
+        return key
+
+    s3 = boto3.client(
+        "s3",
+        endpoint_url=current_app.config["B2_ENDPOINT"],
+        aws_access_key_id=current_app.config["B2_KEY_ID"],
+        aws_secret_access_key=current_app.config["B2_APPLICATION_KEY"],
+        config=BotoConfig(signature_version="s3v4"),
+        region_name=current_app.config["B2_REGION"],
+    )
+
+    try:
+        url = s3.generate_presigned_url(
+            "get_object",
+            Params={
+                "Bucket": current_app.config["B2_BUCKET_NAME"],
+                "Key": key,
+            },
+            ExpiresIn=expires_in,
+        )
+        return url
+    except Exception:
+        return None
