@@ -77,13 +77,18 @@
             </a>
         {% endif %}
 
-        <!-- ✅ Install Button (PWA) -->
-        <button id="install-btn" 
-                class="hidden md:flex items-center gap-1.5 border border-primary-fixed-dim/50 hover:bg-primary-fixed/10 text-primary-fixed-dim hover:text-secondary-fixed transition-all rounded-[8px] px-3 py-1.5 font-label-md text-label-md font-medium"
-                style="display:none;">
-            <span class="material-symbols-outlined text-[18px]">download</span>
-            Install
-        </button>
+      <!-- Install Button (PWA) -->
+      <button id="install-btn"
+            title="Install Nymora app"
+            aria-label="Install Nymora app"
+            class="hidden md:flex items-center justify-center w-9 h-9 border border-primary-fixed-dim/50 hover:bg-primary-fixed/10 text-primary-fixed-dim hover:text-secondary-fixed transition-all rounded-full"
+            style="display:none;">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3v12"/>
+            <path d="M7 11l5 5 5-5"/>
+            <path d="M5 21h14"/>
+        </svg>
+      </button>
     </div>
   </div>
 
