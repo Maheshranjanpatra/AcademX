@@ -37,7 +37,7 @@
       {{ form.file.label(class="font-label-md text-label-md text-on-surface-variant block mb-xs") }}
       {{ form.file(class="w-full rounded-lg border border-outline-variant px-md py-sm font-body-md text-body-md bg-surface-container-low cursor-pointer", id="paperFileInput") }}
       <p class="font-label-md text-xs text-on-surface-variant mt-1">
-        Accepted: PDF only · <strong>Max 10 MB</strong>
+        Accepted: PDF only · <strong>Max {{ MAX_UPLOAD_MB }} MB</strong>
       </p>
       <p id="paperFileInfo" class="font-label-md text-xs mt-1" style="display:none;"></p>
       {% for err in form.file.errors %}<p class="text-error text-xs mt-1">{{ err }}</p>{% endfor %}
@@ -62,7 +62,7 @@ const paperSubmitBtn = document.getElementById('paperSubmitBtn');
 const paperBtnText = document.getElementById('paperBtnText');
 const paperBtnIcon = document.getElementById('paperBtnIcon');
 const paperBtnSpinner = document.getElementById('paperBtnSpinner');
-const PAPER_MAX_SIZE = 10 * 1024 * 1024;  // 10 MB
+const PAPER_MAX_SIZE = {{ MAX_UPLOAD_MB }} * 1024 * 1024; 
 
 // File size validation
 paperFileInput.addEventListener('change', function(e) {
