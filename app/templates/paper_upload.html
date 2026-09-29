@@ -8,7 +8,9 @@
     Upload Previous Year Paper
   </h1>
 
-  <form method="post" enctype="multipart/form-data" class="bg-surface-container-lowest border border-outline-variant rounded-xl card-shadow p-md space-y-md">
+  <form method="post" enctype="multipart/form-data" id="paperForm"
+        data-no-spinner
+        class="bg-surface-container-lowest border border-outline-variant rounded-xl card-shadow p-md space-y-md">
     {{ form.hidden_tag() }}
 
     <div>
@@ -33,14 +35,63 @@
 
     <div>
       {{ form.file.label(class="font-label-md text-label-md text-on-surface-variant block mb-xs") }}
-      {{ form.file(class="w-full rounded-lg border border-outline-variant px-md py-sm font-body-md text-body-md bg-surface-container-low cursor-pointer") }}
-      <p class="font-label-md text-xs text-on-surface-variant mt-1">Accepted formats: PDF, JPG, PNG (Max 10MB)</p>
+      {{ form.file(class="w-full rounded-lg border border-outline-variant px-md py-sm font-body-md text-body-md bg-surface-container-low cursor-pointer", id="paperFileInput") }}
+      <p class="font-label-md text-xs text-on-surface-variant mt-1">
+        Accepted: PDF only · <strong>Max 10 MB</strong>
+      </p>
+      <p id="paperFileInfo" class="font-label-md text-xs mt-1" style="display:none;"></p>
       {% for err in form.file.errors %}<p class="text-error text-xs mt-1">{{ err }}</p>{% endfor %}
     </div>
 
-    <button type="submit" class="bg-primary text-on-primary font-label-md text-label-md px-md py-sm rounded-lg hover:shadow-lg transition-all flex items-center gap-sm">
-      Upload Paper <span class="material-symbols-outlined">upload</span>
+    <button type="submit" id="paperSubmitBtn"
+            class="bg-primary text-on-primary font-label-md text-label-md px-md py-sm rounded-lg hover:shadow-lg transition-all flex items-center justify-center gap-sm w-full">
+      <span id="paperBtnText">Upload Paper</span>
+      <span class="material-symbols-outlined" id="paperBtnIcon">upload</span>
+      <svg id="paperBtnSpinner" class="hidden animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+        <circle cx="12" cy="12" r="10" stroke-opacity="0.25"/>
+        <path d="M22 12a10 10 0 0 0-10-10" stroke-linecap="round"/>
+      </svg>
     </button>
   </form>
 </main>
+
+<script>
+const paperForm = document.getElementById('paperForm');
+const paperFileInput = document.getElementById('paperFileInput');
+const paperSubmitBtn = document.getElementById('paperSubmitBtn');
+const paperBtnText = document.getElementById('paperBtnText');
+const paperBtnIcon = document.getElementById('paperBtnIcon');
+const paperBtnSpinner = document.getElementById('paperBtnSpinner');
+const PAPER_MAX_SIZE = 10 * 1024 * 1024;  // 10 MB
+
+// File size validation
+paperFileInput.addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const sizeMB = (file.size / 1024 / 1024).toFixed(2);
+  const info = document.getElementById('paperFileInfo');
+  info.style.display = 'block';
+
+  if (file.size > PAPER_MAX_SIZE) {
+    info.innerHTML = `File is too large (${sizeMB} MB). Max allowed is 10 MB.`;
+    info.style.color = '#b91c1c';
+    paperSubmitBtn.disabled = true;
+    paperSubmitBtn.style.opacity = '0.5';
+  } else {
+    info.innerHTML = `${file.name} (${sizeMB} MB)`;
+    info.style.color = '#0b7e5a';
+    paperSubmitBtn.disabled = false;
+    paperSubmitBtn.style.opacity = '1';
+  }
+});
+
+// Show inline spinner on submit
+paperForm.addEventListener('submit', function() {
+  paperBtnText.textContent = 'Uploading...';
+  paperBtnIcon.classList.add('hidden');
+  paperBtnSpinner.classList.remove('hidden');
+  paperSubmitBtn.disabled = true;
+  paperSubmitBtn.style.opacity = '0.75';
+});
+</script>
 {% endblock %}
