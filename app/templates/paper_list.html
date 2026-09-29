@@ -4,7 +4,6 @@
 {% block content %}
 <main class="max-w-[1280px] mx-auto w-full px-margin-mobile md:px-margin-desktop py-lg space-y-lg">
 
-  <!-- Header -->
   <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-md">
     <div>
       <h1 class="font-display text-headline-lg-mobile md:text-headline-lg text-on-surface">Past Papers</h1>
@@ -19,7 +18,6 @@
     </a>
   </div>
 
-  <!-- Search & Filter Bar -->
   <form method="get" action="{{ url_for('paper.list_papers') }}" class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md card-shadow flex flex-col md:flex-row gap-md items-center">
     <div class="relative w-full flex-grow">
       <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">search</span>
@@ -42,7 +40,6 @@
     </div>
   </form>
 
-  <!-- Papers List Grid -->
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-md">
     {% for paper in papers %}
     <article class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md card-shadow card-hover-shadow transition-all duration-300 flex flex-col justify-between gap-md">
@@ -67,7 +64,7 @@
       </div>
 
       <div class="pt-sm border-t border-surface-variant flex items-center justify-between">
-        <a href="{{ paper.file_path }}" target="_blank" rel="noopener noreferrer"
+        <a href="{{ paper.file_path | file_url }}" target="_blank" rel="noopener noreferrer"
            class="w-full bg-surface-container-high text-primary hover:bg-primary hover:text-on-primary transition-all rounded-lg px-md py-sm font-label-md text-label-md flex items-center justify-center gap-xs shadow-sm">
           <span class="material-symbols-outlined text-[18px]">download</span>
           View Paper
