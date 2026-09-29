@@ -5,7 +5,10 @@
 
 {% block content %}
 <div class="admin-card" style="max-width: 600px;">
-    <form method="POST" enctype="multipart/form-data">
+    <form method="POST" enctype="multipart/form-data"
+          id="adminMaterialForm"
+          action="{{ url_for('admin.add_material') }}"
+          data-no-spinner>
         {{ form.hidden_tag() if form }}
 
         <div class="form-group">
@@ -34,8 +37,11 @@
 
         <div class="form-group">
             {{ form.file.label(class="form-label") }}
-            {{ form.file(class="form-input") }}
-            <p class="text-muted text-sm mt-1">Accepted: PDF, JPG, PNG (Max {{ MAX_UPLOAD_MB }}MB)</p>
+            {{ form.file(class="form-input", id="adminMatFileInput") }}
+            <p class="text-muted text-sm mt-1">
+                Accepted: PDF, JPG, PNG (Max {{ MAX_UPLOAD_MB }}MB)
+            </p>
+            <p id="adminMatFileInfo" class="text-sm mt-1" style="display:none;"></p>
             {% for error in form.file.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
         </div>
 
@@ -47,9 +53,51 @@
         </div>
 
         <div class="flex gap-2 mt-4">
-            <button type="submit" class="btn btn-primary">Add Material</button>
+            <button type="submit" id="adminMatSubmitBtn" class="btn btn-primary">Add Material</button>
             <a href="{{ url_for('admin.materials') }}" class="btn btn-secondary">Cancel</a>
         </div>
     </form>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  (function () {
+    const MAX_BYTES = {{ MAX_UPLOAD_MB }} * 1024 * 1024;
+    const fileInput = document.getElementById('adminMatFileInput');
+    const info      = document.getElementById('adminMatFileInfo');
+    const submitBtn = document.getElementById('adminMatSubmitBtn');
+
+    fileInput.addEventListener('change', function (e) {
+      const file = e.target.files[0];
+      if (!file) {
+        info.style.display = 'none';
+        submitBtn.disabled = false;
+        submitBtn.style.opacity = '1';
+        return;
+      }
+      const sizeMB = (file.size / 1024 / 1024).toFixed(2);
+      info.style.display = 'block';
+
+      if (file.size > MAX_BYTES) {
+        info.textContent = `File is too large (${sizeMB} MB). Max allowed is {{ MAX_UPLOAD_MB }} MB.`;
+        info.style.color = '#b91c1c';
+        submitBtn.disabled = true;
+        submitBtn.style.opacity = '0.5';
+      } else {
+        info.textContent = `${file.name} (${sizeMB} MB)`;
+        info.style.color = '#0b7e5a';
+        submitBtn.disabled = false;
+        submitBtn.style.opacity = '1';
+      }
+    });
+
+    NymoraSpinner.attach(document.getElementById('adminMaterialForm'), {
+      redirect: '{{ url_for("admin.materials") }}',
+      uploadingText: 'Uploading material....',
+      doneText: 'Material added!',
+      holdMs: 500,
+    });
+  })();
+</script>
 {% endblock %}
