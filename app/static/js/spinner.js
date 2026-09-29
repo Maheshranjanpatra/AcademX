@@ -97,6 +97,7 @@
             const overlay = document.getElementById('nymoraOverlay');
             overlay.classList.remove('is-upload');
             overlay.classList.add('active');
+            overlay.dataset.shownAt = Date.now(); 
             setPhrase(text || 'Just a moment....');
         },
         hide() {
@@ -191,12 +192,29 @@
 
     window.NymoraSpinner = NymoraSpinner;
 
-    // ---- Auto show overlay on internal navigation ----
+        // ---- Auto show overlay on internal navigation (delayed) ----
     document.addEventListener('DOMContentLoaded', function () {
-        // Simple forms
+
+        // Delay before showing the spinner so fast navigations don't trigger it.
+        const NAV_DELAY_MS = 200;
+        let navTimer = null;
+
+        function scheduleNavSpinner(text) {
+            clearTimeout(navTimer);
+            navTimer = setTimeout(function () {
+                NymoraSpinner.show(text || 'Just a moment....');
+            }, NAV_DELAY_MS);
+        }
+
+        function cancelNavSpinner() {
+            clearTimeout(navTimer);
+            NymoraSpinner.hide();
+        }
+
+        // Simple forms with auto spinner
         document.querySelectorAll('form[data-auto-spinner]').forEach(function (form) {
             form.addEventListener('submit', function () {
-                NymoraSpinner.show(form.dataset.spinnerText || 'Just a moment....');
+                scheduleNavSpinner(form.dataset.spinnerText);
             });
         });
 
@@ -204,12 +222,32 @@
         document.querySelectorAll(
             'a[href]:not([target="_blank"]):not([href^="#"]):not([href^="mailto"]):not([data-no-spinner])'
         ).forEach(function (link) {
-            link.addEventListener('click', function () {
+            link.addEventListener('click', function (e) {
+                // Ignore modified clicks (cmd/ctrl/middle-click) — those open new tabs
+                if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+
                 const href = link.getAttribute('href');
                 if (href && !href.startsWith('http') && !href.startsWith('//')) {
-                    NymoraSpinner.show(link.dataset.spinnerText || 'Just a moment....');
+                    scheduleNavSpinner(link.dataset.spinnerText);
                 }
             });
         });
+
+        // If browser restores the page from bfcache, make sure no overlay is stuck
+        window.addEventListener('pageshow', function (event) {
+            if (event.persisted) cancelNavSpinner();
+        });
+
+        // Safety: if the spinner somehow stays longer than 3s, hide it
+        // (prevents "spinner forever" bugs on slow servers)
+        setInterval(function () {
+            const overlay = document.getElementById('nymoraOverlay');
+            if (overlay && overlay.classList.contains('active')) {
+                const startedAt = overlay.dataset.shownAt ? parseInt(overlay.dataset.shownAt, 10) : 0;
+                if (startedAt && Date.now() - startedAt > 3000) {
+                    cancelNavSpinner();
+                }
+            }
+        }, 500);
     });
 })();
