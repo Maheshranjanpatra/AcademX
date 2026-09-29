@@ -1,80 +1,213 @@
-// NYMORA SPINNER — ANONYMOUS SCHOLAR
+/* ==========================================================================
+   NYMORA OVERLAY CONTROLLER
+   - Nav overlay: Data Burst + animated phrase
+   - Upload overlay: Data Burst + phrase + gilded progress bar
+   ========================================================================== */
 
-(function() {
+(function () {
+    'use strict';
+
+    const NYMORA_MARK = `
+        <defs>
+            <linearGradient id="nym-body-grad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#0f3157"/>
+                <stop offset="1" stop-color="#0b2243"/>
+            </linearGradient>
+        </defs>
+        <path d="M115.0 175.9C140.2 169.2 157.7 151.9 160.7 130.6C161.1 127.8 161.3 93.9 161.0 88.5C159.2 59.2 141.7 35.1 115.1 25.2C72.1 9.3 26.5 39.7 22.5 87.1C21.8 94.7 22.3 128.7 23.1 133.2C23.9 137.4 23.9 137.8 23.3 146.4C22.9 152.2 22.4 165.8 22.6 166.5C22.9 167.8 23.3 167.8 35.5 167.7C48.7 167.5 49.5 167.5 54.1 165.3C57.5 163.7 58.3 163.6 59.2 165.1C61.6 169.4 73.3 163.4 77.1 155.9C81.1 147.8 76.3 134.9 67.4 130.0C51.2 121.2 44.2 109.4 44.3 90.9C44.3 77.4 47.0 69.0 53.9 61.6C57.0 58.4 56.5 58.6 59.8 58.1C66.5 57.1 71.9 59.5 76.9 65.6C79.5 68.8 81.3 69.5 89.3 70.6C92.1 71.0 92.1 71.1 92.2 79.9C92.4 89.1 92.2 88.5 95.8 90.4C98.2 91.6 98.3 91.3 99.3 85.5C102.2 67.1 112.1 56.1 124.1 57.9C131.1 58.9 138.1 71.0 139.4 84.4C141.2 102.8 136.4 115.8 123.9 126.1C112.4 135.6 108.5 146.2 108.9 166.8C109.1 178.2 108.6 177.5 115.0 175.9Z" fill="url(#nym-body-grad)"/>
+        <path d="M68.8 88.9C71.8 88.3 72.2 87.1 70.5 83.6C68.2 78.7 58.4 77.0 59.1 81.6C59.8 86.9 63.8 89.9 68.8 88.9Z" fill="#0f3157"/>
+        <path d="M119.6 88.7C122.2 87.9 123.7 86.2 124.9 82.8C125.9 79.8 125.2 79.1 121.1 79.1C116.6 79.1 113.9 81.4 113.0 85.9C112.6 88.1 112.9 88.7 114.9 88.8C118.0 89.0 118.5 89.0 119.6 88.7Z" fill="#0f3157"/>
+        <path d="M92.8 91.2L103.2 102L92.5 103Z" fill="#f08041"/>
+        <path d="M92.8 91.2L81.5 101.5L92.5 103Z" fill="#fec384"/>
+        <path d="M103.2 102L92 119.8L92.5 103Z" fill="#da6a2a"/>
+        <path d="M81.5 101.5L92 119.8L92.5 103Z" fill="#f5a05a"/>
+    `;
+
     function ensureOverlay() {
         if (document.getElementById('nymoraOverlay')) return;
-
         const overlay = document.createElement('div');
         overlay.id = 'nymoraOverlay';
         overlay.className = 'nymora-overlay';
         overlay.innerHTML = `
-            <div class="nymora-spinner nymora-spinner-lg">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
-                    <defs>
-                        <filter id="nymoraGlow" x="-50%" y="-50%" width="200%" height="200%">
-                            <feGaussianBlur stdDeviation="1.6" result="blur"/>
-                            <feMerge>
-                                <feMergeNode in="blur"/>
-                                <feMergeNode in="SourceGraphic"/>
-                            </feMerge>
-                        </filter>
-                    </defs>
-
-                    <g class="scholar-glow" fill="none" stroke="currentColor" stroke-width="2.6"
-                       stroke-linecap="round" stroke-linejoin="round"
-                       filter="url(#nymoraGlow)">
-
-                        <path d="M 14,39 Q 50,47 86,39"/>
-                        <path d="M 32,40 Q 32,16 50,16 Q 68,16 68,40"/>
-                        <path d="M 33,33 L 67,33"/>
-
-                        <circle cx="37" cy="62" r="9.5"/>
-                        <circle cx="63" cy="62" r="9.5"/>
-
-                        <path d="M 46.5,60 Q 50,57.5 53.5,60"/>
-
-                    </g>
-                </svg>
+            <div class="nymora-burst">
+                <div class="burst-rays">
+                    <i></i><i></i><i></i><i></i><i></i><i></i>
+                    <i></i><i></i><i></i><i></i><i></i><i></i>
+                </div>
+                <div class="burst-core">
+                    <svg viewBox="0 0 192 192" xmlns="http://www.w3.org/2000/svg">${NYMORA_MARK}</svg>
+                </div>
             </div>
-            <div class="nymora-overlay-text" id="nymoraOverlayText">Just a moment…</div>
+            <p class="nymora-phrase" id="nymoraPhrase"></p>
+            <div class="nymora-bar" id="nymoraBar">
+                <div class="bar-head">
+                    <div class="pct-num" id="nymoraBarPct">0%</div>
+                </div>
+                <div class="bar-body">
+                    <div class="fill"></div>
+                    <div class="tip"></div>
+                </div>
+            </div>
         `;
         document.body.appendChild(overlay);
+        renderPhrase('Just a moment....');
     }
 
-    window.NymoraSpinner = {
-        show: function(text) {
+    function renderPhrase(text) {
+        const el = document.getElementById('nymoraPhrase');
+        if (!el) return;
+        el.textContent = '';
+        let dotIndex = 0;
+        [...text].forEach((ch) => {
+            const span = document.createElement('span');
+            const isDot = ch === '.';
+            span.className = 'char' + (isDot ? ' is-dot' : '');
+            span.textContent = ch === ' ' ? '\u00A0' : ch;
+            if (isDot) span.style.setProperty('--di', dotIndex++);
+            el.appendChild(span);
+        });
+    }
+
+    function setPhrase(text) {
+        renderPhrase(text);
+    }
+
+    function setBarProgress(pct) {
+        const bar = document.getElementById('nymoraBar');
+        if (!bar) return;
+        const clamped = Math.max(0, Math.min(100, pct));
+        bar.style.setProperty('--p', clamped / 100);
+        const label = document.getElementById('nymoraBarPct');
+        if (label) label.textContent = Math.round(clamped) + '%';
+    }
+
+    function setBarState(state) {
+        // state: 'idle' | 'done' | 'error'
+        const bar = document.getElementById('nymoraBar');
+        if (!bar) return;
+        bar.classList.remove('is-done', 'is-error');
+        if (state === 'done') bar.classList.add('is-done');
+        if (state === 'error') bar.classList.add('is-error');
+    }
+
+    const NymoraSpinner = {
+        // ---- Navigation overlay ----
+        show(text) {
             ensureOverlay();
             const overlay = document.getElementById('nymoraOverlay');
-            const label = document.getElementById('nymoraOverlayText');
-            if (text && label) label.textContent = text;
+            overlay.classList.remove('is-upload');
             overlay.classList.add('active');
+            setPhrase(text || 'Just a moment....');
         },
-        hide: function() {
+        hide() {
             const overlay = document.getElementById('nymoraOverlay');
             if (overlay) overlay.classList.remove('active');
         },
-        button: function(btn, loading) {
-            if (!btn) return;
-            if (loading) btn.classList.add('is-loading');
-            else btn.classList.remove('is-loading');
-        }
+
+        // ---- Upload overlay ----
+        upload: {
+            start(text) {
+                ensureOverlay();
+                const overlay = document.getElementById('nymoraOverlay');
+                overlay.classList.add('active', 'is-upload');
+                setPhrase(text || 'Uploading your file....');
+                setBarProgress(0);
+                setBarState('idle');
+            },
+            progress(pct) {
+                setBarProgress(pct);
+            },
+            done(text) {
+                setBarProgress(100);
+                setBarState('done');
+                setPhrase(text || 'Done!');
+            },
+            error(message) {
+                setBarState('error');
+                setPhrase(message || 'Upload failed.');
+            },
+            hide() {
+                const overlay = document.getElementById('nymoraOverlay');
+                if (overlay) overlay.classList.remove('active', 'is-upload');
+            },
+        },
+
+        // ---- Attach AJAX upload to a form ----
+        attach(formEl, options) {
+            if (!formEl) return;
+            const opts = options || {};
+            const redirectUrl = opts.redirect || null;
+            const uploadingText = opts.uploadingText || 'Uploading your file....';
+            const doneText = opts.doneText || 'Done!';
+            const holdMs = opts.holdMs != null ? opts.holdMs : 500;
+
+            formEl.addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                NymoraSpinner.upload.start(uploadingText);
+
+                const xhr = new XMLHttpRequest();
+                const formData = new FormData(formEl);
+
+                xhr.upload.addEventListener('progress', function (evt) {
+                    if (!evt.lengthComputable) return;
+                    let pct = (evt.loaded / evt.total) * 100;
+                    // Cap at 95 until server finishes
+                    if (pct >= 95) pct = 95;
+                    NymoraSpinner.upload.progress(pct);
+                });
+
+                xhr.onload = function () {
+                    if (xhr.status >= 200 && xhr.status < 400) {
+                        NymoraSpinner.upload.done(doneText);
+                        setTimeout(function () {
+                            const target = redirectUrl || xhr.responseURL || '/';
+                            window.location.href = target;
+                        }, holdMs);
+                    } else {
+                        NymoraSpinner.upload.error(
+                            'Upload failed. Please try again.'
+                        );
+                        setTimeout(function () {
+                            NymoraSpinner.upload.hide();
+                            window.location.reload();
+                        }, 1800);
+                    }
+                };
+
+                xhr.onerror = function () {
+                    NymoraSpinner.upload.error('Network error. Please try again.');
+                    setTimeout(function () {
+                        NymoraSpinner.upload.hide();
+                        window.location.reload();
+                    }, 1800);
+                };
+
+                xhr.open('POST', formEl.action, true);
+                xhr.send(formData);
+            });
+        },
     };
 
-    document.addEventListener('DOMContentLoaded', function() {
-        // Auto-show on regular form submits (skip AJAX-opted-out forms)
-        document.querySelectorAll('form:not([data-no-spinner])').forEach(form => {
-            form.addEventListener('submit', function() {
-                if (form.dataset.ajax === 'true') return;
-                window.NymoraSpinner.show();
+    window.NymoraSpinner = NymoraSpinner;
+
+    // ---- Auto show overlay on internal navigation ----
+    document.addEventListener('DOMContentLoaded', function () {
+        // Simple forms
+        document.querySelectorAll('form[data-auto-spinner]').forEach(function (form) {
+            form.addEventListener('submit', function () {
+                NymoraSpinner.show(form.dataset.spinnerText || 'Just a moment....');
             });
         });
 
-        // Auto-show on internal link clicks
-        document.querySelectorAll('a[href]:not([target="_blank"]):not([href^="#"]):not([href^="mailto"]):not([data-no-spinner])').forEach(link => {
-            link.addEventListener('click', function() {
-                const href = this.getAttribute('href');
+        // Internal link clicks
+        document.querySelectorAll(
+            'a[href]:not([target="_blank"]):not([href^="#"]):not([href^="mailto"]):not([data-no-spinner])'
+        ).forEach(function (link) {
+            link.addEventListener('click', function () {
+                const href = link.getAttribute('href');
                 if (href && !href.startsWith('http') && !href.startsWith('//')) {
-                    window.NymoraSpinner.show();
+                    NymoraSpinner.show(link.dataset.spinnerText || 'Just a moment....');
                 }
             });
         });
