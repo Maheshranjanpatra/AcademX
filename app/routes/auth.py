@@ -123,7 +123,7 @@ def callback():
         db.session.add(user)
         db.session.commit()
 
-    login_user(user)
+    login_user(user, remember=True)
 
     if not user.profile_complete:
         return redirect(url_for("auth.complete_profile"))
