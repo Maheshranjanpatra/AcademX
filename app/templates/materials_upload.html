@@ -8,7 +8,10 @@
     Share your notes, handouts, or links. Your submission will be reviewed by an admin before becoming public.
   </p>
 
-  <form method="post" enctype="multipart/form-data" class="bg-surface-container-lowest border border-outline-variant rounded-xl card-shadow p-md space-y-md">
+  <form method="post" enctype="multipart/form-data" id="uploadForm"
+        action="{{ url_for('materials.upload_material') }}"
+        data-no-spinner
+        class="bg-surface-container-lowest border border-outline-variant rounded-xl card-shadow p-md space-y-md">
     {{ form.hidden_tag() }}
 
     <div>
@@ -37,8 +40,11 @@
 
     <div>
       {{ form.file.label(class="font-label-md text-label-md text-on-surface-variant block mb-xs") }}
-      {{ form.file(class="w-full rounded-lg border border-outline-variant px-md py-sm font-body-md text-body-md") }}
-      <p class="font-label-md text-xs text-on-surface-variant mt-1">Accepted: PDF, JPG, JPEG, DOCX (Max 26MB)</p>
+      {{ form.file(class="w-full rounded-lg border border-outline-variant px-md py-sm font-body-md text-body-md", id="fileInput") }}
+      <p class="font-label-md text-xs text-on-surface-variant mt-1">
+        Accepted: PDF, JPG, JPEG, DOCX · <strong>Max 26MB</strong>
+      </p>
+      <p id="fileInfo" class="font-label-md text-xs mt-1" style="display:none;"></p>
       {% for err in form.file.errors %}<p class="text-error text-xs mt-1">{{ err }}</p>{% endfor %}
     </div>
 
@@ -49,9 +55,111 @@
       {% for err in form.file_url.errors %}<p class="text-error text-xs mt-1">{{ err }}</p>{% endfor %}
     </div>
 
-    <button type="submit" class="bg-primary text-on-primary font-label-md text-label-md px-md py-sm rounded-lg hover:shadow-lg transition-all flex items-center gap-sm">
-      Upload <span class="material-symbols-outlined">upload</span>
+    <!-- Upload Progress (hidden by default) -->
+    <div id="progressWrap" class="hidden space-y-2 pt-2">
+      <div class="flex items-center justify-between">
+        <span class="font-label-md text-xs text-on-surface-variant" id="progressLabel">Uploading...</span>
+        <span class="font-mono text-xs font-bold text-primary" id="progressPct">0%</span>
+      </div>
+      <div class="w-full h-2 bg-surface-container rounded-full overflow-hidden">
+        <div id="progressBar" class="h-full bg-primary rounded-full transition-all duration-200" style="width:0%"></div>
+      </div>
+    </div>
+
+    <button type="submit" id="submitBtn"
+            class="bg-primary text-on-primary font-label-md text-label-md px-md py-sm rounded-lg hover:shadow-lg transition-all flex items-center justify-center gap-sm w-full">
+      <span id="btnText">Upload</span>
+      <svg id="btnSpinner" class="hidden animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+        <circle cx="12" cy="12" r="10" stroke-opacity="0.25"/>
+        <path d="M22 12a10 10 0 0 0-10-10" stroke-linecap="round"/>
+      </svg>
     </button>
   </form>
 </main>
+
+<script>
+const form = document.getElementById('uploadForm');
+const fileInput = document.getElementById('fileInput');
+const progressWrap = document.getElementById('progressWrap');
+const progressBar = document.getElementById('progressBar');
+const progressPct = document.getElementById('progressPct');
+const progressLabel = document.getElementById('progressLabel');
+const submitBtn = document.getElementById('submitBtn');
+const btnText = document.getElementById('btnText');
+const btnSpinner = document.getElementById('btnSpinner');
+const MAX_SIZE = 26 * 1024 * 1024;  // 26 MB
+
+// File validation preview
+fileInput.addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const sizeMB = (file.size / 1024 / 1024).toFixed(2);
+  const info = document.getElementById('fileInfo');
+  info.style.display = 'block';
+
+  if (file.size > MAX_SIZE) {
+    info.innerHTML = `File is too large (${sizeMB} MB). Max allowed is 26 MB.`;
+    info.style.color = '#b91c1c';
+    submitBtn.disabled = true;
+    submitBtn.style.opacity = '0.5';
+  } else {
+    info.innerHTML = `${file.name} (${sizeMB} MB)`;
+    info.style.color = '#0b7e5a';
+    submitBtn.disabled = false;
+    submitBtn.style.opacity = '1';
+  }
+});
+
+// AJAX upload with live progress
+form.addEventListener('submit', function(e) {
+  e.preventDefault();
+
+  const xhr = new XMLHttpRequest();
+  const formData = new FormData(form);
+
+  // UI: show progress + inline spinner
+  progressWrap.classList.remove('hidden');
+  submitBtn.disabled = true;
+  btnText.textContent = 'Uploading...';
+  btnSpinner.classList.remove('hidden');
+
+  xhr.upload.addEventListener('progress', function(evt) {
+    if (evt.lengthComputable) {
+      const pct = Math.round((evt.loaded / evt.total) * 100);
+      progressBar.style.width = pct + '%';
+      progressPct.textContent = pct + '%';
+      progressLabel.textContent = pct < 100
+        ? 'Uploading...'
+        : 'Processing on server...';
+    }
+  });
+
+  xhr.onload = function() {
+    if (xhr.status === 200 || xhr.status === 302) {
+      progressBar.style.width = '100%';
+      progressPct.textContent = '100%';
+      progressLabel.textContent = 'Done! Redirecting...';
+      setTimeout(() => { window.location.href = '{{ url_for("materials.my_uploads") }}'; }, 500);
+    } else {
+      progressLabel.textContent = 'Upload failed';
+      progressBar.style.background = '#dc2626';
+      btnText.textContent = 'Upload';
+      btnSpinner.classList.add('hidden');
+      submitBtn.disabled = false;
+      setTimeout(() => { window.location.reload(); }, 1500);
+    }
+  };
+
+  xhr.onerror = function() {
+    progressLabel.textContent = 'Network error. Try again.';
+    progressBar.style.background = '#dc2626';
+    btnText.textContent = 'Upload';
+    btnSpinner.classList.add('hidden');
+    submitBtn.disabled = false;
+  };
+
+  xhr.open('POST', form.action, true);
+  xhr.send(formData);
+});
+</script>
 {% endblock %}
