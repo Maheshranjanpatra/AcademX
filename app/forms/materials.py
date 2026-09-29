@@ -2,17 +2,22 @@ from flask_wtf import FlaskForm
 from flask_wtf.file import FileAllowed, FileField
 from wtforms import SelectField, StringField, SubmitField, TextAreaField
 from wtforms.validators import DataRequired, Length, Optional, URL, ValidationError
+from flask import current_app
 
 
 def validate_file_size(form, field):
-    """Custom validator to check file size (max 26MB)."""
+    """Check file size against MAX_CONTENT_LENGTH from config."""
     if field.data:
         file = field.data
-        file.seek(0, 2)
+        file.seek(0, 2)  
         size = file.tell()
-        file.seek(0)
-        if size > 10 * 1024 * 1024:
-            raise ValidationError("File size must be less than 10MB.")
+        file.seek(0)  
+
+        max_bytes = current_app.config["MAX_CONTENT_LENGTH"]
+        max_mb = max_bytes // (1024 * 1024)
+
+        if size > max_bytes:
+            raise ValidationError(f"File size must be less than {max_mb}MB.")
 
 
 class MaterialUploadForm(FlaskForm):
@@ -21,7 +26,7 @@ class MaterialUploadForm(FlaskForm):
         validators=[DataRequired(), Length(max=150)]
     )
     subject = StringField(
-        "Course Code",
+        "Subject / Course Code",
         validators=[DataRequired(), Length(max=80)]
     )
     category = SelectField(
@@ -43,7 +48,7 @@ class MaterialUploadForm(FlaskForm):
     file = FileField(
         "Upload File (PDF / Image / Word)",
         validators=[
-            FileAllowed(["pdf", "jpg", "jpeg", "docx"], "PDF, JPG, JPEG, or DOCX files only!"),
+            FileAllowed(["pdf", "jpg", "jpeg", "png", "docx"], "PDF, JPG, PNG, or DOCX files only!"),
             validate_file_size
         ]
     )
