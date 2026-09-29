@@ -1,18 +1,21 @@
-from flask import Flask, request, redirect, url_for, session, flash
+from flask import Flask, request, redirect, url_for, session, flash, render_template
 from flask_login import current_user
 from app.config import Config
 from app.extensions import db, migrate, login_manager, oauth, csrf
 from datetime import date
 
+
 def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
 
+    # ---- Extensions ----
     db.init_app(app)
     migrate.init_app(app, db)
     login_manager.init_app(app)
     oauth.init_app(app)
     csrf.init_app(app)
+
     google = oauth.register(
         name="google",
         client_id=app.config["GOOGLE_CLIENT_ID"],
@@ -21,13 +24,14 @@ def create_app(config_class=Config):
         client_kwargs={"scope": "openid email profile"},
     )
 
+    # ---- Models ----
     from app.models import user, question, quiz, video, paper, material
 
     @login_manager.user_loader
     def load_user(user_id):
         return user.User.query.get(int(user_id))
 
-    # Register blueprints
+    # ---- Blueprints ----
     from app.routes.auth import auth_bp
     from app.routes.dashboard import dashboard_bp
     from app.routes.qa import qa_bp
@@ -48,10 +52,11 @@ def create_app(config_class=Config):
     app.register_blueprint(admin_bp, url_prefix="/admin")
     app.register_blueprint(dashboard_bp, url_prefix="/dashboard")
 
+    # ---- Jinja filter for B2 signed URLs ----
     from app.utils.helpers import get_file_url
     app.jinja_env.filters["file_url"] = get_file_url
-    
-    # GLOBAL BEFORE_REQUEST
+
+    # ---- Global before_request ----
     @app.before_request
     def enforce_profile_completion():
         if request.endpoint == 'static' or request.path.startswith('/static/'):
@@ -69,15 +74,15 @@ def create_app(config_class=Config):
             'auth.complete_profile',
         ]
 
-        # user already logged in, profile not complete
         if current_user.is_authenticated and not current_user.profile_complete:
             if request.endpoint not in ['auth.complete_profile', 'auth.logout']:
                 flash("Please complete your profile first.", "error")
                 return redirect(url_for('auth.complete_profile'))
+
         if not current_user.is_authenticated and request.endpoint not in PUBLIC_ENDPOINTS:
             return redirect(url_for('auth.login'))
-        return
 
+    # ---- Context processors ----
     @app.context_processor
     def inject_streak_status():
         if not current_user.is_authenticated:
@@ -91,18 +96,16 @@ def create_app(config_class=Config):
 
         return {"streak_warning": False}
 
-    return app
-
     @app.context_processor
     def inject_upload_limit():
         return {
             "MAX_UPLOAD_MB": app.config["MAX_CONTENT_LENGTH"] // (1024 * 1024)
         }
-    
-    # ERROR HANDLERS
+
+    # ---- Error handlers ----
     @app.errorhandler(500)
     def internal_error(error):
-        db.session.rollback()  
+        db.session.rollback()
         return render_template('errors/500.html'), 500
 
     @app.errorhandler(404)
@@ -112,3 +115,5 @@ def create_app(config_class=Config):
     @app.errorhandler(413)
     def request_entity_too_large(error):
         return render_template('errors/413.html'), 413
+
+    return app  
