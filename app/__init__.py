@@ -108,3 +108,7 @@ def create_app(config_class=Config):
     @app.errorhandler(404)
     def not_found(error):
         return render_template('errors/404.html'), 404
+
+    @app.errorhandler(413)
+    def request_entity_too_large(error):
+        return render_template('errors/413.html'), 413
