@@ -9,6 +9,7 @@
   </h1>
 
   <form method="post" enctype="multipart/form-data" id="paperForm"
+        action="{{ url_for('paper.upload') }}"
         data-no-spinner
         class="bg-surface-container-lowest border border-outline-variant rounded-xl card-shadow p-md space-y-md">
     {{ form.hidden_tag() }}
@@ -45,53 +46,50 @@
 
     <button type="submit" id="paperSubmitBtn"
             class="bg-primary text-on-primary font-label-md text-label-md px-md py-sm rounded-lg hover:shadow-lg transition-all flex items-center justify-center gap-sm w-full">
-      <span id="paperBtnText">Upload Paper</span>
-      <span class="material-symbols-outlined" id="paperBtnIcon">upload</span>
-      <svg id="paperBtnSpinner" class="hidden animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-        <circle cx="12" cy="12" r="10" stroke-opacity="0.25"/>
-        <path d="M22 12a10 10 0 0 0-10-10" stroke-linecap="round"/>
-      </svg>
+      Upload Paper <span class="material-symbols-outlined">upload</span>
     </button>
   </form>
 </main>
+{% endblock %}
 
+{% block scripts %}
 <script>
-const paperForm = document.getElementById('paperForm');
-const paperFileInput = document.getElementById('paperFileInput');
-const paperSubmitBtn = document.getElementById('paperSubmitBtn');
-const paperBtnText = document.getElementById('paperBtnText');
-const paperBtnIcon = document.getElementById('paperBtnIcon');
-const paperBtnSpinner = document.getElementById('paperBtnSpinner');
-const PAPER_MAX_SIZE = {{ MAX_UPLOAD_MB }} * 1024 * 1024; 
+  (function () {
+    const MAX_BYTES = {{ MAX_UPLOAD_MB }} * 1024 * 1024;
+    const fileInput = document.getElementById('paperFileInput');
+    const info      = document.getElementById('paperFileInfo');
+    const submitBtn = document.getElementById('paperSubmitBtn');
 
-// File size validation
-paperFileInput.addEventListener('change', function(e) {
-  const file = e.target.files[0];
-  if (!file) return;
-  const sizeMB = (file.size / 1024 / 1024).toFixed(2);
-  const info = document.getElementById('paperFileInfo');
-  info.style.display = 'block';
+    fileInput.addEventListener('change', function (e) {
+      const file = e.target.files[0];
+      if (!file) {
+        info.style.display = 'none';
+        submitBtn.disabled = false;
+        submitBtn.style.opacity = '1';
+        return;
+      }
+      const sizeMB = (file.size / 1024 / 1024).toFixed(2);
+      info.style.display = 'block';
 
-  if (file.size > PAPER_MAX_SIZE) {
-    info.innerHTML = `File is too large (${sizeMB} MB). Max allowed is {{ MAX_UPLOAD_MB }} MB.`;
-    info.style.color = '#b91c1c';
-    paperSubmitBtn.disabled = true;
-    paperSubmitBtn.style.opacity = '0.5';
-  } else {
-    info.innerHTML = `${file.name} (${sizeMB} MB)`;
-    info.style.color = '#0b7e5a';
-    paperSubmitBtn.disabled = false;
-    paperSubmitBtn.style.opacity = '1';
-  }
-});
+      if (file.size > MAX_BYTES) {
+        info.innerHTML = `File is too large (${sizeMB} MB). Max allowed is {{ MAX_UPLOAD_MB }} MB.`;
+        info.style.color = '#b91c1c';
+        submitBtn.disabled = true;
+        submitBtn.style.opacity = '0.5';
+      } else {
+        info.innerHTML = `${file.name} (${sizeMB} MB)`;
+        info.style.color = '#0b7e5a';
+        submitBtn.disabled = false;
+        submitBtn.style.opacity = '1';
+      }
+    });
 
-// Show inline spinner on submit
-paperForm.addEventListener('submit', function() {
-  paperBtnText.textContent = 'Uploading...';
-  paperBtnIcon.classList.add('hidden');
-  paperBtnSpinner.classList.remove('hidden');
-  paperSubmitBtn.disabled = true;
-  paperSubmitBtn.style.opacity = '0.75';
-});
+    NymoraSpinner.attach(document.getElementById('paperForm'), {
+      redirect: '{{ url_for("paper.list_papers") }}',
+      uploadingText: 'Uploading your paper....',
+      doneText: 'Paper submitted!',
+      holdMs: 500,
+    });
+  })();
 </script>
 {% endblock %}
