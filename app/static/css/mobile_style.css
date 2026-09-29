@@ -1,0 +1,518 @@
+/* ============================================================
+   Nymora Mobile Navigation — aurora gradient, bottom nav, drawer
+   Scoped to @media (max-width: 767px) — desktop untouched
+   ============================================================ */
+
+@media (max-width: 767px) {
+
+  /* ---------- Aurora (adapted to Nymora) ---------- */
+  :root {
+    --nymora-aurora: linear-gradient(120deg, #0058be 0%, #006b5f 35%, #71f8e4 65%, #b8860b 100%);
+    --nymora-aurora-deep: linear-gradient(120deg, #003d85 0%, #004d44 35%, #4fdbc8 65%, #8a6508 100%);
+    --aurora-size: 250% 250%;
+
+    --nav-bg: rgba(9, 16, 30, 0.92);
+    --nav-bd: rgba(255, 255, 255, 0.08);
+    --nav-item: #adc6ff;
+    --nav-item-on: #71f8e4;
+    --nav-on-bg: linear-gradient(135deg, rgba(113,248,228,.20), rgba(0,88,190,.42));
+    --nav-on-sh: inset 0 0 0 1px rgba(113,248,228,.28), 0 0 22px -6px rgba(113,248,228,.55);
+    --nav-on-glow: drop-shadow(0 0 8px rgba(113,248,228,.65));
+
+    --dr-bg: #0a0d20;
+    --dr-bd: rgba(113, 248, 228, 0.15);
+    --dr-halo: radial-gradient(240px 160px at 20% 0%, rgba(0,88,190,.30), transparent 70%),
+               radial-gradient(220px 140px at 90% 100%, rgba(113,248,228,.18), transparent 70%);
+    --dr-item: #c8d3ee;
+    --dr-item-hover: rgba(255, 255, 255, 0.05);
+    --dr-active-fg: #0a0d20;
+    --dr-active-bg: var(--nymora-aurora);
+    --dr-active-glow: 0 10px 24px -8px rgba(0,88,190,.75), inset 0 1px 0 rgba(255,255,255,.45);
+    --dr-close-bg: rgba(255, 255, 255, 0.08);
+    --dr-close-fg: #71f8e4;
+    --dr-name: #ffffff;
+  }
+
+  html.light {
+    --nav-bg: rgba(255, 255, 255, 0.92);
+    --nav-bd: rgba(0, 0, 0, 0.06);
+    --nav-item: #727785;
+    --nav-item-on: #ffffff;
+    --nav-on-bg: var(--nymora-aurora-deep);
+    --nav-on-sh: 0 8px 20px -8px rgba(0,88,190,.55), inset 0 1px 0 rgba(255,255,255,.35);
+    --nav-on-glow: drop-shadow(0 0 8px rgba(0,88,190,.35));
+
+    --dr-bg: #faf8ff;
+    --dr-bd: rgba(0, 88, 190, 0.15);
+    --dr-halo: radial-gradient(240px 160px at 20% 0%, rgba(0,88,190,.15), transparent 70%),
+               radial-gradient(220px 140px at 90% 100%, rgba(0,107,95,.12), transparent 70%);
+    --dr-item: #3b3357;
+    --dr-item-hover: rgba(0, 88, 190, 0.06);
+    --dr-active-fg: #ffffff;
+    --dr-active-bg: var(--nymora-aurora-deep);
+    --dr-active-glow: 0 10px 24px -8px rgba(0,88,190,.5), inset 0 1px 0 rgba(255,255,255,.35);
+    --dr-close-bg: rgba(0, 88, 190, 0.10);
+    --dr-close-fg: #0058be;
+    --dr-name: #1a1428;
+  }
+
+  @keyframes auroraShift {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  .aurora-bg {
+    background: var(--nymora-aurora);
+    background-size: var(--aurora-size);
+    animation: auroraShift 7s ease-in-out infinite;
+  }
+
+  /* ---------- Body padding so content isn't hidden behind bottom nav ---------- */
+  body.has-bottom-nav {
+    padding-bottom: 76px;
+  }
+
+  /* Hide old mobile dropdown */
+  #mobile-nav {
+    display: none !important;
+  }
+
+  /* ============================================================
+     BOTTOM NAV
+     ============================================================ */
+  .mobile-bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+    gap: 4px;
+    padding: 8px 10px 12px;
+    background: var(--nav-bg);
+    backdrop-filter: blur(20px) saturate(160%);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    border-top: 1px solid var(--nav-bd);
+    transition: background 0.35s, border-color 0.3s;
+  }
+
+  .mobile-nav-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 10px;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    color: var(--nav-item);
+    border-radius: 999px;
+    overflow: hidden;
+    gap: 0;
+    text-decoration: none;
+    transition: background 0.45s, color 0.3s, gap 0.4s cubic-bezier(.4,0,.2,1),
+                box-shadow 0.4s, padding 0.4s cubic-bezier(.4,0,.2,1);
+  }
+
+  .mobile-nav-item .msr {
+    font-size: 23px;
+    position: relative;
+    z-index: 1;
+    transition: font-variation-settings 0.25s, transform 0.25s;
+  }
+
+  .mobile-nav-item .lbl {
+    max-width: 0;
+    opacity: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: -0.005em;
+    position: relative;
+    z-index: 1;
+    transition: max-width 0.42s cubic-bezier(.4,0,.2,1), opacity 0.28s;
+  }
+
+  .mobile-nav-item.active {
+    gap: 7px;
+    padding: 10px 14px;
+    color: var(--nav-item-on);
+    background: var(--nav-on-bg);
+    background-size: var(--aurora-size);
+    box-shadow: var(--nav-on-sh);
+  }
+
+  html.light .mobile-nav-item.active {
+    animation: auroraShift 7s ease-in-out infinite;
+  }
+
+  .mobile-nav-item.active .lbl {
+    max-width: 96px;
+    opacity: 1;
+  }
+
+  .mobile-nav-item.active .msr {
+    font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+    filter: var(--nav-on-glow);
+  }
+
+  /* ============================================================
+     SCRIM
+     ============================================================ */
+  .mobile-scrim {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.32s;
+    z-index: 60;
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+  }
+
+  html.light .mobile-scrim {
+    background: rgba(13, 21, 38, 0.35);
+  }
+
+  .mobile-scrim.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* ============================================================
+     DRAWER
+     ============================================================ */
+  .mobile-drawer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 84%;
+    max-width: 320px;
+    background: var(--dr-bg);
+    border-right: 1px solid var(--dr-bd);
+    box-shadow: 0 24px 60px -22px rgba(0, 0, 0, 0.9), 0 0 60px -18px rgba(0, 88, 190, 0.5);
+    transform: translateX(-100%);
+    transition: transform 0.46s cubic-bezier(.32, .72, 0, 1),
+                background 0.35s, border-color 0.3s, box-shadow 0.35s;
+    z-index: 70;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .mobile-drawer.open {
+    transform: translateX(0);
+  }
+
+  /* --- Drawer profile section --- */
+  .dr-profile {
+    padding: 26px 22px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+    position: relative;
+    flex: 0 0 auto;
+    background: var(--dr-halo);
+    border-bottom: 1px solid var(--dr-bd);
+    transition: background 0.35s, border-color 0.3s;
+  }
+
+  .dr-avatar {
+    width: 58px;
+    height: 58px;
+    border-radius: 20px;
+    display: grid;
+    place-items: center;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 24px;
+    letter-spacing: -0.02em;
+    position: relative;
+    color: var(--dr-active-fg);
+    box-shadow: 0 10px 26px -8px rgba(0, 88, 190, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  }
+
+  html.light .dr-avatar {
+    color: #fff;
+    background: var(--nymora-aurora-deep) !important;
+    background-size: var(--aurora-size) !important;
+  }
+
+  .dr-avatar::after {
+    content: "";
+    position: absolute;
+    inset: -4px;
+    border-radius: 24px;
+    border: 1.5px solid currentColor;
+    opacity: 0.18;
+  }
+
+  .dr-hi {
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.4;
+    color: var(--dr-item);
+    transition: color 0.3s;
+  }
+
+  .dr-hi strong {
+    display: block;
+    font-family: 'Poppins', sans-serif;
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    margin-top: 2px;
+    color: var(--dr-name);
+    transition: color 0.3s;
+  }
+
+  .dr-close {
+    position: absolute;
+    top: 22px;
+    right: 16px;
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    border: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--dr-close-bg);
+    color: var(--dr-close-fg);
+    transition: background 0.2s, color 0.3s, transform 0.2s;
+  }
+
+  .dr-close:active {
+    transform: scale(0.9);
+  }
+
+  .dr-close .msr {
+    font-size: 20px;
+  }
+
+  /* --- Drawer nav items --- */
+  .dr-nav {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 10px 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .dr-nav::-webkit-scrollbar {
+    width: 0;
+  }
+
+  .dr-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 14px;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--dr-item);
+    border-radius: 13px;
+    text-align: left;
+    overflow: hidden;
+    text-decoration: none;
+    transition: background 0.3s, color 0.25s, transform 0.2s, box-shadow 0.3s;
+  }
+
+  .dr-item .msr {
+    font-size: 21px;
+    flex: 0 0 21px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .dr-item span:not(.msr) {
+    position: relative;
+    z-index: 1;
+  }
+
+  .dr-item:active {
+    transform: scale(0.98);
+  }
+
+  .dr-item:not(.active):hover {
+    background: var(--dr-item-hover);
+  }
+
+  .dr-item.active {
+    color: var(--dr-active-fg);
+    background: var(--dr-active-bg);
+    background-size: var(--aurora-size);
+    animation: auroraShift 7s ease-in-out infinite;
+    box-shadow: var(--dr-active-glow);
+  }
+
+  .dr-item.active .msr {
+    font-variation-settings: 'FILL' 1, 'wght' 500;
+  }
+
+  /* --- Drawer theme toggle --- */
+  .dr-theme {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    margin: 0 12px 8px;
+    border-radius: 13px;
+    background: var(--dr-item-hover);
+    transition: background 0.3s;
+  }
+
+  .dr-theme-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--dr-item);
+  }
+
+  .dr-theme-label .msr {
+    font-size: 20px;
+  }
+
+  .dr-theme-toggle {
+    position: relative;
+    width: 44px;
+    height: 24px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.15);
+    cursor: pointer;
+    transition: background 0.3s;
+    border: 0;
+    padding: 0;
+  }
+
+  html.light .dr-theme-toggle {
+    background: rgba(0, 0, 0, 0.12);
+  }
+
+  .dr-theme-toggle::after {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #fff;
+    transition: transform 0.3s cubic-bezier(.34, 1.4, .64, 1), background 0.3s;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  }
+
+  html.light .dr-theme-toggle::after {
+    background: #0058be;
+  }
+
+  .dr-theme-toggle.on::after {
+    transform: translateX(20px);
+  }
+
+  /* --- Drawer footer --- */
+  .dr-copy {
+    flex: 0 0 auto;
+    padding: 14px 20px 20px;
+    font-size: 10.5px;
+    line-height: 1.55;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    color: var(--dr-item);
+    border-top: 1px solid var(--dr-bd);
+    transition: color 0.3s, border-color 0.3s;
+  }
+
+  .dr-copy strong {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 11.5px;
+    background: linear-gradient(100deg, #0058be, #71f8e4);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* ============================================================
+     RIPPLE
+     ============================================================ */
+  .ripple {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    background: currentColor;
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0.22;
+    animation: rippleOut 0.62s ease-out forwards;
+    z-index: 0;
+  }
+
+  @keyframes rippleOut {
+    0%   { transform: translate(-50%, -50%) scale(0); opacity: 0.26; }
+    100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+  }
+
+  /* ============================================================
+     ICON POP
+     ============================================================ */
+  @keyframes iconPop {
+    0%   { transform: scale(1); }
+    42%  { transform: scale(1.28) translateY(-1px); }
+    72%  { transform: scale(0.94); }
+    100% { transform: scale(1); }
+  }
+
+  .mobile-nav-item.pop .msr,
+  .dr-item.pop .msr {
+    animation: iconPop 0.5s cubic-bezier(.34, 1.56, .64, 1);
+  }
+
+  /* ============================================================
+     TITLE FLIP
+     ============================================================ */
+  @keyframes flip {
+    from { opacity: 0; transform: translateY(8px) scale(0.99); }
+    to   { opacity: 1; transform: none; }
+  }
+
+  .page-title.flip {
+    animation: flip 0.34s cubic-bezier(.2, .7, .3, 1);
+  }
+}
+
+/* ============================================================
+   Material Symbols — force Rounded everywhere
+   ============================================================ */
+.material-symbols-outlined,
+.material-symbols-rounded {
+  font-family: 'Material Symbols Rounded' !important;
+  font-weight: normal;
+  font-style: normal;
+  line-height: 1;
+  display: inline-block;
+  white-space: nowrap;
+  direction: ltr;
+  -webkit-font-feature-settings: 'liga';
+  font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+}

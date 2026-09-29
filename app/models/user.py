@@ -1,5 +1,6 @@
 import random
 from datetime import datetime
+from flask import url_for
 from flask_login import UserMixin
 from app.extensions import db
 
@@ -41,6 +42,11 @@ class User(db.Model, UserMixin):
     )
 
     anonymous_id = db.Column(db.String(20), unique=True, nullable=False, default='')
+
+    @property
+    def username(self):
+        """Returns the part of email before @ — used as display username."""
+        return self.email.split('@')[0] if self.email else 'user'
 
     def generate_anonymous_id(self):
         """Generate a unique anonymous ID."""

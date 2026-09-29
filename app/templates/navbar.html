@@ -5,8 +5,6 @@
     <!-- Logo -->
     <a href="{{ url_for('dashboard.home') if current_user.is_authenticated else url_for('auth.index') }}"
        class="flex items-center gap-3 group">
-    
-      <!-- Squircle wrapper for the SVG -->
       <span class="
         inline-flex items-center justify-center
         h-10 w-10 md:h-12 md:w-12
@@ -23,13 +21,12 @@
              alt="Nymora"
              class="h-full w-full object-contain" />
       </span>
-    
       <span class="font-serif text-xl md:text-2xl font-black tracking-tight text-primary-fixed drop-shadow-sm group-hover:text-secondary-fixed transition-colors duration-300">
         Nymora
       </span>
     </a>
 
-    <!-- Navigation (desktop) -->
+    <!-- Desktop Navigation -->
     <nav class="hidden md:flex gap-4 items-center">
       {% if current_user.is_authenticated %}
         <a class="nav-link {{ 'nav-link-active' if request.endpoint == 'dashboard.home' else '' }}" href="{{ url_for('dashboard.home') }}">
@@ -58,41 +55,47 @@
       </a>
     </nav>
 
-    <!-- Right actions -->
+    <!-- Right Actions -->
     <div class="flex items-center gap-2 md:gap-2.5">
-        <!-- Mobile menu -->
-        <button id="mobile-menu-toggle" class="md:hidden text-primary-fixed-dim hover:text-secondary-fixed transition-colors p-1">
-          <span class="material-symbols-outlined text-[28px]">menu</span>
-        </button>
 
-        <!-- Admin button -->
-        {% if not current_user.is_authenticated %}
-        <a href="{{ url_for('auth.admin_login') }}"
-           class="hidden md:flex items-center gap-1.5 border border-primary-fixed-dim/50 hover:bg-primary-fixed/10 text-primary-fixed-dim hover:text-secondary-fixed transition-all rounded-[8px] px-3 py-1.5 font-label-md text-label-md font-medium">
-            <span class="material-symbols-outlined text-[18px]">admin_panel_settings</span>
-            Admin
-        </a>
-        {% endif %}
+      <!-- Mobile hamburger (opens drawer) -->
+      {% if current_user.is_authenticated %}
+      <button id="mobile-menu-toggle"
+              class="md:hidden text-primary-fixed-dim hover:text-secondary-fixed transition-colors p-1"
+              aria-label="Menu">
+        <span class="material-symbols-outlined text-[28px]">menu</span>
+      </button>
+      {% endif %}
 
-        {% if current_user.is_authenticated %}
-            <div class="flex items-center gap-1.5">
-                {{ user_avatar(current_user, 'w-7 h-7 md:w-8 md:h-8') }}
-                <a href="{{ url_for('dashboard.home') }}" class="hidden md:block text-primary-fixed-dim hover:text-secondary-fixed transition-colors font-label-md text-label-md">
-                    {{ current_user.name.split(' ')[0] }}
-                </a>
-            </div>
-            <!-- Logout button -->
-            <a href="{{ url_for('auth.logout') }}" class="bg-primary-fixed/10 hover:bg-primary-fixed/20 transition-all rounded-[8px] px-3 py-1.5 font-label-md text-label-md text-primary-fixed flex items-center gap-1.5">
-                <span class="material-symbols-outlined text-[18px]">logout</span>
-                <span class="hidden sm:inline">Logout</span>
-            </a>
-        {% else %}
-            <!-- Login button -->
-            <a href="{{ url_for('auth.login') }}" class="bg-primary text-on-primary hover:bg-surface-tint hover:shadow-md hover:-translate-y-0.5 transition-all rounded-[8px] px-4 py-1.5 font-label-md text-label-md shadow-sm flex items-center gap-1.5">
-                <span class="material-symbols-outlined text-[18px]">login</span>
-                <span>Login</span>
-            </a>
-        {% endif %}
+      <!-- Admin button (desktop only) -->
+      {% if not current_user.is_authenticated %}
+      <a href="{{ url_for('auth.admin_login') }}"
+         class="hidden md:flex items-center gap-1.5 border border-primary-fixed-dim/50 hover:bg-primary-fixed/10 text-primary-fixed-dim hover:text-secondary-fixed transition-all rounded-[8px] px-3 py-1.5 font-label-md text-label-md font-medium">
+        <span class="material-symbols-outlined text-[18px]">admin_panel_settings</span>
+        Admin
+      </a>
+      {% endif %}
+
+      {% if current_user.is_authenticated %}
+          <!-- User avatar (desktop only — mobile has it in drawer) -->
+          <div class="hidden md:flex items-center gap-1.5">
+              {{ user_avatar(current_user, 'w-7 h-7 md:w-8 md:h-8') }}
+              <a href="{{ url_for('dashboard.home') }}" class="hidden md:block text-primary-fixed-dim hover:text-secondary-fixed transition-colors font-label-md text-label-md">
+                  {{ current_user.name.split(' ')[0] }}
+              </a>
+          </div>
+          <!-- Logout button (desktop only) -->
+          <a href="{{ url_for('auth.logout') }}" class="hidden md:flex bg-primary-fixed/10 hover:bg-primary-fixed/20 transition-all rounded-[8px] px-3 py-1.5 font-label-md text-label-md text-primary-fixed items-center gap-1.5">
+              <span class="material-symbols-outlined text-[18px]">logout</span>
+              <span class="hidden sm:inline">Logout</span>
+          </a>
+      {% else %}
+          <!-- Login button -->
+          <a href="{{ url_for('auth.login') }}" class="bg-primary text-on-primary hover:bg-surface-tint hover:shadow-md hover:-translate-y-0.5 transition-all rounded-[8px] px-4 py-1.5 font-label-md text-label-md shadow-sm flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-[18px]">login</span>
+              <span>Login</span>
+          </a>
+      {% endif %}
 
       <!-- Install Button (PWA) -->
       <button id="install-btn"
@@ -108,87 +111,153 @@
       </button>
     </div>
   </div>
-
-  <!-- Mobile Navigation -->
-  <div id="mobile-nav" class="md:hidden bg-on-primary-fixed/95 backdrop-blur-sm border-t border-primary-fixed/10 px-4 py-3 hidden">
-    <div class="flex flex-col gap-3">
-      {% if current_user.is_authenticated %}
-        <a class="nav-link" href="{{ url_for('dashboard.home') }}">
-          <span class="material-symbols-outlined text-[20px]">dashboard</span> Dashboard
-        </a>
-      {% else %}
-        <a class="nav-link" href="{{ url_for('auth.index') }}">
-          <span class="material-symbols-outlined text-[20px]">home</span> Home
-        </a>
-      {% endif %}
-
-      <a class="nav-link" href="{{ url_for('qa.list_questions') }}">
-        <span class="material-symbols-outlined text-[20px]">forum</span> Q&amp;A
-      </a>
-      <a class="nav-link" href="{{ url_for('video.playlists') }}">
-        <span class="material-symbols-outlined text-[20px]">play_circle</span> Playlists
-      </a>
-      <a class="nav-link" href="{{ url_for('quiz.list_quizzes') }}">
-        <span class="material-symbols-outlined text-[20px]">quiz</span> Quizzes
-      </a>
-      <a class="nav-link" href="{{ url_for('materials.list_materials') }}">
-        <span class="material-symbols-outlined text-[20px]">auto_stories</span> Study Materials
-      </a>
-      <a class="nav-link" href="{{ url_for('materials.my_uploads') }}">
-        <span class="material-symbols-outlined text-[20px]">upload_file</span> My Uploads
-      </a>
-
-      {% if current_user.is_authenticated %}
-        <a class="nav-link" href="{{ url_for('auth.logout') }}">
-          <span class="material-symbols-outlined text-[20px]">logout</span> Logout
-        </a>
-      {% else %}
-        <a class="nav-link" href="{{ url_for('auth.admin_login') }}">
-          <span class="material-symbols-outlined text-[20px]">admin_panel_settings</span> Admin
-        </a>
-      {% endif %}
-    </div>
-  </div>
 </header>
 
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    // Mobile menu toggle
-    const toggleBtn = document.getElementById('mobile-menu-toggle');
-    const mobileNav = document.getElementById('mobile-nav');
-    if (toggleBtn && mobileNav) {
-      toggleBtn.addEventListener('click', function() {
-        mobileNav.classList.toggle('hidden');
-      });
-    }
+{% if current_user.is_authenticated %}
+<!-- ============================================================
+     MOBILE BOTTOM NAV (mobile only)
+     ============================================================ -->
+{% set active_tab = '' %}
+{% if request.endpoint == 'dashboard.home' %}
+  {% set active_tab = 'home' %}
+{% elif request.blueprint == 'qa' %}
+  {% set active_tab = 'qa' %}
+{% elif request.blueprint == 'video' %}
+  {% set active_tab = 'playlist' %}
+{% elif request.blueprint == 'materials' %}
+  {% set active_tab = 'materials' %}
+{% elif request.endpoint == 'pages.profile' %}
+  {% set active_tab = 'profile' %}
+{% endif %}
 
-    // PWA Install Button
-    let deferredPrompt;
-    const installBtn = document.getElementById('install-btn');
+<nav class="mobile-bottom-nav md:hidden" aria-label="Mobile navigation">
+  <a href="{{ url_for('dashboard.home') }}"
+     class="mobile-nav-item {{ 'active' if active_tab == 'home' else '' }}"
+     data-tab="home">
+    <span class="material-symbols-outlined msr">home</span>
+    <span class="lbl">Home</span>
+  </a>
 
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      if (installBtn) {
-        installBtn.style.display = 'flex';
-        installBtn.addEventListener('click', () => {
-          deferredPrompt.prompt();
-          deferredPrompt.userChoice.then((choiceResult) => {
-            if (choiceResult.outcome === 'accepted') {
-              console.log('✅ User installed PWA');
-            } else {
-              console.log('❌ User dismissed install');
-            }
-            deferredPrompt = null;
-            installBtn.style.display = 'none';
-          });
-        });
-      }
-    });
+  <a href="{{ url_for('qa.list_questions') }}"
+     class="mobile-nav-item {{ 'active' if active_tab == 'qa' else '' }}"
+     data-tab="qa">
+    <span class="material-symbols-outlined msr">forum</span>
+    <span class="lbl">Q&amp;A</span>
+  </a>
 
-    window.addEventListener('appinstalled', () => {
-      console.log('✅ PWA installed successfully');
-      if (installBtn) installBtn.style.display = 'none';
-    });
-  });
-</script>
+  <a href="{{ url_for('video.playlists') }}"
+     class="mobile-nav-item {{ 'active' if active_tab == 'playlist' else '' }}"
+     data-tab="playlist">
+    <span class="material-symbols-outlined msr">play_circle</span>
+    <span class="lbl">Videos</span>
+  </a>
+
+  <a href="{{ url_for('materials.list_materials') }}"
+     class="mobile-nav-item {{ 'active' if active_tab == 'materials' else '' }}"
+     data-tab="materials">
+    <span class="material-symbols-outlined msr">menu_book</span>
+    <span class="lbl">Materials</span>
+  </a>
+
+  <a href="{{ url_for('pages.profile') }}"
+     class="mobile-nav-item {{ 'active' if active_tab == 'profile' else '' }}"
+     data-tab="profile">
+    <span class="material-symbols-outlined msr">person</span>
+    <span class="lbl">Profile</span>
+  </a>
+</nav>
+
+<!-- ============================================================
+     MOBILE DRAWER
+     ============================================================ -->
+<div class="mobile-scrim md:hidden" id="mobile-scrim"></div>
+
+<aside class="mobile-drawer md:hidden" id="mobile-drawer" aria-label="Side menu">
+
+  <!-- Profile header -->
+  <div class="dr-profile">
+    <div class="dr-avatar aurora-bg">
+      {{ current_user.username[0]|upper }}
+    </div>
+    <div class="dr-hi">
+      Hi there,
+      <strong>{{ current_user.username }}</strong>
+    </div>
+    <button class="dr-close" id="mobile-drawer-close" aria-label="Close menu">
+      <span class="material-symbols-outlined msr">close</span>
+    </button>
+  </div>
+
+  <!-- Nav items -->
+  <nav class="dr-nav">
+    <a class="dr-item {{ 'active' if request.endpoint == 'dashboard.home' else '' }}"
+       href="{{ url_for('dashboard.home') }}">
+      <span class="material-symbols-outlined msr">dashboard</span>
+      <span>Dashboard</span>
+    </a>
+
+    <a class="dr-item {{ 'active' if request.blueprint == 'qa' else '' }}"
+       href="{{ url_for('qa.list_questions') }}">
+      <span class="material-symbols-outlined msr">forum</span>
+      <span>Q&amp;A</span>
+    </a>
+
+    <a class="dr-item {{ 'active' if request.blueprint == 'video' else '' }}"
+       href="{{ url_for('video.playlists') }}">
+      <span class="material-symbols-outlined msr">playlist_play</span>
+      <span>Playlists</span>
+    </a>
+
+    <a class="dr-item {{ 'active' if request.blueprint == 'quiz' else '' }}"
+       href="{{ url_for('quiz.list_quizzes') }}">
+      <span class="material-symbols-outlined msr">quiz</span>
+      <span>Quizzes</span>
+    </a>
+
+    <a class="dr-item {{ 'active' if request.blueprint == 'materials' else '' }}"
+       href="{{ url_for('materials.list_materials') }}">
+      <span class="material-symbols-outlined msr">menu_book</span>
+      <span>Study Materials</span>
+    </a>
+
+    <a class="dr-item {{ 'active' if request.endpoint == 'materials.my_uploads' else '' }}"
+       href="{{ url_for('materials.my_uploads') }}">
+      <span class="material-symbols-outlined msr">cloud_upload</span>
+      <span>My Uploads</span>
+    </a>
+
+    <a class="dr-item {{ 'active' if request.blueprint == 'paper' else '' }}"
+       href="{{ url_for('paper.list_papers') }}">
+      <span class="material-symbols-outlined msr">description</span>
+      <span>Past Papers</span>
+    </a>
+
+    <a class="dr-item {{ 'active' if request.endpoint == 'pages.profile' else '' }}"
+       href="{{ url_for('pages.profile') }}">
+      <span class="material-symbols-outlined msr">person</span>
+      <span>Profile</span>
+    </a>
+
+    <a class="dr-item" href="{{ url_for('auth.logout') }}">
+      <span class="material-symbols-outlined msr">logout</span>
+      <span>Logout</span>
+    </a>
+  </nav>
+
+  <!-- Theme toggle -->
+  <div class="dr-theme">
+    <span class="dr-theme-label">
+      <span class="material-symbols-outlined msr">dark_mode</span>
+      Dark mode
+    </span>
+    <button class="dr-theme-toggle" id="mobile-theme-toggle" aria-label="Toggle theme"></button>
+  </div>
+
+  <!-- Footer -->
+  <div class="dr-copy">
+    <strong>© 2026 Nymora</strong>
+    <span>All rights reserved.</span>
+    <span>Made with care · v1.0</span>
+  </div>
+</aside>
+{% endif %}
