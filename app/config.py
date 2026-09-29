@@ -29,3 +29,10 @@ class Config:
 
     # YouTube API
     YOUTUBE_API_KEY = os.environ.get("YOUTUBE_API_KEY")
+
+    # Backblaze B2
+    B2_KEY_ID = os.environ.get("B2_KEY_ID")
+    B2_APPLICATION_KEY = os.environ.get("B2_APPLICATION_KEY")
+    B2_BUCKET_NAME = os.environ.get("B2_BUCKET_NAME")
+    B2_ENDPOINT = os.environ.get("B2_ENDPOINT")
+    B2_REGION = "us-west-004"  
