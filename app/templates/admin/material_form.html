@@ -35,7 +35,7 @@
         <div class="form-group">
             {{ form.file.label(class="form-label") }}
             {{ form.file(class="form-input") }}
-            <p class="text-muted text-sm mt-1">Accepted: PDF, JPG, PNG (Max 26MB)</p>
+            <p class="text-muted text-sm mt-1">Accepted: PDF, JPG, PNG (Max {{ MAX_UPLOAD_MB }}MB)</p>
             {% for error in form.file.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
         </div>
 
