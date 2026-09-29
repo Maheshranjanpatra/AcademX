@@ -47,13 +47,9 @@
                     <td>{{ item.uploader.name if item.uploader else 'Unknown' }}</td>
                     <td>
                         {% if item.file_path %}
-                            <a href="{{ item.file_path }}" target="_blank" class="text-primary hover:underline">
-                                View File
-                            </a>
+                            <a href="{{ item.file_path | file_url }}" target="_blank" class="text-primary hover:underline">View File</a>
                         {% elif item.file_url %}
-                            <a href="{{ item.file_url }}" target="_blank" class="text-primary hover:underline">
-                                External Link
-                            </a>
+                            <a href="{{ item.file_url }}" target="_blank" class="text-primary hover:underline">External Link</a>
                         {% else %}
                             <span class="text-muted">—</span>
                         {% endif %}
