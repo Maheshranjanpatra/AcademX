@@ -65,7 +65,7 @@
                         </button>
                         {% endif %}
                         {% if paper.file_path %}
-                        <a href="{{ paper.file_path }}" target="_blank" class="action-btn" title="View PDF">
+                        <a href="{{ paper.file_path | file_url }}" target="_blank" class="action-btn" title="View PDF">
                             <span class="material-symbols-outlined">picture_as_pdf</span>
                         </a>
                         {% endif %}
