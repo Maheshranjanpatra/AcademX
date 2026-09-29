@@ -42,7 +42,7 @@
       {{ form.file.label(class="font-label-md text-label-md text-on-surface-variant block mb-xs") }}
       {{ form.file(class="w-full rounded-lg border border-outline-variant px-md py-sm font-body-md text-body-md", id="fileInput") }}
       <p class="font-label-md text-xs text-on-surface-variant mt-1">
-        Accepted: PDF, JPG, JPEG, DOCX · <strong>Max 26MB</strong>
+        Accepted: PDF, JPG, JPEG, DOCX · <strong>Max {{ MAX_UPLOAD_MB }}MB</strong>
       </p>
       <p id="fileInfo" class="font-label-md text-xs mt-1" style="display:none;"></p>
       {% for err in form.file.errors %}<p class="text-error text-xs mt-1">{{ err }}</p>{% endfor %}
@@ -87,7 +87,7 @@ const progressLabel = document.getElementById('progressLabel');
 const submitBtn = document.getElementById('submitBtn');
 const btnText = document.getElementById('btnText');
 const btnSpinner = document.getElementById('btnSpinner');
-const MAX_SIZE = 26 * 1024 * 1024;  // 26 MB
+const MAX_SIZE = {{ MAX_UPLOAD_MB }} * 1024 * 1024;  
 
 // File validation preview
 fileInput.addEventListener('change', function(e) {
