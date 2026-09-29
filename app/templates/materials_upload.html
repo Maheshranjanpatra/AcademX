@@ -98,7 +98,7 @@ fileInput.addEventListener('change', function(e) {
   info.style.display = 'block';
 
   if (file.size > MAX_SIZE) {
-    info.innerHTML = `File is too large (${sizeMB} MB). Max allowed is 26 MB.`;
+    info.innerHTML = `File is too large (${sizeMB} MB). Max allowed is {{ MAX_UPLOAD_MB }} MB.`;
     info.style.color = '#b91c1c';
     submitBtn.disabled = true;
     submitBtn.style.opacity = '0.5';
