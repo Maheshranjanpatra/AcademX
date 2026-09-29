@@ -1,24 +1,43 @@
-import cloudinary
-import cloudinary.uploader
+import boto3
+import time
+from botocore.config import Config as BotoConfig
 from flask import current_app
 from app.utils.validators import YOUTUBE_ID_RE
 
 def save_file(file_storage, subfolder):
-    """Uploads a file to Cloudinary and returns the secure public URL.
-    This ensures files persist across Render redeploys (which wipe local disk)."""
-    cloudinary.config(
-        cloud_name=current_app.config['CLOUDINARY_CLOUD_NAME'],
-        api_key=current_app.config['CLOUDINARY_API_KEY'],
-        api_secret=current_app.config['CLOUDINARY_API_SECRET']
+    """Upload file to Backblaze B2 (S3-compatible).
+    Returns a presigned public URL that expires in 7 days.
+    (Regenerated on each page load for security.)"""
+    s3 = boto3.client(
+        "s3",
+        endpoint_url=current_app.config["B2_ENDPOINT"],
+        aws_access_key_id=current_app.config["B2_KEY_ID"],
+        aws_secret_access_key=current_app.config["B2_APPLICATION_KEY"],
+        config=BotoConfig(signature_version="s3v4"),
+        region_name=current_app.config["B2_REGION"],
     )
-    result = cloudinary.uploader.upload(
+
+    bucket = current_app.config["B2_BUCKET_NAME"]
+
+    # Build unique key
+    filename = file_storage.filename or "file"
+    safe_name = "".join(
+        c if c.isalnum() or c in "._-" else "_" for c in filename
+    )
+    key = f"nymora/{subfolder}/{int(time.time())}_{safe_name}"
+
+    file_storage.seek(0)
+
+    s3.upload_fileobj(
         file_storage,
-        folder=f"nymora/{subfolder}",
-        quality="auto:good",    
-        fetch_format="auto",    
-        flags="lossy", 
+        bucket,
+        key,
+        ExtraArgs={
+            "ContentType": file_storage.content_type or "application/octet-stream"
+        },
     )
-    return result['secure_url']
+
+    return key
 
 def extract_youtube_id(value):
     """Extracts an 11-char YouTube ID from a raw ID or full URL. Returns None if not found."""
