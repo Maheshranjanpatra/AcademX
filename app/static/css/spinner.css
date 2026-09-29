@@ -1,12 +1,12 @@
-/* ============================================
-   NYMORA LOADING SPINNER — ANONYMITY THEME
-   ============================================ */
+ /* NYMORA SPINNER — ANONYMOUS SCHOLAR */
 
 .nymora-spinner {
     display: inline-block;
-    width: 48px;
-    height: 48px;
+    width: 64px;
+    height: 64px;
     color: #0058be;
+    animation: nymora-breathe 3.2s ease-in-out infinite;
+    will-change: transform;
 }
 
 .nymora-spinner svg {
@@ -15,56 +15,50 @@
     overflow: visible;
 }
 
-/* Outer rotating squircle */
-.nymora-spinner .spinner-squircle {
-    transform-origin: 30px 30px;
-    animation: nymora-squircle-spin 1.6s cubic-bezier(0.5, 0, 0.5, 1) infinite;
-    stroke-linecap: round;
+/* Subtle natural "breathing" — like a scholar quietly watching */
+@keyframes nymora-breathe {
+    0%, 100% { transform: scale(1); }
+    50%      { transform: scale(1.045); }
 }
 
-/* Inner eye pulses gently */
-.nymora-spinner .spinner-eye {
-    animation: nymora-eye-pulse 1.6s ease-in-out infinite;
-    transform-origin: 30px 30px;
+/* Glow softly flickers, like a candle behind parchment */
+.nymora-spinner .scholar-glow {
+    animation: nymora-glow 3.2s ease-in-out infinite;
+    transform-origin: 50px 50px;
 }
 
-@keyframes nymora-squircle-spin {
-    0%   { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-@keyframes nymora-eye-pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50%      { opacity: 0.55; transform: scale(0.94); }
+@keyframes nymora-glow {
+    0%, 100% { opacity: 0.82; }
+    50%      { opacity: 1; }
 }
 
 /* ===== Size variants ===== */
-.nymora-spinner-sm { width: 20px; height: 20px; }
-.nymora-spinner-md { width: 32px; height: 32px; }
-.nymora-spinner-lg { width: 64px; height: 64px; }
-.nymora-spinner-xl { width: 96px; height: 96px; }
+.nymora-spinner-sm { width: 24px; height: 24px; }
+.nymora-spinner-md { width: 40px; height: 40px; }
+.nymora-spinner-lg { width: 72px; height: 72px; }
+.nymora-spinner-xl { width: 108px; height: 108px; }
 
 /* ===== Color variants ===== */
-.nymora-spinner-teal { color: #006b5f; }
-.nymora-spinner-gold { color: #b8860b; }
+.nymora-spinner-teal  { color: #006b5f; }
+.nymora-spinner-gold  { color: #b8860b; }
 .nymora-spinner-white { color: #ffffff; }
 
 /* ===== Full-page overlay ===== */
 .nymora-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(249, 249, 255, 0.85);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
+    background: rgba(249, 249, 255, 0.88);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     display: flex;
     align-items: center;
     justify-content: center;
     flex-direction: column;
-    gap: 1rem;
+    gap: 1.25rem;
     z-index: 9999;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.25s ease;
+    transition: opacity 0.28s ease;
 }
 
 .nymora-overlay.active {
@@ -73,7 +67,7 @@
 }
 
 html.dark .nymora-overlay {
-    background: rgba(20, 22, 30, 0.85);
+    background: rgba(20, 22, 30, 0.88);
 }
 
 .nymora-overlay-text {
@@ -81,9 +75,9 @@ html.dark .nymora-overlay {
     font-size: 0.85rem;
     font-weight: 500;
     color: #424754;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
-    animation: nymora-text-fade 2s ease-in-out infinite;
+    animation: nymora-text-fade 2.4s ease-in-out infinite;
 }
 
 html.dark .nymora-overlay-text {
@@ -91,27 +85,13 @@ html.dark .nymora-overlay-text {
 }
 
 @keyframes nymora-text-fade {
-    0%, 100% { opacity: 0.6; }
+    0%, 100% { opacity: 0.55; }
     50%      { opacity: 1; }
 }
 
 /* ===== Inline button spinner ===== */
 .btn.is-loading {
     pointer-events: none;
-    opacity: 0.75;
+    opacity: 0.8;
     position: relative;
-}
-
-.btn.is-loading::after {
-    content: '';
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 14px;
-    height: 14px;
-    border: 2px solid currentColor;
-    border-top-color: transparent;
-    border-radius: 50%;
-    animation: nymora-squircle-spin 0.7s linear infinite;
 }
