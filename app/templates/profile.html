@@ -11,7 +11,7 @@
     <div class="flex justify-center">
       <div class="dr-avatar aurora-bg"
            style="width: 88px; height: 88px; font-size: 36px; border-radius: 26px;">
-        {{ current_user.username[0]|upper }}
+        {{ (current_user.name or current_user.username)[0]|upper }}
       </div>
     </div>
 
@@ -41,7 +41,7 @@
       <!-- Reg num — hidden on mobile -->
       <p class="hidden md:flex text-sm text-on-surface-variant items-center gap-1.5">
         <span class="material-symbols-outlined text-[16px]">badge</span>
-        Reg: {{ current_user.reg_num or '—' }}
+        Username: {{ current_user.reg_num or '—' }}
       </p>
     </div>
   </section>

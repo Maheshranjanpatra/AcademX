@@ -5,8 +5,8 @@
    <!-- Logo -->
     <a href="{{ url_for('dashboard.home') if current_user.is_authenticated else url_for('auth.index') }}"
        class="flex items-center gap-3 group">
-    
-      <img src="{{ url_for('static', filename='images/nymora.jpg') }}"
+
+      <img src="{{ url_for('static', filename='images/nymora.svg') }}"
            alt="Nymora"
            class="
              h-10 w-10 md:h-12 md:w-12
@@ -17,7 +17,7 @@
              transition-all duration-300
              group-hover:scale-105
              group-hover:shadow-lg" />
-    
+
       <span class="font-serif text-xl md:text-2xl font-black tracking-tight text-primary-fixed drop-shadow-sm group-hover:text-secondary-fixed transition-colors duration-300">
         Nymora
       </span>
@@ -174,7 +174,7 @@
   <!-- Profile header -->
   <div class="dr-profile">
     <div class="dr-avatar aurora-bg">
-      {{ current_user.username[0]|upper }}
+      {{ (current_user.name or current_user.username)[0]|upper }}
     </div>
     <div class="dr-hi">
       Hi there,
