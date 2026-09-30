@@ -1,6 +1,10 @@
 {% extends "base.html" %}
 {% block title %}{{ question.title }}{% endblock %}
 
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/math_composer.css') }}"/>
+{% endblock %}
+
 {% block content %}
 <main class="max-w-[840px] mx-auto w-full px-margin-mobile md:px-margin-desktop py-lg space-y-lg">
 
@@ -94,7 +98,7 @@
     <h3 class="font-headline-md text-on-surface text-[18px] mb-sm">Your Answer</h3>
     <form method="post" action="{{ url_for('qa.answer_question', question_id=question.id) }}" class="space-y-sm">
       {{ form.hidden_tag() }}
-      {{ form.body(rows=4, class="w-full rounded-lg border border-outline-variant px-md py-sm font-body-md text-body-md") }}
+      {{ form.body(rows=4, class="w-full rounded-lg border border-outline-variant px-md py-sm font-body-md text-body-md mc-enabled", placeholder="Type your answer... Use $x^2$ for math.") }}
       {% for err in form.body.errors %}<p class="text-error text-xs mt-1">{{ err }}</p>{% endfor %}
 
       <div class="flex items-center gap-sm">
@@ -114,4 +118,8 @@
   {% endif %}
 
 </main>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/math_composer.js') }}" defer></script>
 {% endblock %}
