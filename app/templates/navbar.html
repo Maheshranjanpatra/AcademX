@@ -178,7 +178,7 @@
     </div>
     <div class="dr-hi">
       Hi there,
-      <strong>{{ current_user.username }}</strong>
+      <strong>{{ current_user.name or current_user.username }}</strong>
     </div>
     <button class="dr-close" id="mobile-drawer-close" aria-label="Close menu">
       <span class="material-symbols-outlined msr">close</span>

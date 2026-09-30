@@ -7,7 +7,7 @@
   <!-- ===== HEADER: Avatar (centre) · Nym ID (centre, bold) · Username + Dept (left) ===== -->
   <section class="bg-surface-container-lowest border border-outline-variant rounded-2xl p-lg card-shadow">
 
-    <!-- Avatar (centred) -->
+    <!-- Avatar (centred) — first letter of Google name -->
     <div class="flex justify-center">
       <div class="dr-avatar aurora-bg"
            style="width: 88px; height: 88px; font-size: 36px; border-radius: 26px;">
@@ -15,34 +15,41 @@
       </div>
     </div>
 
-    <!-- Nym ID (centred, bold) -->
+    <!-- Nym ID (centred) + friendly explanation -->
     <div class="text-center mt-md">
-      <p class="text-xs text-on-surface-variant">
-        Your Nym ID — visible to others instead of your real identity
-      </p>
-      <p class="font-display text-xl font-bold text-primary mt-1">
+      <p class="font-display text-xl font-bold text-primary">
         @{{ current_user.anonymous_id }}
+      </p>
+      <p class="text-xs text-on-surface-variant mt-1 max-w-[280px] mx-auto leading-relaxed">
+        This is how others see you — your real identity stays hidden.
       </p>
     </div>
 
-    <!-- Username + Department (left-aligned) -->
-    <div class="mt-lg text-left space-y-1">
-      <h1 class="font-display text-2xl font-bold text-on-surface">
-        {{ current_user.username }}
+    <!-- Name (gradient, bold) + identity rows -->
+    <div class="mt-lg text-left space-y-2">
+
+      <h1 class="font-display text-3xl font-black tracking-tight leading-tight pb-1"
+          style="background: linear-gradient(120deg, #0058be 0%, #006b5f 45%, #b8860b 100%);
+                 -webkit-background-clip: text; background-clip: text;
+                 -webkit-text-fill-color: transparent;">
+        {{ current_user.name or current_user.username }}
       </h1>
-      <p class="text-sm text-on-surface-variant flex items-center gap-1.5">
-        <span class="material-symbols-outlined text-[16px]">school</span>
-        {{ current_user.department or 'Department not set' }}
+
+      <p class="text-sm text-on-surface-variant flex items-center gap-2">
+        <span class="material-symbols-outlined text-[18px]">badge</span>
+        <span><span class="text-on-surface-variant">Username:</span> {{ current_user.username }}</span>
       </p>
-      <p class="text-sm text-on-surface-variant flex items-center gap-1.5">
-        <span class="material-symbols-outlined text-[16px]">mail</span>
-        {{ current_user.email }}
+
+      <p class="text-sm text-on-surface-variant flex items-center gap-2">
+        <span class="material-symbols-outlined text-[18px]">school</span>
+        <span><span class="text-on-surface-variant">Dept:</span> {{ current_user.department or 'Not set' }}</span>
       </p>
-      <!-- Reg num — hidden on mobile -->
-      <p class="hidden md:flex text-sm text-on-surface-variant items-center gap-1.5">
-        <span class="material-symbols-outlined text-[16px]">badge</span>
-        Username: {{ current_user.reg_num or '—' }}
+
+      <p class="text-sm text-on-surface-variant flex items-center gap-2">
+        <span class="material-symbols-outlined text-[18px]">mail</span>
+        <span><span class="text-on-surface-variant">Email:</span> {{ current_user.email }}</span>
       </p>
+
     </div>
   </section>
 
