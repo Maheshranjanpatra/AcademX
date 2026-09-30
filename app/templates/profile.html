@@ -2,64 +2,97 @@
 {% block title %}Profile — Nymora{% endblock %}
 
 {% block content %}
-<main class="max-w-[640px] mx-auto px-margin-mobile py-lg space-y-lg pb-24 md:pb-lg">
+<main class="max-w-[640px] mx-auto px-margin-mobile md:px-margin-desktop py-lg space-y-lg pb-24 md:pb-lg">
 
-  <!-- Profile Header -->
-  <section class="bg-surface-container-lowest border border-outline-variant rounded-2xl p-lg text-center space-y-md card-shadow">
+  <!-- ===== HEADER: Avatar (centre) · Nym ID (centre, bold) · Username + Dept (left) ===== -->
+  <section class="bg-surface-container-lowest border border-outline-variant rounded-2xl p-lg card-shadow">
+
+    <!-- Avatar (centred) -->
     <div class="flex justify-center">
-      <div class="dr-avatar aurora-bg" style="width: 80px; height: 80px; font-size: 32px; border-radius: 24px;">
+      <div class="dr-avatar aurora-bg"
+           style="width: 88px; height: 88px; font-size: 36px; border-radius: 26px;">
         {{ current_user.username[0]|upper }}
       </div>
     </div>
-    <div>
-      <h1 class="font-display text-headline-lg text-on-surface">{{ current_user.username }}</h1>
-      <p class="text-on-surface-variant text-sm mt-1">@{{ current_user.anonymous_id }}</p>
+
+    <!-- Nym ID (centred, bold) -->
+    <div class="text-center mt-md">
+      <p class="text-xs text-on-surface-variant">
+        Your Nym ID — visible to others instead of your real identity
+      </p>
+      <p class="font-display text-xl font-bold text-primary mt-1">
+        @{{ current_user.anonymous_id }}
+      </p>
     </div>
-    <div class="flex flex-col gap-2 text-sm text-on-surface-variant">
-      <span class="flex items-center justify-center gap-1.5">
+
+    <!-- Username + Department (left-aligned) -->
+    <div class="mt-lg text-left space-y-1">
+      <h1 class="font-display text-2xl font-bold text-on-surface">
+        {{ current_user.username }}
+      </h1>
+      <p class="text-sm text-on-surface-variant flex items-center gap-1.5">
         <span class="material-symbols-outlined text-[16px]">school</span>
         {{ current_user.department or 'Department not set' }}
-      </span>
-      <span class="flex items-center justify-center gap-1.5">
-        <span class="material-symbols-outlined text-[16px]">mail</span>
-        {{ current_user.email }}
-      </span>
-      <span class="flex items-center justify-center gap-1.5">
+      </p>
+      <!-- Reg num — hidden on mobile -->
+      <p class="hidden md:flex text-sm text-on-surface-variant items-center gap-1.5">
         <span class="material-symbols-outlined text-[16px]">badge</span>
         Reg: {{ current_user.reg_num or '—' }}
-      </span>
+      </p>
     </div>
   </section>
 
-  <!-- Stats -->
-  <section class="grid grid-cols-3 gap-sm">
-    <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md text-center card-shadow">
-      <div class="font-display text-2xl font-bold text-primary">{{ questions_asked }}</div>
-      <div class="text-xs text-on-surface-variant mt-1">Questions</div>
-    </div>
-    <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md text-center card-shadow">
-      <div class="font-display text-2xl font-bold text-secondary">{{ answers_given }}</div>
-      <div class="text-xs text-on-surface-variant mt-1">Answers</div>
-    </div>
-    <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md text-center card-shadow">
-      <div class="font-display text-2xl font-bold text-tertiary">{{ quizzes_taken }}</div>
-      <div class="text-xs text-on-surface-variant mt-1">Quizzes</div>
+  <!-- ===== ACTIVITY STATS ===== -->
+  <section class="space-y-sm">
+    <h2 class="font-display text-headline-md text-on-surface text-left">Activity</h2>
+    <div class="grid grid-cols-3 gap-sm">
+      <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md text-center card-shadow">
+        <div class="font-display text-2xl font-bold text-primary">{{ questions_asked }}</div>
+        <div class="text-xs text-on-surface-variant mt-1">Questions</div>
+      </div>
+      <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md text-center card-shadow">
+        <div class="font-display text-2xl font-bold text-secondary">{{ answers_given }}</div>
+        <div class="text-xs text-on-surface-variant mt-1">Answers</div>
+      </div>
+      <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md text-center card-shadow">
+        <div class="font-display text-2xl font-bold text-tertiary">{{ quizzes_taken }}</div>
+        <div class="text-xs text-on-surface-variant mt-1">Quizzes</div>
+      </div>
     </div>
   </section>
 
-  <!-- Playlist Progress -->
+  <!-- ===== PUBLISHED STATS ===== -->
+  <section class="space-y-sm">
+    <h2 class="font-display text-headline-md text-on-surface text-left">Published</h2>
+    <div class="grid grid-cols-3 gap-sm">
+      <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md text-center card-shadow">
+        <div class="font-display text-2xl font-bold text-primary">{{ papers_published }}</div>
+        <div class="text-xs text-on-surface-variant mt-1">Papers</div>
+      </div>
+      <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md text-center card-shadow">
+        <div class="font-display text-2xl font-bold text-secondary">{{ playlists_published }}</div>
+        <div class="text-xs text-on-surface-variant mt-1">Playlists</div>
+      </div>
+      <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md text-center card-shadow">
+        <div class="font-display text-2xl font-bold text-tertiary">{{ materials_published }}</div>
+        <div class="text-xs text-on-surface-variant mt-1">Materials</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PLAYLIST PROGRESS ===== -->
   {% if playlist_progress %}
   <section class="space-y-md">
-    <h2 class="font-display text-headline-md text-on-surface flex items-center gap-2">
+    <h2 class="font-display text-headline-md text-on-surface flex items-center gap-2 text-left">
       <span class="material-symbols-outlined text-primary">trending_up</span>
       Learning Progress
     </h2>
     <div class="space-y-sm">
       {% for item in playlist_progress %}
-      <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md space-y-sm card-shadow">
+      <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md space-y-sm card-shadow text-left">
         <div class="flex items-center justify-between">
           <span class="font-label-md text-label-md font-semibold text-on-surface">{{ item.title }}</span>
-          <span class="text-xs text-on-surface-variant">{{ item.completed }}/{{ item.total }} videos</span>
+          <span class="text-xs text-on-surface-variant">{{ item.completed }}/{{ item.total }}</span>
         </div>
         <div class="w-full bg-surface-container rounded-full h-2 overflow-hidden">
           <div class="bg-primary rounded-full h-2 transition-all duration-500"
@@ -83,7 +116,7 @@
   </section>
   {% endif %}
 
-  <!-- Logout -->
+  <!-- ===== LOGOUT ===== -->
   <a href="{{ url_for('auth.logout') }}"
      class="flex items-center justify-center gap-2 w-full bg-error-container text-on-error-container font-label-md text-label-md px-6 py-3 rounded-xl hover:opacity-90 transition-all">
     <span class="material-symbols-outlined text-[18px]">logout</span>

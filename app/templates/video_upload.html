@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Upload Playlist — Nymora{% endblock %}
+
+{% block content %}
+<main class="max-w-[640px] mx-auto px-margin-mobile md:px-margin-desktop py-lg space-y-lg">
+
+  <div>
+    <a href="{{ url_for('video.playlists') }}"
+       class="inline-flex items-center gap-1 text-primary hover:text-secondary transition-colors font-label-md text-label-md">
+      <span class="material-symbols-outlined text-[18px]">arrow_back</span>
+      Back to Playlists
+    </a>
+  </div>
+
+  <div class="bg-surface-container-lowest border border-outline-variant rounded-2xl p-lg card-shadow">
+    <h1 class="font-display text-headline-lg text-on-surface mb-1">Upload a Playlist</h1>
+    <p class="text-on-surface-variant text-sm mb-md">
+      Share a YouTube playlist with the community. Your submission will be reviewed by an admin
+      before appearing publicly.
+    </p>
+
+    <form method="POST" class="space-y-md">
+      {{ form.hidden_tag() }}
+
+      <div>
+        {{ form.title.label(class="block font-label-md text-label-md text-on-surface mb-1") }}
+        {{ form.title(class="w-full rounded-lg border border-outline-variant bg-surface px-3 py-2 text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none") }}
+        {% for e in form.title.errors %}<p class="text-error text-xs mt-1">{{ e }}</p>{% endfor %}
+      </div>
+
+      <div>
+        {{ form.subject.label(class="block font-label-md text-label-md text-on-surface mb-1") }}
+        {{ form.subject(class="w-full rounded-lg border border-outline-variant bg-surface px-3 py-2 text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none", placeholder="e.g. Data Structures") }}
+      </div>
+
+      <div>
+        {{ form.description.label(class="block font-label-md text-label-md text-on-surface mb-1") }}
+        {{ form.description(rows=3, class="w-full rounded-lg border border-outline-variant bg-surface px-3 py-2 text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none") }}
+      </div>
+
+      <div>
+        {{ form.video_urls.label(class="block font-label-md text-label-md text-on-surface mb-1") }}
+        {{ form.video_urls(rows=8, placeholder="https://www.youtube.com/watch?v=...\nhttps://youtu.be/...\nhttps://www.youtube.com/playlist?list=... (one video per line)", class="w-full rounded-lg border border-outline-variant bg-surface px-3 py-2 text-on-surface font-mono text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none") }}
+        <p class="text-xs text-on-surface-variant mt-1">{{ form.video_urls.description }}</p>
+        {% for e in form.video_urls.errors %}<p class="text-error text-xs mt-1">{{ e }}</p>{% endfor %}
+      </div>
+
+      <div class="flex gap-2">
+        <button type="submit"
+                class="flex-1 bg-primary text-on-primary font-label-md text-label-md px-6 py-3 rounded-lg hover:bg-surface-tint transition-all">
+          Submit for Review
+        </button>
+        <a href="{{ url_for('video.playlists') }}"
+           class="px-6 py-3 rounded-lg border border-outline-variant text-on-surface-variant font-label-md text-label-md hover:bg-surface-container transition-all">
+          Cancel
+        </a>
+      </div>
+    </form>
+  </div>
+</main>
+{% endblock %}

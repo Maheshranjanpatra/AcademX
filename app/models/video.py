@@ -11,6 +11,12 @@ class Playlist(db.Model):
     subject = db.Column(db.String(80))
     description = db.Column(db.Text)
 
+    # ===== NEW: user uploads + moderation =====
+    uploaded_by = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
+    status = db.Column(db.String(20), default="approved", nullable=False)
+    # status: "approved" | "pending" | "rejected"
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
     videos = db.relationship(
         "Video",
         backref="playlist",

@@ -3,6 +3,8 @@ from flask_login import login_required, current_user
 from sqlalchemy import or_
 from app.extensions import db
 from app.models.material import Material
+from app.models.paper import Paper
+from app.models.video import Playlist
 from app.forms.materials import MaterialUploadForm
 from app.utils.decorators import profile_required
 from app.utils.helpers import save_file
@@ -26,6 +28,7 @@ def list_materials():
 
     materials = query.all()
     return render_template("materials_list.html", materials=materials)
+
 
 @materials_bp.route("/upload", methods=["GET", "POST"])
 @login_required
@@ -68,10 +71,45 @@ def upload_material():
 
     return render_template("materials_upload.html", form=form)
 
+
 @materials_bp.route("/my-uploads")
 @login_required
 @profile_required
 def my_uploads():
-    """Show materials uploaded by the current user with their status."""
-    materials = Material.query.filter_by(uploaded_by=current_user.id).order_by(Material.uploaded_at.desc()).all()
-    return render_template("materials_my_uploads.html", materials=materials)
+    """Show everything the current user has uploaded — with filter tabs."""
+    filter_type = request.args.get("filter", "all")  # all | playlists | materials | papers
+
+    materials = (
+        Material.query
+        .filter_by(uploaded_by=current_user.id)
+        .order_by(Material.uploaded_at.desc())
+        .all()
+    )
+    papers = (
+        Paper.query
+        .filter_by(uploaded_by=current_user.id)
+        .order_by(Paper.uploaded_at.desc())
+        .all()
+    )
+    playlists = (
+        Playlist.query
+        .filter_by(uploaded_by=current_user.id)
+        .order_by(Playlist.created_at.desc())
+        .all()
+    )
+
+    counts = {
+        "all":       len(materials) + len(papers) + len(playlists),
+        "materials": len(materials),
+        "papers":    len(papers),
+        "playlists": len(playlists),
+    }
+
+    return render_template(
+        "materials_my_uploads.html",
+        materials=materials,
+        papers=papers,
+        playlists=playlists,
+        counts=counts,
+        filter_type=filter_type,
+    )

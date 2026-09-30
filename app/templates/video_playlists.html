@@ -12,9 +12,17 @@
         Structured playlist modules organized by course subject and topic.
       </p>
     </div>
+
+    {% if current_user.is_authenticated %}
+    <a href="{{ url_for('video.upload_playlist') }}"
+       class="inline-flex items-center justify-center gap-2 bg-primary text-on-primary font-label-md text-label-md px-5 py-2.5 rounded-lg hover:bg-surface-tint transition-all shadow-sm">
+      <span class="material-symbols-outlined text-[18px]">upload</span>
+      Upload Playlist
+    </a>
+    {% endif %}
   </div>
 
-  <!--  Quote -->
+  <!-- Quote -->
   <div class="bg-surface-container-lowest border-l-4 border-primary rounded-r-xl p-lg my-6 shadow-sm">
       <blockquote class="font-serif text-xl italic text-on-surface-variant leading-relaxed">
           “You may deceive the whole world, but never betray your own soul.
@@ -47,6 +55,13 @@
           {{ playlist.description }}
         </p>
         {% endif %}
+
+        {% if playlist.uploader %}
+        <p class="text-xs text-on-surface-variant flex items-center gap-1">
+          <span class="material-symbols-outlined text-[14px]">person</span>
+          by {{ playlist.uploader.username }}
+        </p>
+        {% endif %}
       </div>
 
       <div class="pt-sm border-t border-surface-variant flex items-center justify-between">
@@ -65,7 +80,13 @@
     </article>
     {% else %}
     <div class="col-span-full bg-surface-container-lowest border border-outline-variant rounded-xl p-xl text-center">
+      <span class="material-symbols-outlined text-5xl text-on-surface-variant mb-2">play_circle</span>
       <p class="font-body-md text-on-surface-variant">No video playlists available yet.</p>
+      {% if current_user.is_authenticated %}
+      <a href="{{ url_for('video.upload_playlist') }}" class="inline-block mt-3 text-primary hover:underline font-label-md text-label-md">
+        Be the first to upload one →
+      </a>
+      {% endif %}
     </div>
     {% endfor %}
   </div>

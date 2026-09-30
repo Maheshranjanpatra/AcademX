@@ -28,31 +28,39 @@ def offline():
 @pages_bp.route("/profile")
 @login_required
 def profile():
-    """Full profile page — stats, progress, account info."""
-    from app.models import Playlist, Video, VideoProgress
+    """Full profile page — stats, progress, published items."""
+    from app.models import Playlist, Video, VideoProgress, Material, Paper
     from app.extensions import db
 
-    playlists = Playlist.query.all()
+    # --- Learning progress across approved playlists ---
+    playlists = Playlist.query.filter_by(status="approved").all()
     playlist_progress = []
     for pl in playlists:
         total = Video.query.filter_by(playlist_id=pl.id).count()
+        if total == 0:
+            continue
         completed = db.session.query(VideoProgress).join(Video).filter(
             Video.playlist_id == pl.id,
             VideoProgress.user_id == current_user.id,
             VideoProgress.completed == True
         ).count()
-        if total > 0:
-            playlist_progress.append({
-                'title': pl.title,
-                'subject': pl.subject,
-                'total': total,
-                'completed': completed,
-                'percent': round((completed / total) * 100, 1)
-            })
+        playlist_progress.append({
+            "title": pl.title,
+            "subject": pl.subject,
+            "total": total,
+            "completed": completed,
+            "percent": round((completed / total) * 100, 1),
+        })
 
+    # --- Activity stats ---
     questions_asked = current_user.questions.count()
-    answers_given = current_user.answers.count()
-    quizzes_taken = current_user.quiz_attempts.count()
+    answers_given   = current_user.answers.count()
+    quizzes_taken   = current_user.quiz_attempts.count()
+
+    # --- Published stats ---
+    papers_published    = current_user.papers.count()
+    playlists_published = current_user.playlists_uploaded.count()
+    materials_published = Material.query.filter_by(uploaded_by=current_user.id).count()
 
     return render_template(
         "profile.html",
@@ -60,6 +68,9 @@ def profile():
         questions_asked=questions_asked,
         answers_given=answers_given,
         quizzes_taken=quizzes_taken,
+        papers_published=papers_published,
+        playlists_published=playlists_published,
+        materials_published=materials_published,
     )
 
 

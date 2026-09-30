@@ -28,6 +28,7 @@ class User(db.Model, UserMixin):
     answers = db.relationship("Answer", backref="author", lazy="dynamic")
     quiz_attempts = db.relationship("QuizAttempt", backref="user", lazy="dynamic")
     video_progress = db.relationship("VideoProgress", backref="user", lazy="dynamic")
+
     papers = db.relationship(
         "Paper",
         foreign_keys="Paper.uploaded_by",
@@ -38,6 +39,14 @@ class User(db.Model, UserMixin):
         "Paper",
         foreign_keys="Paper.reviewed_by",
         backref="reviewer",
+        lazy="dynamic",
+    )
+
+    # ===== NEW: playlists uploaded by this user =====
+    playlists_uploaded = db.relationship(
+        "Playlist",
+        foreign_keys="Playlist.uploaded_by",
+        backref="uploader",
         lazy="dynamic",
     )
 

@@ -3,50 +3,180 @@
 
 {% block content %}
 <main class="max-w-[1280px] mx-auto w-full px-margin-mobile md:px-margin-desktop py-lg space-y-lg">
-  <div class="flex justify-between items-center">
+
+  <div class="flex justify-between items-center flex-wrap gap-md">
     <h1 class="font-display text-headline-lg-mobile md:text-headline-lg text-on-surface">My Uploads</h1>
-    <a href="{{ url_for('materials.upload_material') }}" class="bg-primary text-on-primary font-label-md text-label-md px-md py-sm rounded-lg shadow-sm transition-all flex items-center gap-sm">
-      <span class="material-symbols-outlined">add</span> Upload New
-    </a>
+    <div class="flex gap-2">
+      <a href="{{ url_for('materials.upload_material') }}"
+         class="bg-surface-container text-on-surface font-label-md text-label-md px-md py-sm rounded-lg transition-all flex items-center gap-2 hover:bg-surface-container-high">
+        <span class="material-symbols-outlined text-[18px]">description</span> Material
+      </a>
+      <a href="{{ url_for('video.upload_playlist') }}"
+         class="bg-primary text-on-primary font-label-md text-label-md px-md py-sm rounded-lg transition-all flex items-center gap-2 hover:bg-surface-tint shadow-sm">
+        <span class="material-symbols-outlined text-[18px]">playlist_add</span> Playlist
+      </a>
+    </div>
   </div>
 
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-md">
-    {% for material in materials %}
-    <div class="bg-surface-container-lowest border rounded-xl p-md card-shadow space-y-sm">
-      <div class="flex items-center justify-between">
-        <span class="bg-primary-fixed text-on-primary-fixed font-label-md text-xs px-2.5 py-1 rounded-full">{{ material.subject or "General" }}</span>
-        <span class="status-badge
-          {% if material.status == 'pending' %}bg-yellow-100 text-yellow-800{% endif %}
-          {% if material.status == 'approved' %}bg-green-100 text-green-800{% endif %}
-          {% if material.status == 'rejected' %}bg-red-100 text-red-800{% endif %}
-        ">
-          {{ material.status|title }}
-        </span>
-      </div>
-      <h2 class="font-headline-md text-headline-md text-on-surface font-semibold">{{ material.title }}</h2>
-      <p class="font-body-md text-body-md text-on-surface-variant">{{ material.category or "Document" }}</p>
-      <p class="font-body-md text-xs text-on-surface-variant">Uploaded: {{ material.uploaded_at.strftime('%b %d, %Y') }}</p>
-      {% if material.status == 'approved' %}
-        {% set link_target = material.file_url if material.file_url else material.file_path %}
-        <a href="{{ link_target | file_url }}" target="_blank" class="text-primary hover:underline">View Material</a>
-      {% elif material.status == 'rejected' %}
-        <p class="text-error text-sm">Rejected. Please contact admin for details.</p>
-      {% else %}
+  <!-- ===== Filter Tabs ===== -->
+  <div class="flex flex-wrap gap-2 border-b border-outline-variant pb-3">
+    {% set tabs = [
+      ('all',       'All',       counts.all),
+      ('playlists', 'Playlists', counts.playlists),
+      ('materials', 'Materials', counts.materials),
+      ('papers',    'Papers',    counts.papers),
+    ] %}
+    {% for key, label, count in tabs %}
+      <a href="{{ url_for('materials.my_uploads', filter=key) }}"
+         class="px-4 py-2 rounded-full font-label-md text-label-md transition-all flex items-center gap-2
+                {{ 'bg-primary text-on-primary shadow-sm' if filter_type == key else 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high' }}">
+        {{ label }}
+        <span class="text-xs opacity-75">({{ count }})</span>
+      </a>
+    {% endfor %}
+  </div>
+
+  <!-- ===== PLAYLISTS ===== -->
+  {% if filter_type in ['all', 'playlists'] and playlists %}
+  <section class="space-y-sm">
+    <h2 class="font-display text-headline-md text-on-surface">Playlists</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-md">
+      {% for pl in playlists %}
+      <div class="bg-surface-container-lowest border rounded-xl p-md card-shadow space-y-sm">
+        <div class="flex items-center justify-between gap-2">
+          <span class="bg-primary-fixed text-on-primary-fixed font-label-md text-xs px-2.5 py-1 rounded-full">
+            {{ pl.subject or "General" }}
+          </span>
+          <span class="font-label-md text-xs px-2.5 py-1 rounded-full
+            {% if pl.status == 'approved' %}bg-green-100 text-green-800
+            {% elif pl.status == 'pending' %}bg-yellow-100 text-yellow-800
+            {% else %}bg-red-100 text-red-800{% endif %}">
+            {{ pl.status|title }}
+          </span>
+        </div>
+        <h3 class="font-headline-md text-headline-md text-on-surface font-semibold">{{ pl.title }}</h3>
+        <p class="font-body-md text-body-md text-on-surface-variant">
+          {{ pl.videos|length }} {{ "video" if pl.videos|length == 1 else "videos" }}
+        </p>
+        <p class="font-body-md text-xs text-on-surface-variant">
+          Submitted: {{ pl.created_at.strftime('%b %d, %Y') if pl.created_at else '—' }}
+        </p>
+        {% if pl.status == 'approved' and pl.videos|length > 0 %}
+        <a href="{{ url_for('video.watch', video_id=pl.videos[0].id) }}"
+           class="text-primary hover:underline font-label-md text-label-md inline-flex items-center gap-1">
+          View playlist <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+        </a>
+        {% elif pl.status == 'pending' %}
         <p class="text-on-surface-variant text-sm flex items-center gap-1">
           <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10"/>
-            <polyline points="12 6 12 12 16 14"/>
+            <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
           </svg>
           Awaiting admin review…
         </p>
-      {% endif %}
+        {% else %}
+        <p class="text-error text-sm">Rejected. Contact admin for details.</p>
+        {% endif %}
+      </div>
+      {% endfor %}
     </div>
-    {% else %}
-    <div class="col-span-full text-center p-xl bg-surface-container-lowest rounded-xl border border-outline-variant">
-      <p class="font-body-md text-on-surface-variant">You haven't uploaded any materials yet.</p>
-      <a href="{{ url_for('materials.upload_material') }}" class="text-primary hover:underline">Upload now</a>
+  </section>
+  {% endif %}
+
+  <!-- ===== MATERIALS ===== -->
+  {% if filter_type in ['all', 'materials'] and materials %}
+  <section class="space-y-sm">
+    <h2 class="font-display text-headline-md text-on-surface">Materials</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-md">
+      {% for material in materials %}
+      <div class="bg-surface-container-lowest border rounded-xl p-md card-shadow space-y-sm">
+        <div class="flex items-center justify-between">
+          <span class="bg-primary-fixed text-on-primary-fixed font-label-md text-xs px-2.5 py-1 rounded-full">
+            {{ material.subject or "General" }}
+          </span>
+          <span class="font-label-md text-xs px-2.5 py-1 rounded-full
+            {% if material.status == 'approved' %}bg-green-100 text-green-800
+            {% elif material.status == 'pending' %}bg-yellow-100 text-yellow-800
+            {% else %}bg-red-100 text-red-800{% endif %}">
+            {{ material.status|title }}
+          </span>
+        </div>
+        <h3 class="font-headline-md text-headline-md text-on-surface font-semibold">{{ material.title }}</h3>
+        <p class="font-body-md text-body-md text-on-surface-variant">{{ material.category or "Document" }}</p>
+        <p class="font-body-md text-xs text-on-surface-variant">
+          Uploaded: {{ material.uploaded_at.strftime('%b %d, %Y') }}
+        </p>
+        {% if material.status == 'approved' %}
+          {% set link_target = material.file_url if material.file_url else material.file_path %}
+          <a href="{{ link_target }}" target="_blank" class="text-primary hover:underline font-label-md text-label-md">View Material →</a>
+        {% elif material.status == 'rejected' %}
+          <p class="text-error text-sm">Rejected. Please contact admin for details.</p>
+        {% else %}
+          <p class="text-on-surface-variant text-sm flex items-center gap-1">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+            </svg>
+            Awaiting admin review…
+          </p>
+        {% endif %}
+      </div>
+      {% endfor %}
     </div>
-    {% endfor %}
+  </section>
+  {% endif %}
+
+  <!-- ===== PAPERS ===== -->
+  {% if filter_type in ['all', 'papers'] and papers %}
+  <section class="space-y-sm">
+    <h2 class="font-display text-headline-md text-on-surface">Papers</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-md">
+      {% for p in papers %}
+      <div class="bg-surface-container-lowest border rounded-xl p-md card-shadow space-y-sm">
+        <div class="flex items-center justify-between">
+          <span class="bg-primary-fixed text-on-primary-fixed font-label-md text-xs px-2.5 py-1 rounded-full">
+            {{ p.subject }}
+          </span>
+          <span class="font-label-md text-xs px-2.5 py-1 rounded-full
+            {% if p.status == 'approved' %}bg-green-100 text-green-800
+            {% elif p.status == 'pending' %}bg-yellow-100 text-yellow-800
+            {% else %}bg-red-100 text-red-800{% endif %}">
+            {{ p.status|title }}
+          </span>
+        </div>
+        <h3 class="font-headline-md text-headline-md text-on-surface font-semibold">
+          {{ p.exam_type }} — {{ p.year }}
+        </h3>
+        <p class="font-body-md text-xs text-on-surface-variant">
+          Uploaded: {{ p.uploaded_at.strftime('%b %d, %Y') if p.uploaded_at else '—' }}
+        </p>
+        {% if p.status == 'approved' %}
+          <a href="{{ p.file_path }}" target="_blank" class="text-primary hover:underline font-label-md text-label-md">View Paper →</a>
+        {% elif p.status == 'pending' %}
+          <p class="text-on-surface-variant text-sm flex items-center gap-1">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+            </svg>
+            Awaiting admin review…
+          </p>
+        {% else %}
+          <p class="text-error text-sm">Rejected.</p>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  {% if counts.all == 0 %}
+  <div class="text-center py-xl bg-surface-container-lowest border border-outline-variant rounded-xl">
+    <span class="material-symbols-outlined text-5xl text-on-surface-variant mb-2">cloud_upload</span>
+    <p class="font-body-md text-on-surface-variant">You haven't uploaded anything yet.</p>
+    <div class="flex gap-2 justify-center mt-4">
+      <a href="{{ url_for('materials.upload_material') }}" class="text-primary hover:underline font-label-md text-label-md">Upload a material →</a>
+      <span class="text-on-surface-variant">·</span>
+      <a href="{{ url_for('video.upload_playlist') }}" class="text-primary hover:underline font-label-md text-label-md">Upload a playlist →</a>
+    </div>
   </div>
+  {% endif %}
+
 </main>
 {% endblock %}
