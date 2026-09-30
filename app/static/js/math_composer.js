@@ -289,18 +289,111 @@
     typesetWithMathJax(content);
   }
 
-  function typesetWithMathJax(el) {
-    var MJ = window.MathJax;
-    if (!MJ) return;
+    <!-- ===== MathJax (lazy) ===== -->
+    <script>
+      /* Config — must be set BEFORE MathJax loads */
+      window.MathJax = {
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']],
+          displayMath: [['$$', '$$'], ['\\[', '\\]']]
+        },
+        svg: { fontCache: 'global' }
+      };
 
-    if (MJ.typesetPromise) {
+      /* Lazy loader — only fetches MathJax when the page actually has math.
+         Exposes window.loadMathJax() for other scripts (e.g. math_composer). */
+      (function () {
+        var MJ_URL = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+        var loadPromise = null;
+
+        window.loadMathJax = function () {
+          if (loadPromise) return loadPromise;
+          loadPromise = new Promise(function (resolve, reject) {
+            var s = document.createElement('script');
+            s.id = 'MathJax-script';
+            s.async = true;
+            s.src = MJ_URL;
+            s.onload = function () {
+              if (window.MathJax && window.MathJax.startup && window.MathJax.startup.promise) {
+                window.MathJax.startup.promise.then(resolve).catch(reject);
+              } else {
+                resolve();
+              }
+            };
+            s.onerror = function () { loadPromise = null; reject(); };
+            document.head.appendChild(s);
+          });
+          return loadPromise;
+        };
+
+        /* Check for $...$ patterns in the DOM */
+        var MATH_RE = /\$[^$\n]+\$/;
+
+        function shouldLoad(root) {
+          var text = root ? (root.textContent || '') : '';
+          return MATH_RE.test(text);
+        }
+
+        function detectAndLoad() {
+          if (loadPromise) return;
+          if (shouldLoad(document.body)) {
+            window.loadMathJax();
+          }
+        }
+
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', detectAndLoad);
+        } else {
+          detectAndLoad();
+        }
+
+        /* Catch late-inserted content (preview divs, paginated lists, widgets) */
+        if (window.MutationObserver) {
+          var observer = new MutationObserver(function (mutations) {
+            if (loadPromise) { observer.disconnect(); return; }
+            for (var i = 0; i < mutations.length; i++) {
+              var added = mutations[i].addedNodes;
+              for (var j = 0; j < added.length; j++) {
+                var node = added[j];
+                if (node.nodeType === 1 && shouldLoad(node)) {
+                  window.loadMathJax();
+                  observer.disconnect();
+                  return;
+                }
+              }
+            }
+          });
+          observer.observe(document.documentElement, { childList: true, subtree: true });
+        }
+      })();  function typesetWithMathJax(el) {
+    var MJ = window.MathJax;
+
+    // Fast path: MathJax already loaded and ready
+    if (MJ && MJ.typesetPromise) {
       MJ.typesetPromise([el]).catch(function () {});
-    } else if (MJ.startup && MJ.startup.promise) {
+      return;
+    }
+
+    // Slow path: MathJax not loaded yet — trigger lazy load, then typeset
+    if (window.loadMathJax) {
+      window.loadMathJax().then(function () {
+        if (window.MathJax && window.MathJax.typesetPromise) {
+          window.MathJax.typesetPromise([el]).catch(function () {});
+        }
+      }).catch(function () {
+        // MathJax failed to load — leave raw LaTeX visible, no crash
+      });
+      return;
+    }
+
+    // Fallback: no loader available (should never happen)
+    if (MJ && MJ.startup && MJ.startup.promise) {
       MJ.startup.promise.then(function () {
         MJ.typesetPromise && MJ.typesetPromise([el]).catch(function () {});
       });
     }
   }
+    </script>
 
   /* ---------- Ready ---------- */
 
