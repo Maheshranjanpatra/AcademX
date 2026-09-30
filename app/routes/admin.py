@@ -23,7 +23,8 @@ admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
 @admin_bp.context_processor
 def inject_admin_globals():
     return {
-        'sidebar_pending_papers': Paper.query.filter_by(status='pending').count()
+        'sidebar_pending_papers':    Paper.query.filter_by(status='pending').count(),
+        'sidebar_pending_playlists': Playlist.query.filter_by(status='pending').count(),
     }
 
 # DASHBOARD
@@ -37,6 +38,7 @@ def dashboard():
     total_users = User.query.count()
     total_questions = Question.query.count()
     pending_papers = Paper.query.filter_by(status="pending").count()
+    pending_playlists = Playlist.query.filter_by(status="pending").count()
     total_quizzes = Quiz.query.count()
 
     one_week_ago = datetime.utcnow() - timedelta(days=7)
@@ -86,13 +88,14 @@ def dashboard():
     activities = sorted(activities, key=lambda x: x['time'], reverse=True)[:10]
 
     metrics = {
-        'users': total_users,
-        'users_trend': f'+{users_last_week}' if users_last_week > 0 else f'{users_last_week}',
-        'questions': total_questions,
-        'questions_trend': f'+{questions_last_week}' if questions_last_week > 0 else f'{questions_last_week}',
-        'papers': pending_papers,
-        'quizzes': total_quizzes,
-        'quizzes_trend': f'+{quizzes_last_week}' if quizzes_last_week > 0 else f'{quizzes_last_week}',
+        'users':             total_users,
+        'users_trend':       f'+{users_last_week}' if users_last_week > 0 else f'{users_last_week}',
+        'questions':         total_questions,
+        'questions_trend':   f'+{questions_last_week}' if questions_last_week > 0 else f'{questions_last_week}',
+        'papers':            pending_papers,
+        'playlists':         pending_playlists,
+        'quizzes':           total_quizzes,
+        'quizzes_trend':     f'+{quizzes_last_week}' if quizzes_last_week > 0 else f'{quizzes_last_week}',
     }
 
     return render_template(
@@ -345,6 +348,90 @@ def batch_paper_action():
 
     db.session.commit()
     return redirect(url_for('admin.papers'))
+
+# PLAYLIST MODERATION
+
+@admin_bp.route("/playlists")
+@admin_required
+@check_session_timeout
+def playlists():
+    tab = request.args.get('tab', 'pending')
+    search = request.args.get('search', '')
+
+    query = Playlist.query
+
+    if tab == 'pending':
+        query = query.filter_by(status='pending')
+    elif tab == 'approved':
+        query = query.filter_by(status='approved')
+    elif tab == 'rejected':
+        query = query.filter_by(status='rejected')
+
+    if search:
+        query = query.filter(
+            db.or_(
+                Playlist.title.ilike(f'%{search}%'),
+                Playlist.subject.ilike(f'%{search}%')
+            )
+        )
+
+    playlists = query.order_by(Playlist.created_at.desc()).all()
+
+    pending_count  = Playlist.query.filter_by(status='pending').count()
+    approved_count = Playlist.query.filter_by(status='approved').count()
+    rejected_count = Playlist.query.filter_by(status='rejected').count()
+
+    return render_template(
+        'admin/playlists.html',
+        playlists=playlists,
+        tab=tab,
+        pending_count=pending_count,
+        approved_count=approved_count,
+        rejected_count=rejected_count,
+        search=search
+    )
+
+
+@admin_bp.route("/playlists/<int:playlist_id>/approve", methods=["POST"])
+@admin_required
+@check_session_timeout
+def approve_playlist(playlist_id):
+    playlist = Playlist.query.get_or_404(playlist_id)
+    if playlist.status != 'pending':
+        flash("This playlist has already been reviewed.", "warning")
+        return redirect(url_for('admin.playlists'))
+
+    playlist.status = 'approved'
+    db.session.commit()
+    flash(f"Playlist '{playlist.title}' has been approved.", "success")
+    return redirect(url_for('admin.playlists'))
+
+
+@admin_bp.route("/playlists/<int:playlist_id>/reject", methods=["POST"])
+@admin_required
+@check_session_timeout
+def reject_playlist(playlist_id):
+    playlist = Playlist.query.get_or_404(playlist_id)
+    if playlist.status != 'pending':
+        flash("This playlist has already been reviewed.", "warning")
+        return redirect(url_for('admin.playlists'))
+
+    playlist.status = 'rejected'
+    db.session.commit()
+    flash(f"Playlist '{playlist.title}' has been rejected.", "success")
+    return redirect(url_for('admin.playlists'))
+
+
+@admin_bp.route("/playlists/<int:playlist_id>/delete", methods=["POST"])
+@admin_required
+@check_session_timeout
+def delete_playlist_admin(playlist_id):
+    playlist = Playlist.query.get_or_404(playlist_id)
+    title = playlist.title
+    db.session.delete(playlist)
+    db.session.commit()
+    flash(f"Playlist '{title}' has been deleted.", "success")
+    return redirect(url_for('admin.playlists'))
 
 # Q&A MODERATION
 
@@ -623,7 +710,9 @@ def create_playlist():
         playlist = Playlist(
             title=form.title.data,
             subject=form.subject.data,
-            description=form.description.data
+            description=form.description.data,
+            uploaded_by=current_user.id,
+            status="approved",
         )
         db.session.add(playlist)
         db.session.commit()

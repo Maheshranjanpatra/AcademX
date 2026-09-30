@@ -1,0 +1,135 @@
+{% extends "admin/layout.html" %}
+{% block title %}Playlist Moderation{% endblock %}
+{% block page_title %}Playlist Moderation{% endblock %}
+
+{% block content %}
+
+<!-- ====== TABS ====== -->
+<div class="tabs-container">
+    <a href="{{ url_for('admin.playlists', tab='pending') }}"
+       class="tab-btn {{ 'active' if tab == 'pending' else '' }}">
+        Pending ({{ pending_count }})
+    </a>
+    <a href="{{ url_for('admin.playlists', tab='approved') }}"
+       class="tab-btn {{ 'active' if tab == 'approved' else '' }}">
+        Approved ({{ approved_count }})
+    </a>
+    <a href="{{ url_for('admin.playlists', tab='rejected') }}"
+       class="tab-btn {{ 'active' if tab == 'rejected' else '' }}">
+        Rejected ({{ rejected_count }})
+    </a>
+</div>
+
+<!-- ====== SEARCH ====== -->
+<div class="table-header-actions">
+    <form method="GET" class="search-filter-group" style="width:100%;">
+        <input type="hidden" name="tab" value="{{ tab }}">
+        <div class="search-bar">
+            <span class="material-symbols-outlined search-icon">search</span>
+            <input type="text" name="search" placeholder="Search by title or subject…"
+                   value="{{ search }}">
+        </div>
+        <button type="submit" class="btn btn-secondary">Search</button>
+        {% if search %}
+        <a href="{{ url_for('admin.playlists', tab=tab) }}" class="btn btn-secondary">Clear</a>
+        {% endif %}
+    </form>
+</div>
+
+<!-- ====== TABLE ====== -->
+<div class="admin-card">
+    {% if playlists %}
+    <div class="admin-table-container">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Subject</th>
+                    <th>Uploader</th>
+                    <th>Videos</th>
+                    <th>Submitted</th>
+                    <th>Status</th>
+                    <th style="text-align:right;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for pl in playlists %}
+                <tr>
+                    <td><strong>{{ pl.title }}</strong></td>
+                    <td>{{ pl.subject or '—' }}</td>
+                    <td>
+                        {% if pl.uploader %}
+                            {{ pl.uploader.username }}
+                        {% else %}
+                            <span class="text-muted">Admin</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span class="status-badge info">{{ pl.videos|length }}</span>
+                    </td>
+                    <td>
+                        {{ pl.created_at.strftime('%b %d, %Y') if pl.created_at else '—' }}
+                    </td>
+                    <td>
+                        <span class="status-badge {{ pl.status }}">{{ pl.status|capitalize }}</span>
+                    </td>
+                    <td style="text-align:right;">
+                        <div style="display:inline-flex; gap:6px;">
+                            {% if pl.videos|length > 0 %}
+                            <a href="{{ url_for('video.watch', video_id=pl.videos[0].id) }}"
+                               class="action-btn" target="_blank" title="Preview">
+                                <span class="material-symbols-outlined" style="font-size:16px;">visibility</span>
+                            </a>
+                            {% endif %}
+
+                            {% if pl.status == 'pending' %}
+                                <form method="POST"
+                                      action="{{ url_for('admin.approve_playlist', playlist_id=pl.id) }}"
+                                      style="display:inline;">
+                                    <button type="submit" class="action-btn success" title="Approve"
+                                            onclick="return confirm('Approve this playlist?');">
+                                        <span class="material-symbols-outlined" style="font-size:16px;">check</span>
+                                    </button>
+                                </form>
+                                <form method="POST"
+                                      action="{{ url_for('admin.reject_playlist', playlist_id=pl.id) }}"
+                                      style="display:inline;">
+                                    <button type="submit" class="action-btn danger" title="Reject"
+                                            onclick="return confirm('Reject this playlist?');">
+                                        <span class="material-symbols-outlined" style="font-size:16px;">close</span>
+                                    </button>
+                                </form>
+                            {% endif %}
+
+                            <form method="POST"
+                                  action="{{ url_for('admin.delete_playlist_admin', playlist_id=pl.id) }}"
+                                  style="display:inline;"
+                                  onsubmit="return confirm('Permanently delete this playlist and all its videos?');">
+                                <button type="submit" class="action-btn danger" title="Delete">
+                                    <span class="material-symbols-outlined" style="font-size:16px;">delete</span>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <span class="material-symbols-outlined" style="font-size:48px; opacity:0.4;">playlist_play</span>
+        <p style="margin-top:12px;">
+            {% if tab == 'pending' %}
+                No playlists pending review.
+            {% elif tab == 'approved' %}
+                No approved playlists yet.
+            {% else %}
+                No rejected playlists.
+            {% endif %}
+        </p>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}

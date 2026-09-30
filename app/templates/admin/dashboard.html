@@ -35,6 +35,16 @@
         </div>
     </div>
     <div class="metric-card">
+        <div class="metric-icon" style="background: rgba(0, 107, 95, 0.1); color: var(--accent-secondary);">
+            <span class="material-symbols-outlined">playlist_play</span>
+        </div>
+        <div class="metric-info">
+            <h3>{{ metrics.playlists }}</h3>
+            <p>Pending Playlists</p>
+            <span class="trend neutral">Requires Review</span>
+        </div>
+    </div>
+    <div class="metric-card">
         <div class="metric-icon" style="background: rgba(0, 88, 190, 0.1); color: var(--accent-primary);">
             <span class="material-symbols-outlined">quiz</span>
         </div>
@@ -88,6 +98,10 @@
         <a href="{{ url_for('admin.papers') }}" class="action-card highlight">
             <span class="material-symbols-outlined">rate_review</span>
             <span>Review Pending Papers</span>
+        </a>
+        <a href="{{ url_for('admin.playlists') }}" class="action-card highlight">
+            <span class="material-symbols-outlined">playlist_play</span>
+            <span>Review Pending Playlists</span>
         </a>
         <a href="{{ url_for('admin.materials') }}" class="action-card">
             <span class="material-symbols-outlined">library_add</span>
