@@ -40,3 +40,10 @@ Thumbs.db
 # Uploads (local dev only — production uses B2)
 app/static/uploads/
 Nymora.docx
+# Node
+node_modules/
+npm-debug.log*
+.npm/
+
+# Keep build artifacts committed (Render needs them)
+# tailwind.build.css stays tracked on purpose
