@@ -34,6 +34,10 @@
         <span class="material-symbols-outlined text-[16px]">school</span>
         {{ current_user.department or 'Department not set' }}
       </p>
+      <p class="text-sm text-on-surface-variant flex items-center gap-1.5">
+        <span class="material-symbols-outlined text-[16px]">mail</span>
+        {{ current_user.email }}
+      </p>
       <!-- Reg num — hidden on mobile -->
       <p class="hidden md:flex text-sm text-on-surface-variant items-center gap-1.5">
         <span class="material-symbols-outlined text-[16px]">badge</span>

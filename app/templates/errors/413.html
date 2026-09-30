@@ -1,55 +1,60 @@
 {% extends "base.html" %}
-
-{% block title %}File Too Large{% endblock %}
+{% block title %}File too large — Nymora{% endblock %}
 
 {% block content %}
-<div class="min-h-[70vh] flex items-center justify-center px-4 py-16">
-    <div class="max-w-[480px] w-full bg-surface-container-lowest border border-outline-variant rounded-2xl card-shadow p-8 text-center space-y-5">
+{% set error_code = "413" %}
+{% set error_name = "File too large" %}
+{% set mail_subject = error_code ~ " error on Nymora" %}
+{% set mail_body = "Hi Mahesh,\n\nI hit a " ~ error_code ~ " error (file too large) on Nymora.\n\nPage: " ~ request.url ~ "\n\nThanks!" %}
 
-        <div class="flex justify-center">
-            <div class="w-20 h-20 rounded-full bg-tertiary-fixed/40 flex items-center justify-center">
-                <svg class="w-10 h-10 text-tertiary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                    <polyline points="17 8 12 3 7 8"/>
-                    <line x1="12" y1="3" x2="12" y2="15"/>
-                    <line x1="4" y1="20" x2="20" y2="20" opacity="0.4"/>
-                </svg>
-            </div>
-        </div>
+<div class="err-wrap">
+  <div class="err-card">
 
-        <div class="space-y-2">
-            <h1 class="font-display text-headline-lg-mobile md:text-headline-lg text-on-surface">
-                File is too large
-            </h1>
-            <p class="font-body-md text-body-md text-on-surface-variant">
-                The file you're trying to upload exceeds our maximum limit.
-                Please compress it or choose a smaller file.
-            </p>
-            <p class="font-label-md text-xs text-on-surface-variant">
-                <strong>Max size:</strong> 26 MB
-            </p>
-        </div>
-
-        <div class="flex flex-col sm:flex-row gap-3 pt-2">
-            <a href="javascript:history.back()"
-               class="flex-1 bg-primary text-on-primary font-label-md text-label-md px-5 py-3 rounded-lg hover:bg-surface-tint transition-all flex items-center justify-center gap-2 shadow-sm">
-                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="19" y1="12" x2="5" y2="12"/>
-                    <polyline points="12 19 5 12 12 5"/>
-                </svg>
-                Go Back
-            </a>
-
-            <a href="{{ url_for('auth.index') }}"
-               class="flex-1 border border-outline-variant text-on-surface font-label-md text-label-md px-5 py-3 rounded-lg hover:bg-surface-container transition-all flex items-center justify-center gap-2">
-                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-                    <polyline points="9 22 9 12 15 12 15 22"/>
-                </svg>
-                Go Home
-            </a>
-        </div>
-
+    <div class="err-icon-wrap" style="background: rgba(184, 134, 11, 0.15);">
+      <svg class="err-icon" style="color: #b8860b;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 8V19a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8"/>
+        <path d="M1 3h22v5H1z"/>
+        <line x1="12" y1="12" x2="12" y2="16"/>
+        <line x1="12" y1="19" x2="12.01" y2="19"/>
+      </svg>
     </div>
+
+    <h1 class="err-title">That file is a little too heavy</h1>
+    <p class="err-msg">
+      It's over the limit we can safely carry. Compress it, split it, or pick something lighter — we'll gladly take it then.
+    </p>
+
+    <div class="err-ref">
+      <p class="err-ref-label">Maximum allowed</p>
+      <p class="err-ref-value">26 MB per file</p>
+    </div>
+
+    <div class="err-actions">
+      <button class="err-btn primary" onclick="errRefresh(this)">
+        <svg class="err-refresh-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12a9 9 0 1 1-3-6.7"/>
+          <polyline points="21 3 21 9 15 9"/>
+        </svg>
+        Try refreshing first
+      </button>
+
+      <a class="err-btn outline" href="mailto:myprojects.mahesh@gmail.com?subject={{ mail_subject|urlencode }}&body={{ mail_body|urlencode }}">
+        <svg class="err-refresh-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+          <polyline points="22,6 12,13 2,6"/>
+        </svg>
+        Contact developer
+      </a>
+
+      <a class="err-home-link" href="javascript:history.back()">
+        ← Or go back
+      </a>
+    </div>
+
+    <p class="err-footnote">
+      Still seeing this with a small file? Let us know — tap "Contact developer".
+    </p>
+
+  </div>
 </div>
 {% endblock %}

@@ -1,0 +1,199 @@
+/* ============================================================
+   Nymora Error Pages — shared styles
+   ============================================================ */
+
+.err-wrap {
+  min-height: 70vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.err-card {
+  max-width: 520px;
+  width: 100%;
+  background: var(--surface-container-lowest, #fff);
+  border: 1px solid var(--outline-variant, #c2c6d6);
+  border-radius: 1.25rem;
+  padding: 2rem 1.75rem;
+  text-align: center;
+  box-shadow: 0 12px 40px -12px rgba(0, 88, 190, 0.12);
+  animation: errFadeIn 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes errFadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* --- Icon bubble --- */
+.err-icon-wrap {
+  width: 88px;
+  height: 88px;
+  margin: 0 auto;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: errIconFloat 3.2s ease-in-out infinite;
+}
+
+@keyframes errIconFloat {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-6px); }
+}
+
+.err-icon {
+  width: 44px;
+  height: 44px;
+}
+
+/* --- Title + message --- */
+.err-title {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-weight: 700;
+  font-size: 1.5rem;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  margin: 1.25rem 0 0.5rem;
+  color: var(--on-surface, #191b23);
+}
+
+.err-msg {
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  color: var(--on-surface-variant, #424754);
+  margin: 0;
+}
+
+/* --- Optional error reference box --- */
+.err-ref {
+  margin: 1rem 0 0;
+  padding: 0.75rem 0.875rem;
+  background: var(--surface-container, #ecedf7);
+  border-radius: 0.625rem;
+  text-align: left;
+}
+
+.err-ref-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--on-surface-variant, #424754);
+  margin: 0 0 0.25rem;
+}
+
+.err-ref-value {
+  font-family: 'Source Code Pro', monospace;
+  font-size: 0.75rem;
+  color: var(--on-surface, #191b23);
+  word-break: break-all;
+  margin: 0;
+}
+
+/* --- Action buttons --- */
+.err-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  margin-top: 1.5rem;
+}
+
+.err-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: 0.625rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.err-btn.primary {
+  background: var(--primary, #0058be);
+  color: #fff;
+  box-shadow: 0 4px 14px -4px rgba(0, 88, 190, 0.4);
+}
+.err-btn.primary:hover {
+  background: var(--surface-tint, #005ac2);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px -6px rgba(0, 88, 190, 0.5);
+}
+
+.err-btn.outline {
+  background: transparent;
+  border-color: var(--outline-variant, #c2c6d6);
+  color: var(--on-surface, #191b23);
+}
+.err-btn.outline:hover {
+  background: var(--surface-container, #ecedf7);
+  border-color: var(--primary, #0058be);
+  color: var(--primary, #0058be);
+}
+
+.err-refresh-icon {
+  width: 16px;
+  height: 16px;
+  transition: transform 0.3s ease;
+}
+
+.err-refresh-icon.spinning {
+  animation: errSpin 0.75s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes errSpin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* --- Tiny home link --- */
+.err-home-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--on-surface-variant, #424754);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.err-home-link:hover {
+  color: var(--primary, #0058be);
+}
+
+/* --- Footnote --- */
+.err-footnote {
+  margin: 1.25rem 0 0;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: var(--on-surface-variant, #424754);
+  opacity: 0.85;
+}
+
+/* --- Offline overlay (works without base CSS) --- */
+.err-offline-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+.err-offline-overlay.open {
+  display: flex;
+}
+.err-offline-overlay .err-card {
+  background: #fff;
+  animation: errFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}

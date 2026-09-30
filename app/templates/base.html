@@ -29,6 +29,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"/>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/spinner.css') }}"/>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile_style.css') }}"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/errors.css') }}"/>
 
     <!-- ===== Tailwind Config ===== -->
     <script id="tailwind-config">
@@ -287,5 +288,70 @@
     });
 </script>
 
+<!-- ===== Offline Overlay ===== -->
+<div id="offline-overlay" class="err-offline-overlay" aria-hidden="true">
+  <div class="err-card">
+    <div class="err-icon-wrap" style="background: rgba(184, 134, 11, 0.15);">
+      <svg class="err-icon" style="color: #b8860b;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M5 12.55a11 11 0 0 1 14.08 0"/>
+        <path d="M1.42 9a16 16 0 0 1 21.16 0"/>
+        <path d="M8.53 16.11a6 6 0 0 1 6.95 0"/>
+        <line x1="12" y1="20" x2="12.01" y2="20"/>
+        <line x1="2" y1="2" x2="22" y2="22"/>
+      </svg>
+    </div>
+    <h1 class="err-title">You're offline</h1>
+    <p class="err-msg">
+      Looks like your connection dropped. Don't worry — your progress is safe.
+      Reconnect and refresh to pick up where you left off.
+    </p>
+    <div class="err-actions">
+      <button class="err-btn primary" onclick="errRefresh(this)">
+        <svg class="err-refresh-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12a9 9 0 1 1-3-6.7"/>
+          <polyline points="21 3 21 9 15 9"/>
+        </svg>
+        Try refreshing
+      </button>
+      <a class="err-btn outline"
+         href="mailto:myprojects.mahesh@gmail.com?subject=Offline%20issue%20on%20Nymora&body=Hi%20Mahesh%2C%0A%0AI%20keep%20running%20into%20offline%20issues%20on%20Nymora.%0A%0AThanks!">
+        <svg class="err-refresh-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+          <polyline points="22,6 12,13 2,6"/>
+        </svg>
+        Contact developer
+      </a>
+    </div>
+    <p class="err-footnote">
+      If refreshing doesn't help, tap "Contact developer" — everything is pre-filled, just hit send.
+    </p>
+  </div>
+</div>
+
+<script>
+  (function() {
+    function updateOnline() {
+      var overlay = document.getElementById('offline-overlay');
+      if (!overlay) return;
+      if (!navigator.onLine) {
+        overlay.classList.add('open');
+        overlay.setAttribute('aria-hidden', 'false');
+      } else {
+        overlay.classList.remove('open');
+        overlay.setAttribute('aria-hidden', 'true');
+      }
+    }
+    window.addEventListener('online', updateOnline);
+    window.addEventListener('offline', updateOnline);
+    window.addEventListener('load', updateOnline);
+
+    // Global refresh handler (used by error pages + overlay)
+    window.errRefresh = function(btn) {
+      var icon = btn.querySelector('.err-refresh-icon');
+      if (icon) icon.classList.add('spinning');
+      setTimeout(function() { window.location.reload(); }, 750);
+    };
+  })();
+</script>
 </body>
 </html>

@@ -22,17 +22,26 @@ def policy():
 
 @pages_bp.route("/offline")
 def offline():
-    return render_template("offline.html")
+    return render_template("errors/offline.html")
+
+
+@pages_bp.route("/slow")
+def slow():
+    return render_template("errors/slow.html")
+
+
+@pages_bp.route("/timeout")
+def timeout():
+    return render_template("errors/timeout.html")
 
 
 @pages_bp.route("/profile")
 @login_required
 def profile():
     """Full profile page — stats, progress, published items."""
-    from app.models import Playlist, Video, VideoProgress, Material, Paper
+    from app.models import Playlist, Video, VideoProgress, Material
     from app.extensions import db
 
-    # --- Learning progress across approved playlists ---
     playlists = Playlist.query.filter_by(status="approved").all()
     playlist_progress = []
     for pl in playlists:
@@ -52,12 +61,10 @@ def profile():
             "percent": round((completed / total) * 100, 1),
         })
 
-    # --- Activity stats ---
     questions_asked = current_user.questions.count()
     answers_given   = current_user.answers.count()
     quizzes_taken   = current_user.quiz_attempts.count()
 
-    # --- Published stats ---
     papers_published    = current_user.papers.count()
     playlists_published = current_user.playlists_uploaded.count()
     materials_published = Material.query.filter_by(uploaded_by=current_user.id).count()
