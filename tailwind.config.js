@@ -75,13 +75,13 @@ module.exports = {
       },
       fontFamily: {
         "body-md": ["Inter"],
-        display: ["Poppins"],
+        display: ["Inter"],
         "label-md": ["Inter"],
         "body-lg": ["Inter"],
-        "headline-md": ["Poppins"],
-        "headline-lg-mobile": ["Poppins"],
-        "headline-lg": ["Poppins"],
-        "math-block": ["Source Code Pro"],
+        "headline-md": ["Inter"],
+        "headline-lg-mobile": ["Inter"],
+        "headline-lg": ["Inter"],
+        "math-block": ["ui-monospace", "SFMono-Regular", "Menlo", "Consolas", "monospace"],
       },
       fontSize: {
         "body-md": ["16px", { lineHeight: "1.5", fontWeight: "400" }],

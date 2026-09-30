@@ -11,6 +11,10 @@
   body {
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
   }
+  .font-mono,
+  [class*="math-block"] {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
 
   .font-serif {
     font-family: 'Playfair Display', Georgia, serif;
