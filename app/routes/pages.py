@@ -24,6 +24,9 @@ def policy():
 def offline():
     return render_template("errors/offline.html")
 
+@pages_bp.route("/ping")
+def ping():
+    return "", 204
 
 @pages_bp.route("/slow")
 def slow():
