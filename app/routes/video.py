@@ -11,7 +11,10 @@ from app.models.streak import Streak
 from app.forms.video import UserPlaylistForm
 from app.utils.decorators import profile_required
 from app.utils.helpers import (
-    get_progress_animation, get_animation_copy, extract_youtube_id
+    get_progress_animation, get_animation_copy
+)
+from app.utils.youtube import (
+    extract_playlist_id, extract_video_id, get_playlist_videos
 )
 
 video_bp = Blueprint("video", __name__)
@@ -59,16 +62,37 @@ def upload_playlist():
     form = UserPlaylistForm()
 
     if form.validate_on_submit():
-        # Parse URLs first
-        lines = [l.strip() for l in form.video_urls.data.splitlines() if l.strip()]
-        parsed_ids = []
-        for line in lines:
-            vid = extract_youtube_id(line)
-            if vid:
-                parsed_ids.append(vid)
+        raw_url = (form.playlist_url.data or "").strip()
 
-        if not parsed_ids:
-            flash("No valid YouTube URLs found. Please check your links.", "error")
+        playlist_id = extract_playlist_id(raw_url)
+        if not playlist_id:
+            if extract_video_id(raw_url):
+                flash(
+                    "That's a single video link, not a playlist. "
+                    "Please paste a YouTube playlist URL (it contains 'list=...').",
+                    "error"
+                )
+            else:
+                flash(
+                    "Invalid YouTube playlist URL. Please check and try again.",
+                    "error"
+                )
+            return render_template("video_upload.html", form=form)
+
+        try:
+            videos_data = get_playlist_videos(playlist_id)
+        except ValueError as e:
+            flash(str(e), "error")
+            return render_template("video_upload.html", form=form)
+        except Exception:
+            flash("Could not fetch this playlist from YouTube. Please try again.", "error")
+            return render_template("video_upload.html", form=form)
+
+        if not videos_data:
+            flash(
+                "No videos found in this playlist. Make sure it's public and not empty.",
+                "error"
+            )
             return render_template("video_upload.html", form=form)
 
         playlist = Playlist(
@@ -79,22 +103,22 @@ def upload_playlist():
             status="pending",
         )
         db.session.add(playlist)
-        db.session.flush()  # get playlist.id
+        db.session.flush()
 
-        for idx, vid in enumerate(parsed_ids, start=1):
+        for idx, v in enumerate(videos_data, start=1):
             video = Video(
                 playlist_id=playlist.id,
-                title=f"Video {idx}",
-                youtube_video_id=vid,
+                title=v["title"],
+                youtube_video_id=v["video_id"],
                 order_index=idx,
-                duration_seconds=0,
+                duration_seconds=v["duration_seconds"],
             )
             db.session.add(video)
 
         db.session.commit()
 
         flash(
-            f"Playlist submitted with {len(parsed_ids)} video(s) — "
+            f"Playlist submitted with {len(videos_data)} video(s) — "
             f"pending admin approval.",
             "success"
         )

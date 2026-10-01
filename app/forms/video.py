@@ -16,9 +16,9 @@ class UserPlaylistForm(FlaskForm):
         "Description",
         validators=[Optional(), Length(max=1000)]
     )
-    video_urls = TextAreaField(
-        "YouTube Video URLs (one per line)",
-        validators=[DataRequired()],
-        description="Paste one YouTube URL per line — watch, youtu.be, embed, or shorts links all work."
+    playlist_url = StringField(
+        "YouTube Playlist URL",
+        validators=[DataRequired(), Length(max=500)],
+        description="Paste a full YouTube playlist link (must contain 'list=...')."
     )
     submit = SubmitField("Submit Playlist")
