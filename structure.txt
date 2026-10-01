@@ -1,125 +1,159 @@
-Nymora/
-│
-├── app/
-│   ├── __init__.py
-│   ├── config.py
-│   ├── extensions.py
-│   │
-│   ├── forms/
-│   │   ├── __init__.py
-│   │   ├── auth.py
-│   │   ├── admin_login.py
-│   │   ├── qa.py
-│   │   ├── quiz.py
-│   │   ├── material.py
-│   │   ├── admin.py
-│   │   └── paper.py
-│   │
-│   ├── models/
-│   │   ├── __init__.py
-│   │   ├── user.py
-│   │   ├── streak.py
-│   │   ├── question.py
-│   │   ├── quiz.py
-│   │   ├── video.py
-│   │   ├── paper.py
-│   │   └── material.py
-│   │
-│   ├── routes/
-│   │   ├── __init__.py
-│   │   ├── admin.py
-│   │   ├── auth.py
-│   │   ├── dashboard.py
-│   │   ├── qa.py
-│   │   ├── pages.py
-│   │   ├── quiz.py
-│   │   ├── video.py
-│   │   ├── paper.py
-│   │   └── materials.py
-│   │
-│   ├── static/
-│   │   ├── uploads/
-│   │   │   ├── papers/
-│   │   │   └── materials/
-│   │   ├── css/
-│   │   │   ├── admin_dashboard.css
-│   │   │   ├── admin_login.css
-│   │   │   ├── admin.css
-│   │   │   ├── auth_login.css
-│   │   │   └── style.css
-│   │   ├── js/
-│   │   │   ├── admin_dashboard.js
-│   │   │   ├── admin_login.js
-│   │   │   ├── auth_login.js
-│   │   │   ├── admin.js
-│   │   │   └── landing.js
-│   │   ├── images/
-│   │   │   └── nymora.jpg
-│   │   ├── profiles/
-│   │   │   ├── avatar1.png
-│   │   │   ├── avatar2.png
-│   │   │   │      ........
-│   │   │   └── avatar10.png
-│   │   └── animations/
-│   │       ├── lay_egg.mp4
-│   │       ├── egg_crack_02.mp4
-│   │       ├── egg_crack_01.mp4
-│   │       ├── egg_hatch.mp4
-│   │       ├── kill_egg.mp4
-│   │       └── sad_bird.mp4
-│   │
-│   ├── templates/
-│   │   ├── about.html
-│   │   ├── auth_complete_profile.html
-│   │   ├── auth_login.html
-│   │   ├── base.html
-│   │   ├── contact.html
-│   │   ├── dashboard.html
-│   │   ├── footer.html
-│   │   ├── index.html
-│   │   ├── macros.html
-│   │   ├── materials_list.html
-│   │   ├── navbar.html
-│   │   ├── paper_list.html
-│   │   ├── paper_upload.html
-│   │   ├── policy.html
-│   │   ├── qa_list.html
-│   │   ├── qa_detail.html
-│   │   ├── qa_ask.html
-│   │   ├── quiz_list.html
-│   │   ├── quiz_attempt.html
-│   │   ├── quiz_result.html
-│   │   ├── video_playlists.html
-│   │   ├── video_watch.html
-│   │   └── admin/
-│   │       ├── audit.html
-│   │       ├── bulk_import.html
-│   │       ├── login.html
-│   │       ├── layout.html
-│   │       ├── dashboard.html
-│   │       ├── users.html
-│   │       ├── user_detail.html
-│   │       ├── playlist_import.html
-│   │       ├── papers.html
-│   │       ├── qa.html
-│   │       ├── quizzes.html
-│   │       ├── quiz_form.html
-│   │       ├── question_form.html
-│   │       ├── videos.html
-│   │       ├── playlist_form.html
-│   │       ├── video_form.html
-│   │       ├── materials.html
-│   │       └── settings.html
-│   │
-│   └── utils/
-│       ├── __init__.py
-│       ├── validators.py
-│       ├── decorators.py
-│       ├── youtube.py
-│       └── helpers.py
-│
-├── migrations/
-├── tests/
+.
+├── app
+│   ├── forms
+│   │   ├── admin_login.py
+│   │   ├── admin.py
+│   │   ├── auth.py
+│   │   ├── __init__.py
+│   │   ├── materials.py
+│   │   ├── paper.py
+│   │   ├── qa.py
+│   │   ├── quiz.py
+│   │   └── video.py
+│   ├── models
+│   │   ├── __init__.py
+│   │   ├── material.py
+│   │   ├── paper.py
+│   │   ├── question.py
+│   │   ├── quiz.py
+│   │   ├── streak.py
+│   │   ├── user.py
+│   │   └── video.py
+│   ├── routes
+│   │   ├── admin.py
+│   │   ├── auth.py
+│   │   ├── dashboard.py
+│   │   ├── __init__.py
+│   │   ├── materials.py
+│   │   ├── pages.py
+│   │   ├── paper.py
+│   │   ├── qa.py
+│   │   ├── quiz.py
+│   │   └── video.py
+│   ├── static
+│   │   ├── css
+│   │   │   ├── admin.css
+│   │   │   ├── admin_dashboard.css
+│   │   │   ├── admin_login.css
+│   │   │   ├── auth_login.css
+│   │   │   ├── errors.css
+│   │   │   ├── math_composer.css
+│   │   │   ├── mobile_style.css
+│   │   │   ├── spinner.css
+│   │   │   ├── style.css
+│   │   │   └── tailwind.build.css
+│   │   ├── images
+│   │   │   ├── profiles
+│   │   │   │   ├── avatar10.png
+│   │   │   │   ├── avatar1.png
+│   │   │   │   ├── avatar2.png
+│   │   │   │   ├── avatar3.png
+│   │   │   │   ├── avatar4.png
+│   │   │   │   ├── avatar5.png
+│   │   │   │   ├── avatar6.png
+│   │   │   │   ├── avatar7.png
+│   │   │   │   ├── avatar8.png
+│   │   │   │   └── avatar9.png
+│   │   │   ├── apple-touch-icon.png
+│   │   │   ├── icon-192.png
+│   │   │   ├── icon-512.png
+│   │   │   ├── nymora.jpg
+│   │   │   └── nymora-mark.svg
+│   │   ├── js
+│   │   │   ├── admin_dashboard.js
+│   │   │   ├── admin.js
+│   │   │   ├── admin_login.js
+│   │   │   ├── auth_login.js
+│   │   │   ├── landing.js
+│   │   │   ├── math_composer.js
+│   │   │   ├── mobile_nav.js
+│   │   │   └── spinner.js
+│   │   ├── favicon.ico
+│   │   ├── manifest.json
+│   │   └── sw.js
+│   ├── templates
+│   │   ├── admin
+│   │   │   ├── audit.html
+│   │   │   ├── bulk_import_questions.html
+│   │   │   ├── dashboard.html
+│   │   │   ├── layout.html
+│   │   │   ├── login.html
+│   │   │   ├── material_form.html
+│   │   │   ├── materials.html
+│   │   │   ├── papers.html
+│   │   │   ├── playlist_form.html
+│   │   │   ├── playlist_import.html
+│   │   │   ├── playlists.html
+│   │   │   ├── qa.html
+│   │   │   ├── question_form.html
+│   │   │   ├── quiz_form.html
+│   │   │   ├── quiz_questions.html
+│   │   │   ├── quizzes.html
+│   │   │   ├── settings.html
+│   │   │   ├── user_detail.html
+│   │   │   ├── users.html
+│   │   │   ├── video_form.html
+│   │   │   └── videos.html
+│   │   ├── errors
+│   │   │   ├── 404.html
+│   │   │   ├── 413.html
+│   │   │   ├── 500.html
+│   │   │   ├── offline.html
+│   │   │   ├── slow.html
+│   │   │   └── timeout.html
+│   │   ├── about.html
+│   │   ├── auth_complete_profile.html
+│   │   ├── auth_login.html
+│   │   ├── base.html
+│   │   ├── contact.html
+│   │   ├── dashboard.html
+│   │   ├── footer.html
+│   │   ├── index.html
+│   │   ├── macros.html
+│   │   ├── materials_list.html
+│   │   ├── materials_my_uploads.html
+│   │   ├── materials_upload.html
+│   │   ├── navbar.html
+│   │   ├── paper_list.html
+│   │   ├── paper_upload.html
+│   │   ├── policy.html
+│   │   ├── profile.html
+│   │   ├── qa_ask.html
+│   │   ├── qa_detail.html
+│   │   ├── qa_list.html
+│   │   ├── quiz_attempt.html
+│   │   ├── quiz_list.html
+│   │   ├── quiz_result.html
+│   │   ├── video_playlists.html
+│   │   ├── video_upload.html
+│   │   └── video_watch.html
+│   ├── utils
+│   │   ├── constants.py
+│   │   ├── decorators.py
+│   │   ├── helpers.py
+│   │   ├── __init__.py
+│   │   ├── validators.py
+│   │   └── youtube.py
+│   ├── config.py
+│   ├── extensions.py
+│   └── __init__.py
+├── migrations
+│   ├── versions
+│   │   ├── 0aec6831d010_initial_tables.py
+│   │   └── 2219be6d9dc2_add_uploaded_by_status_created_at_to_.py
+│   ├── alembic.ini
+│   ├── env.py
+│   ├── README
+│   └── script.py.mako
+├── src
+│   └── input.css
 ├── .env
+├── .gitignore
+├── Nymora.docx
+├── package.json
+├── package-lock.json
 ├── requirements.txt
-└── run.py
+├── run.py
+└── tailwind.config.js
+
+17 directories, 140 files

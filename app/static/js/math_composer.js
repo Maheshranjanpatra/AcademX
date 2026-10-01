@@ -1,62 +1,61 @@
 /* ============================================================
    Nymora Math Composer
    Auto-enhances every textarea with class `mc-enabled`.
-   - Inline $...$ LaTeX
-   - Live preview when $ is typed
-   - Mini toolbar (x², a/b, √, ∫, ∑, π)
-   - Symbol palette (Greek + ops + arrows)
-   - Smart insert (wraps in $...$ unless already inside math)
    ============================================================ */
 (function () {
   'use strict';
 
   var DEBOUNCE_MS = 300;
 
-  /* ---------- Symbol definitions ---------- */
-
   var QUICK_BUTTONS = [
-    { label: 'x²',  insert: '$^$',           cursor: 2, title: 'Power (x^n)' },
-    { label: 'a/b', insert: '$\\frac{}{}$',  cursor: 7, title: 'Fraction' },
-    { label: '√x',  insert: '$\\sqrt{}$',    cursor: 7, title: 'Square root' },
-    { label: '∫',   insert: '$\\int_{}^{}$', cursor: 7, title: 'Integral' },
-    { label: '∑',   insert: '$\\sum_{}^{}$', cursor: 7, title: 'Sum' },
-    { label: 'π',   insert: '$\\pi$',        cursor: 0, title: 'Pi' }
+    { label: 'x\u00B2', insert: '$^$',           cursor: 2, title: 'Power' },
+    { label: 'a/b',     insert: '$\\frac{}{}$',  cursor: 7, title: 'Fraction' },
+    { label: '\u221Ax', insert: '$\\sqrt{}$',    cursor: 7, title: 'Square root' },
+    { label: '\u222B',  insert: '$\\int_{}^{}$', cursor: 7, title: 'Integral' },
+    { label: '\u2211',  insert: '$\\sum_{}^{}$', cursor: 7, title: 'Sum' },
+    { label: '\u03C0',  insert: '$\\pi$',        cursor: 0, title: 'Pi' }
   ];
 
   var PALETTE = [
     {
       label: 'Greek',
       items: [
-        ['α', '\\alpha'],   ['β', '\\beta'],   ['γ', '\\gamma'],   ['δ', '\\delta'],
-        ['θ', '\\theta'],   ['λ', '\\lambda'], ['μ', '\\mu'],      ['σ', '\\sigma'],
-        ['ω', '\\omega'],   ['π', '\\pi'],     ['φ', '\\phi'],     ['ψ', '\\psi'],
-        ['Σ', '\\Sigma'],   ['Ω', '\\Omega'],  ['Δ', '\\Delta'],   ['Γ', '\\Gamma']
+        ['\u03B1', '\\alpha'],   ['\u03B2', '\\beta'],
+        ['\u03B3', '\\gamma'],   ['\u03B4', '\\delta'],
+        ['\u03B8', '\\theta'],   ['\u03BB', '\\lambda'],
+        ['\u03BC', '\\mu'],      ['\u03C3', '\\sigma'],
+        ['\u03C9', '\\omega'],   ['\u03C0', '\\pi'],
+        ['\u03C6', '\\phi'],     ['\u03C8', '\\psi'],
+        ['\u03A3', '\\Sigma'],   ['\u03A9', '\\Omega'],
+        ['\u0394', '\\Delta'],   ['\u0393', '\\Gamma']
       ]
     },
     {
       label: 'Operations',
       items: [
-        ['±', '\\pm'],       ['×', '\\times'],   ['÷', '\\div'],
-        ['≤', '\\leq'],      ['≥', '\\geq'],     ['≠', '\\neq'],
-        ['≈', '\\approx'],   ['∈', '\\in'],      ['∞', '\\infty'],
-        ['∂', '\\partial'],  ['∇', '\\nabla'],   ['√', '\\sqrt{}']
+        ['\u00B1', '\\pm'],       ['\u00D7', '\\times'],
+        ['\u00F7', '\\div'],      ['\u2264', '\\leq'],
+        ['\u2265', '\\geq'],      ['\u2260', '\\neq'],
+        ['\u2248', '\\approx'],   ['\u2208', '\\in'],
+        ['\u221E', '\\infty'],    ['\u2202', '\\partial'],
+        ['\u2207', '\\nabla'],    ['\u221A', '\\sqrt{}']
       ]
     },
     {
       label: 'Arrows',
       items: [
-        ['→', '\\to'],       ['←', '\\leftarrow'],
-        ['↔', '\\leftrightarrow'], ['⇒', '\\Rightarrow'],
-        ['⇔', '\\Leftrightarrow'], ['↦', '\\mapsto']
+        ['\u2192', '\\to'],               ['\u2190', '\\leftarrow'],
+        ['\u2194', '\\leftrightarrow'],   ['\u21D2', '\\Rightarrow'],
+        ['\u21D4', '\\Leftrightarrow'],   ['\u21A6', '\\mapsto']
       ]
     },
     {
       label: 'Templates',
       items: [
-        ['x²',   '^'],                ['xᵢ',  '_'],
-        ['a/b',  '\\frac{}{}'],       ['√x',  '\\sqrt{}'],
-        ['∫',    '\\int_{}^{}'],      ['∑',   '\\sum_{}^{}'],
-        ['lim',  '\\lim_{x \\to 0}'], ['ddx', '\\frac{d}{dx}']
+        ['x^2',  '^'],                ['x_i',  '_'],
+        ['a/b',  '\\frac{}{}'],       ['sqrt', '\\sqrt{}'],
+        ['int',  '\\int_{}^{}'],      ['sum',  '\\sum_{}^{}'],
+        ['lim',  '\\lim_{x \\to 0}'], ['ddx',  '\\frac{d}{dx}']
       ]
     }
   ];
@@ -65,13 +64,11 @@
     'Type $x^2$ for inline math.\n' +
     'Type $$x^2$$ for display math.\n\n' +
     'Examples:\n' +
-    '  $x^2$         → x²\n' +
-    '  $\\frac{a}{b}$ → fraction\n' +
-    '  $\\sqrt{x}$    → √x\n' +
-    '  $\\int_a^b$    → integral\n\n' +
+    '  $x^2$         -> x squared\n' +
+    '  $\\frac{a}{b}$ -> fraction\n' +
+    '  $\\sqrt{x}$    -> square root\n' +
+    '  $\\int_a^b$    -> integral\n\n' +
     'Or just click the buttons above.';
-
-  /* ---------- Bootstrap ---------- */
 
   function init() {
     var textareas = document.querySelectorAll('textarea.mc-enabled');
@@ -94,19 +91,16 @@
 
     textarea.classList.add('mc-toolbar-attached');
 
-    /* --- Input → debounced preview update --- */
     var timer = null;
     textarea.addEventListener('input', function () {
       clearTimeout(timer);
       timer = setTimeout(function () { updatePreview(textarea, preview); }, DEBOUNCE_MS);
     });
 
-    /* --- Focus → if there's already $, show preview --- */
     textarea.addEventListener('focus', function () {
       if (/\$/.test(textarea.value)) updatePreview(textarea, preview);
     });
 
-    /* --- Toolbar click --- */
     toolbar.addEventListener('click', function (e) {
       var btn = e.target.closest('button[data-insert]');
       if (btn) {
@@ -124,31 +118,25 @@
       }
     });
 
-    /* --- Palette click --- */
     palette.addEventListener('click', function (e) {
       var btn = e.target.closest('button[data-latex]');
       if (!btn) return;
       e.preventDefault();
-      var latex = btn.dataset.latex;
-      smartInsert(textarea, latex);
+      smartInsert(textarea, btn.dataset.latex);
       updatePreview(textarea, preview);
       palette.hidden = true;
     });
 
-    /* --- Click outside → close palette --- */
     document.addEventListener('click', function (e) {
       if (!palette.hidden && !toolbar.contains(e.target)) {
         palette.hidden = true;
       }
     });
 
-    /* --- Escape → close palette --- */
     document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape' && !palette.hidden) palette.hidden = true;
     });
   }
-
-  /* ---------- Builders ---------- */
 
   function buildToolbar() {
     var bar = document.createElement('div');
@@ -238,8 +226,6 @@
     return wrap;
   }
 
-  /* ---------- Insert helpers ---------- */
-
   function insertAtCursor(textarea, text, cursorOffset) {
     var start = textarea.selectionStart;
     var end = textarea.selectionEnd;
@@ -255,10 +241,6 @@
     textarea.dispatchEvent(new Event('input', { bubbles: true }));
   }
 
-  /**
-   * Smart insert: if user is already inside an open $...$, insert raw latex.
-   * Otherwise wrap in $...$.
-   */
   function smartInsert(textarea, latex) {
     var before = textarea.value.slice(0, textarea.selectionStart);
     var dollars = (before.match(/\$/g) || []).length;
@@ -270,8 +252,6 @@
       insertAtCursor(textarea, '$' + latex + '$', latex.length + 1);
     }
   }
-
-  /* ---------- Preview rendering ---------- */
 
   function updatePreview(textarea, previewEl) {
     var text = textarea.value || '';
@@ -289,113 +269,29 @@
     typesetWithMathJax(content);
   }
 
-    <!-- ===== MathJax (lazy) ===== -->
-    <script>
-      /* Config — must be set BEFORE MathJax loads */
-      window.MathJax = {
-        tex: {
-          inlineMath: [['$', '$'], ['\\(', '\\)']],
-          displayMath: [['$$', '$$'], ['\\[', '\\]']]
-        },
-        svg: { fontCache: 'global' }
-      };
-
-      /* Lazy loader — only fetches MathJax when the page actually has math.
-         Exposes window.loadMathJax() for other scripts (e.g. math_composer). */
-      (function () {
-        var MJ_URL = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
-        var loadPromise = null;
-
-        window.loadMathJax = function () {
-          if (loadPromise) return loadPromise;
-          loadPromise = new Promise(function (resolve, reject) {
-            var s = document.createElement('script');
-            s.id = 'MathJax-script';
-            s.async = true;
-            s.src = MJ_URL;
-            s.onload = function () {
-              if (window.MathJax && window.MathJax.startup && window.MathJax.startup.promise) {
-                window.MathJax.startup.promise.then(resolve).catch(reject);
-              } else {
-                resolve();
-              }
-            };
-            s.onerror = function () { loadPromise = null; reject(); };
-            document.head.appendChild(s);
-          });
-          return loadPromise;
-        };
-
-        /* Check for $...$ patterns in the DOM */
-        var MATH_RE = /\$[^$\n]+\$/;
-
-        function shouldLoad(root) {
-          var text = root ? (root.textContent || '') : '';
-          return MATH_RE.test(text);
-        }
-
-        function detectAndLoad() {
-          if (loadPromise) return;
-          if (shouldLoad(document.body)) {
-            window.loadMathJax();
-          }
-        }
-
-        if (document.readyState === 'loading') {
-          document.addEventListener('DOMContentLoaded', detectAndLoad);
-        } else {
-          detectAndLoad();
-        }
-
-        /* Catch late-inserted content (preview divs, paginated lists, widgets) */
-        if (window.MutationObserver) {
-          var observer = new MutationObserver(function (mutations) {
-            if (loadPromise) { observer.disconnect(); return; }
-            for (var i = 0; i < mutations.length; i++) {
-              var added = mutations[i].addedNodes;
-              for (var j = 0; j < added.length; j++) {
-                var node = added[j];
-                if (node.nodeType === 1 && shouldLoad(node)) {
-                  window.loadMathJax();
-                  observer.disconnect();
-                  return;
-                }
-              }
-            }
-          });
-          observer.observe(document.documentElement, { childList: true, subtree: true });
-        }
-      })();  function typesetWithMathJax(el) {
+  function typesetWithMathJax(el) {
     var MJ = window.MathJax;
 
-    // Fast path: MathJax already loaded and ready
     if (MJ && MJ.typesetPromise) {
       MJ.typesetPromise([el]).catch(function () {});
       return;
     }
 
-    // Slow path: MathJax not loaded yet — trigger lazy load, then typeset
     if (window.loadMathJax) {
       window.loadMathJax().then(function () {
         if (window.MathJax && window.MathJax.typesetPromise) {
           window.MathJax.typesetPromise([el]).catch(function () {});
         }
-      }).catch(function () {
-        // MathJax failed to load — leave raw LaTeX visible, no crash
-      });
+      }).catch(function () {});
       return;
     }
 
-    // Fallback: no loader available (should never happen)
     if (MJ && MJ.startup && MJ.startup.promise) {
       MJ.startup.promise.then(function () {
         MJ.typesetPromise && MJ.typesetPromise([el]).catch(function () {});
       });
     }
   }
-    </script>
-
-  /* ---------- Ready ---------- */
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);

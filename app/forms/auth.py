@@ -106,17 +106,17 @@ class CompleteProfileForm(FlaskForm):
     avatar = RadioField(
         "Choose Profile Picture",
         choices=[
-            ('avatar1.png', 'Avatar 1'),
-            ('avatar2.png', 'Avatar 2'),
-            ('avatar3.png', 'Avatar 3'),
-            ('avatar4.png', 'Avatar 4'),
-            ('avatar5.png', 'Avatar 5'),
-            ('avatar6.png', 'Avatar 6'),
-            ('avatar7.png', 'Avatar 7'),
-            ('avatar8.png', 'Avatar 8'),
-            ('avatar9.png', 'Avatar 9'),
-            ('avatar10.png', 'Avatar 10'),
+            ('avatar1.webp', 'Avatar 1'),
+            ('avatar2.webp', 'Avatar 2'),
+            ('avatar3.webp', 'Avatar 3'),
+            ('avatar4.webp', 'Avatar 4'),
+            ('avatar5.webp', 'Avatar 5'),
+            ('avatar6.webp', 'Avatar 6'),
+            ('avatar7.webp', 'Avatar 7'),
+            ('avatar8.webp', 'Avatar 8'),
+            ('avatar9.webp', 'Avatar 9'),
+            ('avatar10.webp', 'Avatar 10'),
         ],
-        default='avatar7.png',
+        default='avatar7.webp',
         validators=[DataRequired()]
     )
