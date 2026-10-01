@@ -86,6 +86,7 @@
                                 <form method="POST"
                                       action="{{ url_for('admin.approve_playlist', playlist_id=pl.id) }}"
                                       style="display:inline;">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                     <button type="submit" class="action-btn success" title="Approve"
                                             onclick="return confirm('Approve this playlist?');">
                                         <span class="material-symbols-outlined" style="font-size:16px;">check</span>
@@ -94,6 +95,7 @@
                                 <form method="POST"
                                       action="{{ url_for('admin.reject_playlist', playlist_id=pl.id) }}"
                                       style="display:inline;">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                     <button type="submit" class="action-btn danger" title="Reject"
                                             onclick="return confirm('Reject this playlist?');">
                                         <span class="material-symbols-outlined" style="font-size:16px;">close</span>
@@ -105,6 +107,7 @@
                                   action="{{ url_for('admin.delete_playlist_admin', playlist_id=pl.id) }}"
                                   style="display:inline;"
                                   onsubmit="return confirm('Permanently delete this playlist and all its videos?');">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                 <button type="submit" class="action-btn danger" title="Delete">
                                     <span class="material-symbols-outlined" style="font-size:16px;">delete</span>
                                 </button>
