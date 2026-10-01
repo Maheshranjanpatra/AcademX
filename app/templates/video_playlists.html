@@ -58,8 +58,8 @@
 
         {% if playlist.uploader %}
         <p class="text-xs text-on-surface-variant flex items-center gap-1">
-          <span class="material-symbols-outlined text-[14px]">person</span>
-          by {{ playlist.uploader.username }}
+          <span class="material-symbols-outlined text-[14px]">visibility_off</span>
+          by {{ playlist.uploader.anonymous_id or 'Anonymous' }}
         </p>
         {% endif %}
       </div>
