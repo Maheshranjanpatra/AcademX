@@ -19,6 +19,12 @@ class Config:
     SQLALCHEMY_DATABASE_URI = _normalize_db_url(os.environ.get("DATABASE_URL"))
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
+    # Recycle connections before Neon suspends them + pre-ping dead ones
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        "pool_pre_ping": True,
+        "pool_recycle": 280,
+    }
+
     # Google OAuth
     GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID")
     GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET")
@@ -35,4 +41,4 @@ class Config:
     B2_APPLICATION_KEY = os.environ.get("B2_APPLICATION_KEY")
     B2_BUCKET_NAME = os.environ.get("B2_BUCKET_NAME")
     B2_ENDPOINT = os.environ.get("B2_ENDPOINT")
-    B2_REGION = "us-west-004"  
+    B2_REGION = "us-west-004"
