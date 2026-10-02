@@ -72,6 +72,7 @@ def create_app(config_class=Config):
             'pages.contact',
             'pages.policy',
             'auth.complete_profile',
+            'pages.ping',
         ]
 
         if current_user.is_authenticated and not current_user.profile_complete:
@@ -116,4 +117,4 @@ def create_app(config_class=Config):
     def request_entity_too_large(error):
         return render_template('errors/413.html'), 413
 
-    return app  
+    return app
