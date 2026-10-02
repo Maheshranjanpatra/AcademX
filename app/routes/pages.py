@@ -26,6 +26,13 @@ def offline():
 
 @pages_bp.route("/ping")
 def ping():
+    from app.extensions import db
+    from sqlalchemy import text
+    try:
+        db.session.execute(text("SELECT 1"))
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
     return "", 204
 
 @pages_bp.route("/slow")
