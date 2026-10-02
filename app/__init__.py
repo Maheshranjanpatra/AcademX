@@ -106,8 +106,12 @@ def create_app(config_class=Config):
     # ---- Error handlers ----
     @app.errorhandler(500)
     def internal_error(error):
-        db.session.rollback()
-        return render_template('errors/500.html'), 500
+        try:
+            db.session.rollback()
+            return render_template('errors/500.html'), 500
+        except Exception:
+            return ("<h2>Something went wrong</h2>"
+                    "<p>Please refresh in a few seconds.</p>"), 500
 
     @app.errorhandler(404)
     def not_found(error):

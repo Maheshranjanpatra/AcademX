@@ -24,7 +24,11 @@ class Config:
         "pool_pre_ping": True,
         "pool_recycle": 280,
         "connect_args": {
-            "connect_timeout": 5,
+            "connect_timeout": 15,
+            "keepalives": 1,
+            "keepalives_idle": 30,
+            "keepalives_interval": 10,
+            "keepalives_count": 3,
         },
     }
     # Google OAuth

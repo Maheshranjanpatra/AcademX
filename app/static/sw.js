@@ -68,16 +68,21 @@ self.addEventListener('fetch', event => {
   const url = new URL(req.url);
   if (url.origin !== self.location.origin) return;
 
+  // Pages: always network, friendly fallback if it fails or Render is cold
   if (req.mode === 'navigate') {
+    const fallback = () => new Response(OFFLINE_HTML, {
+      status: 200,
+      headers: { 'Content-Type': 'text/html; charset=utf-8' }
+    });
     event.respondWith(
-      fetch(req).catch(() => new Response(OFFLINE_HTML, {
-        status: 200,
-        headers: { 'Content-Type': 'text/html; charset=utf-8' }
-      }))
+      fetch(req)
+        .then(res => [502, 503, 504].includes(res.status) ? fallback() : res)
+        .catch(fallback)
     );
     return;
   }
 
+  // Static files only: cache + background refresh
   if (url.pathname.startsWith('/static/')) {
     event.respondWith(
       caches.match(req).then(cached => {

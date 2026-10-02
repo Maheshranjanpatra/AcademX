@@ -327,11 +327,14 @@
         overlay.setAttribute('aria-hidden', 'true');
       }
     }
+
+    // Clear SW wake-retry timer on every successful page load
+    try { sessionStorage.removeItem('nymora-wake-start'); } catch (e) {}
+
     window.addEventListener('online', updateOnline);
     window.addEventListener('offline', updateOnline);
     window.addEventListener('load', updateOnline);
 
-    // Global refresh handler (used by error pages + overlay)
     window.errRefresh = function(btn) {
       var icon = btn.querySelector('.err-refresh-icon');
       if (icon) icon.classList.add('spinning');
