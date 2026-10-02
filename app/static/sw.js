@@ -1,7 +1,6 @@
-// Nymora Service Worker
-const CACHE_NAME = 'nymora-v2';
-const ASSETS = [
-  '/',
+// Nymora Service Worker v3
+const CACHE_NAME = 'nymora-v3';
+const PRECACHE = [
   '/static/css/tailwind.build.css',
   '/static/css/style.css',
   '/static/css/mobile_style.css',
@@ -9,49 +8,88 @@ const ASSETS = [
   '/static/css/spinner.css',
   '/static/js/spinner.js',
   '/static/js/mobile_nav.js',
-  '/static/images/nymora.svg',
+  '/static/images/nymora-mark.svg',
   '/static/manifest.json'
 ];
+
+const OFFLINE_HTML = `<!doctype html><html><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nymora</title>
+<style>
+  body{font-family:sans-serif;text-align:center;margin-top:20vh;color:#333;padding:1rem}
+  button{padding:12px 24px;font-size:16px;border-radius:8px;
+         border:1px solid #ccc;background:#f9f9f9;cursor:pointer;margin-top:1rem}
+</style>
+</head><body>
+<h2 id="t">Waking Nymora up…</h2>
+<p id="m">Couldn't reach the server. Retrying automatically.</p>
+<button onclick="location.reload()">Retry now</button>
+<script>
+  var first = parseInt(sessionStorage.getItem('nymora-wake-start') || '0', 10);
+  var now = Date.now();
+  if (!first) {
+    first = now;
+    sessionStorage.setItem('nymora-wake-start', String(first));
+  }
+  var elapsed = now - first;
+  if (elapsed < 30000) {
+    setTimeout(function(){ location.reload(); }, 5000);
+  } else {
+    sessionStorage.removeItem('nymora-wake-start');
+    document.getElementById('t').textContent = "You're offline";
+    document.getElementById('m').textContent =
+      "Check your internet connection and tap Retry.";
+  }
+</script>
+</body></html>`;
 
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(ASSETS).catch(() => {}))
+      .then(cache => Promise.allSettled(PRECACHE.map(u => cache.add(u))))
       .then(() => self.skipWaiting())
   );
 });
 
 self.addEventListener('activate', event => {
   event.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(
-        keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
-      )
-    )
+    caches.keys()
+      .then(keys => Promise.all(
+        keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
+      ))
+      .then(() => self.clients.claim())
   );
-  return self.clients.claim();
 });
 
 self.addEventListener('fetch', event => {
-  if (event.request.method !== 'GET') return;
+  const req = event.request;
+  if (req.method !== 'GET') return;
 
-  event.respondWith(
-    caches.match(event.request).then(cached => {
-      const networkFetch = fetch(event.request).then(response => {
-        if (response.ok) {
-          const clone = response.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
-        }
-        return response;
-      }).catch(() => {
-        if (cached) return cached;
-        if (event.request.headers.get('accept')?.includes('text/html')) {
-          return caches.match('/offline');
-        }
-        return new Response('', { status: 503 });
-      });
+  const url = new URL(req.url);
+  if (url.origin !== self.location.origin) return;
 
-      return cached || networkFetch;
-    })
-  );
+  if (req.mode === 'navigate') {
+    event.respondWith(
+      fetch(req).catch(() => new Response(OFFLINE_HTML, {
+        status: 200,
+        headers: { 'Content-Type': 'text/html; charset=utf-8' }
+      }))
+    );
+    return;
+  }
+
+  if (url.pathname.startsWith('/static/')) {
+    event.respondWith(
+      caches.match(req).then(cached => {
+        const net = fetch(req).then(res => {
+          if (res.ok) {
+            const copy = res.clone();
+            caches.open(CACHE_NAME).then(c => c.put(req, copy));
+          }
+          return res;
+        }).catch(() => cached || new Response('', { status: 503 }));
+        return cached || net;
+      })
+    );
+  }
 });
