@@ -1,13 +1,13 @@
 {% extends "base.html" %}
-{% block title %}Page not found — Nymora{% endblock %}
+{% block title %}Page not found — AcademX{% endblock %}
 
 {% block content %}
 {% set error_code = "404" %}
 {% set error_name = "Page not found" %}
 {% set error_title = "This page wandered off" %}
 {% set error_msg = "The page you're looking for doesn't exist, or maybe it moved somewhere quieter. Let's get you back on track." %}
-{% set mail_subject = error_code ~ " error on Nymora" %}
-{% set mail_body = "Hi Mahesh,\n\nI hit a " ~ error_code ~ " error on Nymora.\n\nPage: " ~ request.url ~ "\n\nWhat I was doing:\n(please describe briefly)\n\nThanks!" %}
+{% set mail_subject = error_code ~ " error on AcademX" %}
+{% set mail_body = "Hi Mahesh,\n\nI hit a " ~ error_code ~ " error on AcademX.\n\nPage: " ~ request.url ~ "\n\nWhat I was doing:\n(please describe briefly)\n\nThanks!" %}
 
 <div class="err-wrap">
   <div class="err-card">

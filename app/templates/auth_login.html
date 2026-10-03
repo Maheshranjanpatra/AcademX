@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Sign In — Nymora{% endblock %}
+{% block title %}Sign In — AcademX{% endblock %}
 
 {% block extra_head %}
 
@@ -13,66 +13,66 @@
 {% endblock %}
 
 {% block content %}
-<div class="nymora-page-wrapper">
-    <div class="nymora-bg-orb nymora-bg-orb-1" aria-hidden="true"></div>
-    <div class="nymora-bg-orb nymora-bg-orb-2" aria-hidden="true"></div>
-    <div class="nymora-bg-orb nymora-bg-orb-3" aria-hidden="true"></div>
+<div class="academx-page-wrapper">
+    <div class="academx-bg-orb academx-bg-orb-1" aria-hidden="true"></div>
+    <div class="academx-bg-orb academx-bg-orb-2" aria-hidden="true"></div>
+    <div class="academx-bg-orb academx-bg-orb-3" aria-hidden="true"></div>
 
-    <main class="nymora-container">
-        <section class="nymora-hero-side" aria-label="Nymora Philosophy">
-            <div class="nymora-watermark-content">
-                <blockquote class="nymora-quote">
+    <main class="academx-container">
+        <section class="academx-hero-side" aria-label="AcademX Philosophy">
+            <div class="academx-watermark-content">
+                <blockquote class="academx-quote">
                     “The pursuit of knowledge is the noblest of human endeavors.”
                 </blockquote>
-                <div class="nymora-hero-badge">
-                    <span class="nymora-hero-badge-line"></span>
-                    <span class="nymora-hero-badge-text">EST. ACADEMIA</span>
+                <div class="academx-hero-badge">
+                    <span class="academx-hero-badge-line"></span>
+                    <span class="academx-hero-badge-text">EST. ACADEMIA</span>
                 </div>
             </div>
 
             <!-- Designed "Hi" Background -->
-            <div class="nymora-watermark-emblem" aria-hidden="true">
-                <div class="nymora-emblem-ring"></div>
-                <span class="nymora-watermark-text">Hi</span>
-                <div class="nymora-emblem-flourish">✦ ——— ✦</div>
+            <div class="academx-watermark-emblem" aria-hidden="true">
+                <div class="academx-emblem-ring"></div>
+                <span class="academx-watermark-text">Hi</span>
+                <div class="academx-emblem-flourish">✦ ——— ✦</div>
             </div>
         </section>
-        <section class="nymora-card-side">
-            <div class="nymora-auth-card" id="nymoraCard">
-                <div class="nymora-card-inner">
+        <section class="academx-card-side">
+            <div class="academx-auth-card" id="academxCard">
+                <div class="academx-card-inner">
 
                     <!-- Brand-->
-                    <header class="nymora-card-header">
-                        <div class="nymora-squircle-wrapper">
+                    <header class="academx-card-header">
+                        <div class="academx-squircle-wrapper">
                             <img
-                                src="{{ url_for('static', filename='images/nymora.svg') }}"
-                                alt="Nymora Logo"
-                                class="nymora-squircle-img"
+                                src="{{ url_for('static', filename='images/academx.svg') }}"
+                                alt="AcademX Logo"
+                                class="academx-squircle-img"
                                 width="64"
                                 height="64"
                             >
                         </div>
-                        <span class="nymora-brand-title">Nymora</span>
+                        <span class="academx-brand-title">AcademX</span>
                     </header>
 
                     <!-- Elegant Divider -->
-                    <div class="nymora-divider" aria-hidden="true">
-                        <span class="nymora-divider-line"></span>
-                        <span class="nymora-divider-asterisk">✦</span>
-                        <span class="nymora-divider-line"></span>
+                    <div class="academx-divider" aria-hidden="true">
+                        <span class="academx-divider-line"></span>
+                        <span class="academx-divider-asterisk">✦</span>
+                        <span class="academx-divider-line"></span>
                     </div>
 
                     <!-- Welcome Headline -->
-                    <h1 class="nymora-headline">Begin your quest for understanding.</h1>
+                    <h1 class="academx-headline">Begin your quest for understanding.</h1>
 
                     <!-- Inspirational Subtext -->
-                    <p class="nymora-subtext">
+                    <p class="academx-subtext">
                         Join a community where curiosity is celebrated, and every question is a step toward mastery.
                     </p>
 
                     <!-- Trust & Social Proof Badges -->
-                    <div class="nymora-badges-container">
-                        <span class="nymora-badge-icon" aria-hidden="true">
+                    <div class="academx-badges-container">
+                        <span class="academx-badge-icon" aria-hidden="true">
                             <svg class="w-4 h-4 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
                                 <polyline points="9 12 11 14 15 10"/>
@@ -81,21 +81,21 @@
                     </div>
 
                     <!-- Google Button -->
-                    <div class="nymora-action-container">
-                        <a href="{{ url_for('auth.login_google') }}" class="nymora-google-btn" id="nymoraGoogleBtn">
-                            <div class="nymora-btn-content">
-                                <svg class="nymora-google-svg" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+                    <div class="academx-action-container">
+                        <a href="{{ url_for('auth.login_google') }}" class="academx-google-btn" id="academxGoogleBtn">
+                            <div class="academx-btn-content">
+                                <svg class="academx-google-svg" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
                                     <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
                                     <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.11-6.72-4.96H1.29v3.15C3.26 21.3 7.37 24 12 24z"/>
                                     <path fill="#FBBC05" d="M5.28 14.24c-.25-.72-.38-1.49-.38-2.24s.13-1.52.38-2.24V6.61H1.29C.47 8.24 0 10.06 0 12s.47 3.76 1.29 5.39l3.99-3.15z"/>
                                     <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.37 0 3.26 2.7 1.29 6.61l3.99 3.15c.95-2.85 3.6-4.96 6.72-4.96z"/>
                                 </svg>
-                                <span class="nymora-btn-text">Continue with Google</span>
+                                <span class="academx-btn-text">Continue with Google</span>
                             </div>
 
-                            <div class="nymora-btn-spinner" aria-hidden="true">
-                                <svg class="nymora-spinner-svg" viewBox="0 0 50 50">
-                                    <circle class="nymora-spinner-path" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle>
+                            <div class="academx-btn-spinner" aria-hidden="true">
+                                <svg class="academx-spinner-svg" viewBox="0 0 50 50">
+                                    <circle class="academx-spinner-path" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle>
                                 </svg>
                             </div>
 
@@ -104,10 +104,10 @@
 
 
                     <!-- Footer & Terms -->
-                    <footer class="nymora-card-footer">
+                    <footer class="academx-card-footer">
                         <p>
                             By continuing, you agree to our
-                            <a href="{{ url_for('pages.policy') }}" class="nymora-legal-link">Privacy Policy</a>.
+                            <a href="{{ url_for('pages.policy') }}" class="academx-legal-link">Privacy Policy</a>.
                         </p>
                     </footer>
 
@@ -122,7 +122,7 @@
 <script src="{{ url_for('static', filename='js/auth_login.js') }}" defer></script>
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-    const googleBtn = document.getElementById("nymoraGoogleBtn");
+    const googleBtn = document.getElementById("academxGoogleBtn");
 
     if (googleBtn) {
         googleBtn.addEventListener("click", function (e) {

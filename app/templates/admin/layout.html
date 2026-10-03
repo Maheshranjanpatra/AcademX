@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Admin Dashboard{% endblock %} | Nymora</title>
+    <title>{% block title %}Admin Dashboard{% endblock %} | AcademX</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
@@ -20,8 +20,8 @@
     <div class="admin-layout">
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
-                <img src="{{ url_for('static', filename='images/nymora.svg') }}" alt="Nymora Logo" class="logo-img">
-                <span class="logo-text">Nymora</span>
+                <img src="{{ url_for('static', filename='images/academx.svg') }}" alt="AcademX Logo" class="logo-img">
+                <span class="logo-text">AcademX</span>
             </div>
             <nav class="sidebar-nav">
                 <a href="{{ url_for('admin.dashboard') }}" class="nav-item {% if request.endpoint == 'admin.dashboard' %}active{% endif %}">

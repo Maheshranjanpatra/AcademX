@@ -1,4 +1,4 @@
-// NYMORA ADMIN PANEL - COMMON JAVASCRIPT
+// ACADEMX ADMIN PANEL - COMMON JAVASCRIPT
 
 document.addEventListener('DOMContentLoaded', () => {
     initDarkMode();
@@ -15,7 +15,7 @@ function initDarkMode() {
 
     toggleBtn.addEventListener('click', () => {
         const isDark = document.documentElement.classList.toggle('dark');
-        localStorage.setItem('nymora_theme', isDark ? 'dark' : 'light');
+        localStorage.setItem('academx_theme', isDark ? 'dark' : 'light');
     });
 }
 

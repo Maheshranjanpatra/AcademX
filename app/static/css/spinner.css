@@ -1,5 +1,5 @@
 /* ==========================================================================
-   NYMORA OVERLAY — Data Burst Spinner + Animated Phrase + Gilded Bar
+   ACADEMX OVERLAY — Data Burst Spinner + Animated Phrase + Gilded Bar
    ========================================================================== */
 
 :root {
@@ -29,7 +29,7 @@ html.dark {
    FULL-PAGE OVERLAY
    ========================================================================== */
 
-.nymora-overlay {
+.academx-overlay {
     position: fixed;
     inset: 0;
     display: flex;
@@ -48,14 +48,14 @@ html.dark {
         linear-gradient(180deg, var(--n-parchment-1) 0%, var(--n-parchment-2) 100%);
 }
 
-html.dark .nymora-overlay {
+html.dark .academx-overlay {
     background:
         radial-gradient(900px 520px at 50% -10%, #1a1f2e 0%, transparent 60%),
         radial-gradient(1200px 700px at 50% 110%, #0a0c14 0%, transparent 55%),
         linear-gradient(180deg, var(--n-parchment-1) 0%, var(--n-parchment-2) 100%);
 }
 
-.nymora-overlay::before {
+.academx-overlay::before {
     content: '';
     position: absolute;
     inset: 0;
@@ -68,24 +68,24 @@ html.dark .nymora-overlay {
     background-position: 0 0, 2px 3px;
 }
 
-html.dark .nymora-overlay::before {
+html.dark .academx-overlay::before {
     background-image:
         radial-gradient(rgba(255,255,255,.02) 1px, transparent 1px),
         radial-gradient(rgba(255,255,255,.012) 1px, transparent 1px);
 }
 
-.nymora-overlay.active {
+.academx-overlay.active {
     opacity: 1;
     pointer-events: all;
 }
 
 /* Hide the bar in nav mode */
-.nymora-overlay:not(.is-upload) .nymora-bar {
+.academx-overlay:not(.is-upload) .academx-bar {
     display: none;
 }
 
 /* Slightly smaller burst in upload mode */
-.nymora-overlay.is-upload .nymora-burst {
+.academx-overlay.is-upload .academx-burst {
     width: 100px;
     height: 100px;
 }
@@ -94,7 +94,7 @@ html.dark .nymora-overlay::before {
    DATA BURST SPINNER
    ========================================================================== */
 
-.nymora-burst {
+.academx-burst {
     position: relative;
     width: 130px;
     height: 130px;
@@ -102,13 +102,13 @@ html.dark .nymora-overlay::before {
     transition: width 0.3s ease, height 0.3s ease;
 }
 
-.nymora-burst .burst-rays {
+.academx-burst .burst-rays {
     position: absolute;
     inset: 0;
     animation: n-burst-rotate 9s linear infinite;
 }
 
-.nymora-burst .burst-rays i {
+.academx-burst .burst-rays i {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -120,30 +120,30 @@ html.dark .nymora-overlay::before {
     animation: n-ray-pulse 2s ease-in-out infinite;
 }
 
-.nymora-burst .burst-rays i:nth-child(3n+1) {
+.academx-burst .burst-rays i:nth-child(3n+1) {
     background: linear-gradient(to top, transparent 0%, var(--n-burst-teal-soft) 55%, var(--n-burst-teal) 100%);
 }
-.nymora-burst .burst-rays i:nth-child(3n+2) {
+.academx-burst .burst-rays i:nth-child(3n+2) {
     background: linear-gradient(to top, transparent 0%, var(--n-burst-amber) 55%, var(--n-burst-amber-deep) 100%);
 }
-.nymora-burst .burst-rays i:nth-child(3n) {
+.academx-burst .burst-rays i:nth-child(3n) {
     background: linear-gradient(to top, transparent 0%, var(--n-burst-navy-soft) 55%, var(--n-burst-navy) 100%);
 }
 
-.nymora-burst .burst-rays i:nth-child(1)  { --a:   0deg; animation-delay: 0s;    }
-.nymora-burst .burst-rays i:nth-child(2)  { --a:  30deg; animation-delay: -.17s; }
-.nymora-burst .burst-rays i:nth-child(3)  { --a:  60deg; animation-delay: -.34s; }
-.nymora-burst .burst-rays i:nth-child(4)  { --a:  90deg; animation-delay: -.51s; }
-.nymora-burst .burst-rays i:nth-child(5)  { --a: 120deg; animation-delay: -.68s; }
-.nymora-burst .burst-rays i:nth-child(6)  { --a: 150deg; animation-delay: -.85s; }
-.nymora-burst .burst-rays i:nth-child(7)  { --a: 180deg; animation-delay: -1.02s; }
-.nymora-burst .burst-rays i:nth-child(8)  { --a: 210deg; animation-delay: -1.19s; }
-.nymora-burst .burst-rays i:nth-child(9)  { --a: 240deg; animation-delay: -1.36s; }
-.nymora-burst .burst-rays i:nth-child(10) { --a: 270deg; animation-delay: -1.53s; }
-.nymora-burst .burst-rays i:nth-child(11) { --a: 300deg; animation-delay: -1.70s; }
-.nymora-burst .burst-rays i:nth-child(12) { --a: 330deg; animation-delay: -1.87s; }
+.academx-burst .burst-rays i:nth-child(1)  { --a:   0deg; animation-delay: 0s;    }
+.academx-burst .burst-rays i:nth-child(2)  { --a:  30deg; animation-delay: -.17s; }
+.academx-burst .burst-rays i:nth-child(3)  { --a:  60deg; animation-delay: -.34s; }
+.academx-burst .burst-rays i:nth-child(4)  { --a:  90deg; animation-delay: -.51s; }
+.academx-burst .burst-rays i:nth-child(5)  { --a: 120deg; animation-delay: -.68s; }
+.academx-burst .burst-rays i:nth-child(6)  { --a: 150deg; animation-delay: -.85s; }
+.academx-burst .burst-rays i:nth-child(7)  { --a: 180deg; animation-delay: -1.02s; }
+.academx-burst .burst-rays i:nth-child(8)  { --a: 210deg; animation-delay: -1.19s; }
+.academx-burst .burst-rays i:nth-child(9)  { --a: 240deg; animation-delay: -1.36s; }
+.academx-burst .burst-rays i:nth-child(10) { --a: 270deg; animation-delay: -1.53s; }
+.academx-burst .burst-rays i:nth-child(11) { --a: 300deg; animation-delay: -1.70s; }
+.academx-burst .burst-rays i:nth-child(12) { --a: 330deg; animation-delay: -1.87s; }
 
-.nymora-burst .burst-core {
+.academx-burst .burst-core {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -164,7 +164,7 @@ html.dark .nymora-overlay::before {
     overflow: hidden;
 }
 
-.nymora-burst .burst-core svg {
+.academx-burst .burst-core svg {
     width: 64px;
     height: 64px;
     display: block;
@@ -209,7 +209,7 @@ html.dark .nymora-overlay::before {
    ANIMATED PHRASE
    ========================================================================== */
 
-.nymora-phrase {
+.academx-phrase {
     position: relative;
     z-index: 1;
     font-family: Georgia, "Times New Roman", serif;
@@ -223,11 +223,11 @@ html.dark .nymora-overlay::before {
     padding: 0 1rem;
 }
 
-.nymora-phrase .char {
+.academx-phrase .char {
     display: inline-block;
 }
 
-.nymora-phrase .char.is-dot {
+.academx-phrase .char.is-dot {
     color: var(--n-burst-teal);
     animation: n-dot-focus 1.6s ease-in-out infinite;
     animation-delay: calc(var(--di, 0) * 0.16s);
@@ -242,7 +242,7 @@ html.dark .nymora-overlay::before {
    GILDED DUOTONE PROGRESS BAR
    ========================================================================== */
 
-.nymora-bar {
+.academx-bar {
     --p: 0;
     position: relative;
     z-index: 1;
@@ -250,7 +250,7 @@ html.dark .nymora-overlay::before {
     margin-top: 0.5rem;
 }
 
-.nymora-bar .bar-head {
+.academx-bar .bar-head {
     display: flex;
     justify-content: flex-end;
     align-items: center;
@@ -258,7 +258,7 @@ html.dark .nymora-overlay::before {
     min-height: 22px;
 }
 
-.nymora-bar .pct-num {
+.academx-bar .pct-num {
     font-family: Georgia, "Times New Roman", serif;
     font-size: 15px;
     font-variant-numeric: tabular-nums;
@@ -267,7 +267,7 @@ html.dark .nymora-overlay::before {
     transition: color .35s ease;
 }
 
-.nymora-bar .bar-body {
+.academx-bar .bar-body {
     position: relative;
     height: 10px;
     background: var(--n-parchment-2);
@@ -275,11 +275,11 @@ html.dark .nymora-overlay::before {
     box-shadow: inset 0 1px 2px rgba(28,28,30,.06);
 }
 
-html.dark .nymora-bar .bar-body {
+html.dark .academx-bar .bar-body {
     background: rgba(255,255,255,0.08);
 }
 
-.nymora-bar .fill {
+.academx-bar .fill {
     height: 100%;
     width: calc(var(--p) * 100%);
     border-radius: 999px;
@@ -289,7 +289,7 @@ html.dark .nymora-bar .bar-body {
     transition: width .12s linear, background-image .4s ease;
 }
 
-.nymora-bar .tip {
+.academx-bar .tip {
     position: absolute;
     top: 50%;
     left: calc(var(--p) * 100%);
@@ -305,34 +305,34 @@ html.dark .nymora-bar .bar-body {
     transition: left .12s linear, opacity .3s ease;
 }
 
-html.dark .nymora-bar .tip {
+html.dark .academx-bar .tip {
     box-shadow:
         0 1px 4px rgba(0,0,0,.5),
         0 0 0 2px rgba(20,22,30,.9);
 }
 
 /* Done state */
-.nymora-bar.is-done .pct-num {
+.academx-bar.is-done .pct-num {
     color: var(--n-burst-teal);
 }
 
-.nymora-bar.is-done .fill {
+.academx-bar.is-done .fill {
     background-image: linear-gradient(90deg, var(--n-burst-teal) 0%, var(--n-burst-teal-soft) 100%);
 }
 
-.nymora-bar.is-done .tip {
+.academx-bar.is-done .tip {
     opacity: 0;
 }
 
 /* Error state */
-.nymora-bar.is-error .fill {
+.academx-bar.is-error .fill {
     background-image: linear-gradient(90deg, #b91c1c 0%, #dc2626 100%);
 }
 
-.nymora-bar.is-error .pct-num {
+.academx-bar.is-error .pct-num {
     color: #b91c1c;
 }
 
-.nymora-bar.is-error .tip {
+.academx-bar.is-error .tip {
     opacity: 0;
 }

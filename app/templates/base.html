@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>{% block title %}Nymora{% endblock %} - Ask doubts anonymously. Learn effectively.</title>
+    <title>{% block title %}AcademX{% endblock %} - Ask doubts anonymously. Learn effectively.</title>
 
     <!-- ===== PWA ===== -->
     <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
@@ -11,7 +11,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/apple-touch-icon.png') }}">
-    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='images/nymora-mark.svg') }}">
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='images/academx-mark.svg') }}">
 
     <!-- ===== Favicon ===== -->
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.ico') }}">
@@ -300,7 +300,7 @@
         Try refreshing
       </button>
       <a class="err-btn outline"
-         href="mailto:myprojects.mahesh@gmail.com?subject=Offline%20issue%20on%20Nymora&body=Hi%20Mahesh%2C%0A%0AI%20keep%20running%20into%20offline%20issues%20on%20Nymora.%0A%0AThanks!">
+         href="mailto:myprojects.mahesh@gmail.com?subject=Offline%20issue%20on%20AcademX&body=Hi%20Mahesh%2C%0A%0AI%20keep%20running%20into%20offline%20issues%20on%20AcademX.%0A%0AThanks!">
         <svg class="err-refresh-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
           <polyline points="22,6 12,13 2,6"/>
@@ -329,7 +329,7 @@
     }
 
     // Clear SW wake-retry timer on every successful page load
-    try { sessionStorage.removeItem('nymora-wake-start'); } catch (e) {}
+    try { sessionStorage.removeItem('academx-wake-start'); } catch (e) {}
 
     window.addEventListener('online', updateOnline);
     window.addEventListener('offline', updateOnline);

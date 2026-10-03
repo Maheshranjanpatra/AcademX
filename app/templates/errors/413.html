@@ -1,11 +1,11 @@
 {% extends "base.html" %}
-{% block title %}File too large — Nymora{% endblock %}
+{% block title %}File too large — AcademX{% endblock %}
 
 {% block content %}
 {% set error_code = "413" %}
 {% set error_name = "File too large" %}
-{% set mail_subject = error_code ~ " error on Nymora" %}
-{% set mail_body = "Hi Mahesh,\n\nI hit a " ~ error_code ~ " error (file too large) on Nymora.\n\nPage: " ~ request.url ~ "\n\nThanks!" %}
+{% set mail_subject = error_code ~ " error on AcademX" %}
+{% set mail_body = "Hi Mahesh,\n\nI hit a " ~ error_code ~ " error (file too large) on AcademX.\n\nPage: " ~ request.url ~ "\n\nThanks!" %}
 
 <div class="err-wrap">
   <div class="err-card">

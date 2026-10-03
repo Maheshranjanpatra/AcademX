@@ -1,4 +1,4 @@
-// Nymora Administration Interface Engine
+// AcademX Administration Interface Engine
 
 document.addEventListener('DOMContentLoaded', () => {
     const adminCard = document.getElementById('adminCard');

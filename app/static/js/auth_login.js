@@ -1,9 +1,9 @@
-//Nymora Interactive Auth Script
+//AcademX Interactive Auth Script
 
 document.addEventListener('DOMContentLoaded', () => {
-    const card = document.getElementById('nymoraCard');
-    const container = document.querySelector('.nymora-card-side');
-    const googleBtn = document.getElementById('nymoraGoogleBtn');
+    const card = document.getElementById('academxCard');
+    const container = document.querySelector('.academx-card-side');
+    const googleBtn = document.getElementById('academxGoogleBtn');
 
     const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 

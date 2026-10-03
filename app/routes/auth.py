@@ -34,7 +34,7 @@ def admin_login():
                 admin_user = User(
                     google_sub='admin',
                     name='Administrator',
-                    email='admin@nymora.com',
+                    email='admin@academx.com',
                     is_admin=True,
                     profile_complete=True,
                     avatar='avatar1.png',
@@ -158,7 +158,7 @@ def complete_profile():
 
         db.session.commit()
 
-        flash('Profile completed successfully! Welcome to Nymora.', 'success')
+        flash('Profile completed successfully! Welcome to AcademX.', 'success')
         return redirect(url_for("dashboard.home"))
 
     return render_template("auth_complete_profile.html", form=form)

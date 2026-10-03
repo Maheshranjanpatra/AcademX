@@ -1,5 +1,5 @@
 /* ============================================================
-   Nymora Math Composer
+   AcademX Math Composer
    Auto-enhances every textarea with class `mc-enabled`.
    ============================================================ */
 (function () {

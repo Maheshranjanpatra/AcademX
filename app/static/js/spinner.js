@@ -1,5 +1,5 @@
 /* ==========================================================================
-   NYMORA OVERLAY CONTROLLER
+   ACADEMX OVERLAY CONTROLLER
    - Nav overlay: Data Burst + animated phrase
    - Upload overlay: Data Burst + phrase + gilded progress bar
    ========================================================================== */
@@ -7,7 +7,7 @@
 (function () {
     'use strict';
 
-    const NYMORA_MARK = `
+    const ACADEMX_MARK = `
         <defs>
             <linearGradient id="nym-body-grad" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0" stop-color="#0f3157"/>
@@ -24,24 +24,24 @@
     `;
 
     function ensureOverlay() {
-        if (document.getElementById('nymoraOverlay')) return;
+        if (document.getElementById('academxOverlay')) return;
         const overlay = document.createElement('div');
-        overlay.id = 'nymoraOverlay';
-        overlay.className = 'nymora-overlay';
+        overlay.id = 'academxOverlay';
+        overlay.className = 'academx-overlay';
         overlay.innerHTML = `
-            <div class="nymora-burst">
+            <div class="academx-burst">
                 <div class="burst-rays">
                     <i></i><i></i><i></i><i></i><i></i><i></i>
                     <i></i><i></i><i></i><i></i><i></i><i></i>
                 </div>
                 <div class="burst-core">
-                    <svg viewBox="0 0 192 192" xmlns="http://www.w3.org/2000/svg">${NYMORA_MARK}</svg>
+                    <svg viewBox="0 0 192 192" xmlns="http://www.w3.org/2000/svg">${ACADEMX_MARK}</svg>
                 </div>
             </div>
-            <p class="nymora-phrase" id="nymoraPhrase"></p>
-            <div class="nymora-bar" id="nymoraBar">
+            <p class="academx-phrase" id="academxPhrase"></p>
+            <div class="academx-bar" id="academxBar">
                 <div class="bar-head">
-                    <div class="pct-num" id="nymoraBarPct">0%</div>
+                    <div class="pct-num" id="academxBarPct">0%</div>
                 </div>
                 <div class="bar-body">
                     <div class="fill"></div>
@@ -54,7 +54,7 @@
     }
 
     function renderPhrase(text) {
-        const el = document.getElementById('nymoraPhrase');
+        const el = document.getElementById('academxPhrase');
         if (!el) return;
         el.textContent = '';
         let dotIndex = 0;
@@ -73,35 +73,35 @@
     }
 
     function setBarProgress(pct) {
-        const bar = document.getElementById('nymoraBar');
+        const bar = document.getElementById('academxBar');
         if (!bar) return;
         const clamped = Math.max(0, Math.min(100, pct));
         bar.style.setProperty('--p', clamped / 100);
-        const label = document.getElementById('nymoraBarPct');
+        const label = document.getElementById('academxBarPct');
         if (label) label.textContent = Math.round(clamped) + '%';
     }
 
     function setBarState(state) {
         // state: 'idle' | 'done' | 'error'
-        const bar = document.getElementById('nymoraBar');
+        const bar = document.getElementById('academxBar');
         if (!bar) return;
         bar.classList.remove('is-done', 'is-error');
         if (state === 'done') bar.classList.add('is-done');
         if (state === 'error') bar.classList.add('is-error');
     }
 
-    const NymoraSpinner = {
+    const AcademXSpinner = {
         // ---- Navigation overlay ----
         show(text) {
             ensureOverlay();
-            const overlay = document.getElementById('nymoraOverlay');
+            const overlay = document.getElementById('academxOverlay');
             overlay.classList.remove('is-upload');
             overlay.classList.add('active');
-            overlay.dataset.shownAt = Date.now(); 
+            overlay.dataset.shownAt = Date.now();
             setPhrase(text || 'Just a moment....');
         },
         hide() {
-            const overlay = document.getElementById('nymoraOverlay');
+            const overlay = document.getElementById('academxOverlay');
             if (overlay) overlay.classList.remove('active');
         },
 
@@ -109,7 +109,7 @@
         upload: {
             start(text) {
                 ensureOverlay();
-                const overlay = document.getElementById('nymoraOverlay');
+                const overlay = document.getElementById('academxOverlay');
                 overlay.classList.add('active', 'is-upload');
                 setPhrase(text || 'Uploading your file....');
                 setBarProgress(0);
@@ -128,7 +128,7 @@
                 setPhrase(message || 'Upload failed.');
             },
             hide() {
-                const overlay = document.getElementById('nymoraOverlay');
+                const overlay = document.getElementById('academxOverlay');
                 if (overlay) overlay.classList.remove('active', 'is-upload');
             },
         },
@@ -145,7 +145,7 @@
             formEl.addEventListener('submit', function (e) {
                 e.preventDefault();
 
-                NymoraSpinner.upload.start(uploadingText);
+                AcademXSpinner.upload.start(uploadingText);
 
                 const xhr = new XMLHttpRequest();
                 const formData = new FormData(formEl);
@@ -155,31 +155,31 @@
                     let pct = (evt.loaded / evt.total) * 100;
                     // Cap at 95 until server finishes
                     if (pct >= 95) pct = 95;
-                    NymoraSpinner.upload.progress(pct);
+                    AcademXSpinner.upload.progress(pct);
                 });
 
                 xhr.onload = function () {
                     if (xhr.status >= 200 && xhr.status < 400) {
-                        NymoraSpinner.upload.done(doneText);
+                        AcademXSpinner.upload.done(doneText);
                         setTimeout(function () {
                             const target = redirectUrl || xhr.responseURL || '/';
                             window.location.href = target;
                         }, holdMs);
                     } else {
-                        NymoraSpinner.upload.error(
+                        AcademXSpinner.upload.error(
                             'Upload failed. Please try again.'
                         );
                         setTimeout(function () {
-                            NymoraSpinner.upload.hide();
+                            AcademXSpinner.upload.hide();
                             window.location.reload();
                         }, 1800);
                     }
                 };
 
                 xhr.onerror = function () {
-                    NymoraSpinner.upload.error('Network error. Please try again.');
+                    AcademXSpinner.upload.error('Network error. Please try again.');
                     setTimeout(function () {
-                        NymoraSpinner.upload.hide();
+                        AcademXSpinner.upload.hide();
                         window.location.reload();
                     }, 1800);
                 };
@@ -190,7 +190,7 @@
         },
     };
 
-    window.NymoraSpinner = NymoraSpinner;
+    window.AcademXSpinner = AcademXSpinner;
 
         // ---- Auto show overlay on internal navigation (delayed) ----
     document.addEventListener('DOMContentLoaded', function () {
@@ -202,13 +202,13 @@
         function scheduleNavSpinner(text) {
             clearTimeout(navTimer);
             navTimer = setTimeout(function () {
-                NymoraSpinner.show(text || 'Just a moment....');
+                AcademXSpinner.show(text || 'Just a moment....');
             }, NAV_DELAY_MS);
         }
 
         function cancelNavSpinner() {
             clearTimeout(navTimer);
-            NymoraSpinner.hide();
+            AcademXSpinner.hide();
         }
 
         // Simple forms with auto spinner
@@ -241,7 +241,7 @@
         // Safety: if the spinner somehow stays longer than 3s, hide it
         // (prevents "spinner forever" bugs on slow servers)
         setInterval(function () {
-            const overlay = document.getElementById('nymoraOverlay');
+            const overlay = document.getElementById('academxOverlay');
             if (overlay && overlay.classList.contains('active')) {
                 const startedAt = overlay.dataset.shownAt ? parseInt(overlay.dataset.shownAt, 10) : 0;
                 if (startedAt && Date.now() - startedAt > 3000) {

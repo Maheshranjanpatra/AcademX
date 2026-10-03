@@ -1,5 +1,5 @@
 /**
- * Nymora Mobile Navigation
+ * AcademX Mobile Navigation
  * Drawer, ripple, theme toggle, icon pop — mobile only
  */
 (function () {
@@ -76,7 +76,7 @@
      ============================================================ */
   if (themeBtn) {
     var savedTheme = 'light';
-    try { savedTheme = localStorage.getItem('nymora-theme') || 'light'; } catch (e) {}
+    try { savedTheme = localStorage.getItem('academx-theme') || 'light'; } catch (e) {}
 
     if (savedTheme === 'dark') {
       html.classList.remove('light');
@@ -89,12 +89,12 @@
         html.classList.remove('dark');
         html.classList.add('light');
         themeBtn.classList.remove('on');
-        try { localStorage.setItem('nymora-theme', 'light'); } catch (e) {}
+        try { localStorage.setItem('academx-theme', 'light'); } catch (e) {}
       } else {
         html.classList.remove('light');
         html.classList.add('dark');
         themeBtn.classList.add('on');
-        try { localStorage.setItem('nymora-theme', 'dark'); } catch (e) {}
+        try { localStorage.setItem('academx-theme', 'dark'); } catch (e) {}
       }
     });
   }

@@ -1,11 +1,11 @@
 {% extends "base.html" %}
-{% block title %}Something went wrong — Nymora{% endblock %}
+{% block title %}Something went wrong — AcademX{% endblock %}
 
 {% block content %}
 {% set error_code = "500" %}
 {% set error_name = "Internal server error" %}
-{% set mail_subject = error_code ~ " error on Nymora" %}
-{% set mail_body = "Hi Mahesh,\n\nI hit a " ~ error_code ~ " error on Nymora.\n\nError: " ~ error_code ~ " — " ~ error_name ~ "\nPage: " ~ request.url ~ "\n\nWhat I was doing:\n(please describe briefly)\n\nThanks!" %}
+{% set mail_subject = error_code ~ " error on AcademX" %}
+{% set mail_body = "Hi Mahesh,\n\nI hit a " ~ error_code ~ " error on AcademX.\n\nError: " ~ error_code ~ " — " ~ error_name ~ "\nPage: " ~ request.url ~ "\n\nWhat I was doing:\n(please describe briefly)\n\nThanks!" %}
 
 <div class="err-wrap">
   <div class="err-card">

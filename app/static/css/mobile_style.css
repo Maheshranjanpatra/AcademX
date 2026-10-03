@@ -1,14 +1,14 @@
 /* ============================================================
-   Nymora Mobile Navigation — aurora gradient, bottom nav, drawer
+   AcademX Mobile Navigation — aurora gradient, bottom nav, drawer
    Scoped to @media (max-width: 767px) — desktop untouched
    ============================================================ */
 
 @media (max-width: 767px) {
 
-  /* ---------- Aurora (adapted to Nymora) ---------- */
+  /* ---------- Aurora (adapted to AcademX) ---------- */
   :root {
-    --nymora-aurora: linear-gradient(120deg, #0058be 0%, #006b5f 35%, #71f8e4 65%, #b8860b 100%);
-    --nymora-aurora-deep: linear-gradient(120deg, #003d85 0%, #004d44 35%, #4fdbc8 65%, #8a6508 100%);
+    --AcademX-aurora: linear-gradient(120deg, #0058be 0%, #006b5f 35%, #71f8e4 65%, #b8860b 100%);
+    --AcademX-aurora-deep: linear-gradient(120deg, #003d85 0%, #004d44 35%, #4fdbc8 65%, #8a6508 100%);
     --aurora-size: 250% 250%;
 
     --nav-bg: rgba(9, 16, 30, 0.92);
@@ -26,7 +26,7 @@
     --dr-item: #c8d3ee;
     --dr-item-hover: rgba(255, 255, 255, 0.05);
     --dr-active-fg: #0a0d20;
-    --dr-active-bg: var(--nymora-aurora);
+    --dr-active-bg: var(--AcademX-aurora);
     --dr-active-glow: 0 10px 24px -8px rgba(0,88,190,.75), inset 0 1px 0 rgba(255,255,255,.45);
     --dr-close-bg: rgba(255, 255, 255, 0.08);
     --dr-close-fg: #71f8e4;
@@ -38,7 +38,7 @@
     --nav-bd: rgba(0, 0, 0, 0.06);
     --nav-item: #727785;
     --nav-item-on: #ffffff;
-    --nav-on-bg: var(--nymora-aurora-deep);
+    --nav-on-bg: var(--AcademX-aurora-deep);
     --nav-on-sh: 0 8px 20px -8px rgba(0,88,190,.55), inset 0 1px 0 rgba(255,255,255,.35);
     --nav-on-glow: drop-shadow(0 0 8px rgba(0,88,190,.35));
 
@@ -49,7 +49,7 @@
     --dr-item: #3b3357;
     --dr-item-hover: rgba(0, 88, 190, 0.06);
     --dr-active-fg: #ffffff;
-    --dr-active-bg: var(--nymora-aurora-deep);
+    --dr-active-bg: var(--AcademX-aurora-deep);
     --dr-active-glow: 0 10px 24px -8px rgba(0,88,190,.5), inset 0 1px 0 rgba(255,255,255,.35);
     --dr-close-bg: rgba(0, 88, 190, 0.10);
     --dr-close-fg: #0058be;
@@ -63,7 +63,7 @@
   }
 
   .aurora-bg {
-    background: var(--nymora-aurora);
+    background: var(--AcademX-aurora);
     background-size: var(--aurora-size);
     animation: auroraShift 7s ease-in-out infinite;
   }
@@ -242,7 +242,7 @@
 
   html.light .dr-avatar {
     color: #fff;
-    background: var(--nymora-aurora-deep) !important;
+    background: var(--AcademX-aurora-deep) !important;
     background-size: var(--aurora-size) !important;
   }
 

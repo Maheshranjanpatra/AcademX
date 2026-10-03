@@ -6,8 +6,8 @@
     <a href="{{ url_for('dashboard.home') if current_user.is_authenticated else url_for('auth.index') }}"
        class="flex items-center gap-3 group">
 
-      <img src="{{ url_for('static', filename='images/nymora.svg') }}"
-           alt="Nymora"
+      <img src="{{ url_for('static', filename='images/academx.svg') }}"
+           alt="AcademX"
            class="
              h-10 w-10 md:h-12 md:w-12
              rounded-2xl md:rounded-[1.1rem]
@@ -19,7 +19,7 @@
              group-hover:shadow-lg" />
 
       <span class="font-serif text-xl md:text-2xl font-black tracking-tight text-primary-fixed drop-shadow-sm group-hover:text-secondary-fixed transition-colors duration-300">
-        Nymora
+        AcademX
       </span>
     </a>
 
@@ -96,8 +96,8 @@
 
       <!-- Install Button (PWA) -->
       <button id="install-btn"
-            title="Install Nymora app"
-            aria-label="Install Nymora app"
+            title="Install AcademX app"
+            aria-label="Install AcademX app"
             class="hidden md:flex items-center justify-center w-9 h-9 border border-primary-fixed-dim/50 hover:bg-primary-fixed/10 text-primary-fixed-dim hover:text-secondary-fixed transition-all rounded-full"
             style="display:none;">
         <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -252,7 +252,7 @@
 
   <!-- Footer -->
   <div class="dr-copy">
-    <strong>© 2026 Nymora</strong>
+    <strong>© 2026 AcademX</strong>
     <span>All rights reserved.</span>
     <span>Made with care · v1.0</span>
   </div>

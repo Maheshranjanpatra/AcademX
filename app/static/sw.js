@@ -1,5 +1,5 @@
-// Nymora Service Worker v3
-const CACHE_NAME = 'nymora-v3';
+// AcademX Service Worker v3
+const CACHE_NAME = 'academx-v3';
 const PRECACHE = [
   '/static/css/tailwind.build.css',
   '/static/css/style.css',
@@ -8,34 +8,34 @@ const PRECACHE = [
   '/static/css/spinner.css',
   '/static/js/spinner.js',
   '/static/js/mobile_nav.js',
-  '/static/images/nymora-mark.svg',
+  '/static/images/academx-mark.svg',
   '/static/manifest.json'
 ];
 
 const OFFLINE_HTML = `<!doctype html><html><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Nymora</title>
+<title>AcademX</title>
 <style>
   body{font-family:sans-serif;text-align:center;margin-top:20vh;color:#333;padding:1rem}
   button{padding:12px 24px;font-size:16px;border-radius:8px;
          border:1px solid #ccc;background:#f9f9f9;cursor:pointer;margin-top:1rem}
 </style>
 </head><body>
-<h2 id="t">Waking Nymora up…</h2>
+<h2 id="t">Waking AcademX up…</h2>
 <p id="m">Couldn't reach the server. Retrying automatically.</p>
 <button onclick="location.reload()">Retry now</button>
 <script>
-  var first = parseInt(sessionStorage.getItem('nymora-wake-start') || '0', 10);
+  var first = parseInt(sessionStorage.getItem('academx-wake-start') || '0', 10);
   var now = Date.now();
   if (!first) {
     first = now;
-    sessionStorage.setItem('nymora-wake-start', String(first));
+    sessionStorage.setItem('academx-wake-start', String(first));
   }
   var elapsed = now - first;
   if (elapsed < 30000) {
     setTimeout(function(){ location.reload(); }, 5000);
   } else {
-    sessionStorage.removeItem('nymora-wake-start');
+    sessionStorage.removeItem('academx-wake-start');
     document.getElementById('t').textContent = "You're offline";
     document.getElementById('m').textContent =
       "Check your internet connection and tap Retry.";

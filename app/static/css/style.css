@@ -140,7 +140,7 @@ input:focus, textarea:focus, select:focus {
   width: 100%;
 }
 
-/* NYMORA LANDING PAGE STYLES */
+/* ACADEMX LANDING PAGE STYLES */
 :root {
     --color-surface-lowest: #ffffff;
     --color-surface-variant: #e1e2ec;
@@ -151,7 +151,7 @@ input:focus, textarea:focus, select:focus {
     --font-mono: 'Source Code Pro', monospace;
 }
 
-.nymora-body {
+.academx-body {
     font-family: var(--font-body);
     color: var(--color-on-surface);
     background-color: #f8f9fa;
