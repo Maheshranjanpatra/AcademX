@@ -1,7 +1,7 @@
 <div align="center">
-<img src="app/static/images/nymora.svg" alt="Nymora logo" width="80" />
+<img src="app/static/images/academx.svg" alt="AcademX logo" width="80" />
 
-# Nymora
+# AcademX
 
 **Ask doubts anonymously. Learn effectively.**
 
@@ -13,11 +13,11 @@ practice quizzes, past papers, and study materials in a calm, classic interface.
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Neon-4169E1?logo=postgresql&logoColor=white)](https://neon.tech/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-compiled-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
 [![PWA](https://img.shields.io/badge/PWA-installable-5A0FC8?logo=pwa&logoColor=white)](#-features)
-[![Deployed on Render](https://img.shields.io/badge/Deployed%20on-Render-46E3B7?logo=render&logoColor=white)](https://nymora-anon.onrender.com)
+[![Deployed on Render](https://img.shields.io/badge/Deployed%20on-Render-46E3B7?logo=render&logoColor=white)](https://academx.onrender.com)
 
-[Live Site](https://nymora-anon.onrender.com) ·
-[Report a Bug](https://github.com/Maheshranjanpatra/Nymora/issues) ·
-[Request a Feature](https://github.com/Maheshranjanpatra/Nymora/issues) ·
+[Live Site](https://academx.onrender.com) ·
+[Report a Bug](https://github.com/Maheshranjanpatra/AcademX/issues) ·
+[Request a Feature](https://github.com/Maheshranjanpatra/AcademX/issues) ·
 [Contact](mailto:myprojects.mahesh@gmail.com)
 
 </div>
@@ -46,7 +46,7 @@ practice quizzes, past papers, and study materials in a calm, classic interface.
 
 ## 📖 Overview
 
-**Nymora** is a lightweight, mobile-first study platform built for university students. It started from a familiar feeling, hesitating to ask a doubt out loud, and grew into an effort to make asking easier for everyone.
+**AcademX** is a lightweight, mobile-first study platform built for university students. It started from a familiar feeling, hesitating to ask a doubt out loud, and grew into an effort to make asking easier for everyone.
 
 The core idea is simple: give students a **safe, anonymous space** to ask questions, paired with **real study tools** they actually use before exams.
 
