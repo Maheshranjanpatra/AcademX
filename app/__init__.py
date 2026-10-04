@@ -121,4 +121,14 @@ def create_app(config_class=Config):
     def request_entity_too_large(error):
         return render_template('errors/413.html'), 413
 
+    @app.before_request
+    def redirect_old_domain():
+        if request.host.startswith("nymora-anon.onrender.com"):
+            new_url = request.url.replace(
+                "nymora-anon.onrender.com",
+                "academx.onrender.com",
+                1
+            )
+            return redirect(new_url, code=301)
+
     return app
