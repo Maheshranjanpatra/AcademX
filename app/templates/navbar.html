@@ -4,21 +4,17 @@
 
    <!-- Logo -->
     <a href="{{ url_for('dashboard.home') if current_user.is_authenticated else url_for('auth.index') }}"
-       class="flex items-center gap-3 group">
+       class="flex items-center gap-2 md:gap-3 group flex-shrink-0">
 
       <img src="{{ url_for('static', filename='images/academx.svg') }}"
            alt="AcademX"
            class="
-             h-10 w-10 md:h-12 md:w-12
-             rounded-2xl md:rounded-[1.1rem]
-             object-cover
-             shadow-sm
-             border border-primary-fixed/10
+             h-8 w-8 md:h-11 md:w-11
+             object-contain
              transition-all duration-300
-             group-hover:scale-105
-             group-hover:shadow-lg" />
+             group-hover:scale-105" />
 
-      <span class="font-serif text-xl md:text-2xl font-black tracking-tight text-primary-fixed drop-shadow-sm group-hover:text-secondary-fixed transition-colors duration-300">
+      <span class="font-serif text-base md:text-2xl font-black tracking-tight text-primary-fixed drop-shadow-sm group-hover:text-secondary-fixed transition-colors duration-300">
         AcademX
       </span>
     </a>
@@ -88,7 +84,7 @@
           </a>
       {% else %}
           <!-- Login button -->
-          <a href="{{ url_for('auth.login') }}" class="bg-primary text-on-primary hover:bg-surface-tint hover:shadow-md hover:-translate-y-0.5 transition-all rounded-[8px] px-4 py-1.5 font-label-md text-label-md shadow-sm flex items-center gap-1.5">
+          <a href="{{ url_for('auth.login') }}" class="bg-primary text-on-primary hover:bg-surface-tint hover:shadow-md hover:-translate-y-0.5 transition-all rounded-[8px] px-3 md:px-4 py-1.5 font-label-md text-label-md shadow-sm flex items-center gap-1.5 flex-shrink-0">
               <span class="material-symbols-outlined text-[18px]">login</span>
               <span>Login</span>
           </a>
