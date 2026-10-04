@@ -61,7 +61,7 @@ self.addEventListener('activate', event => {
   );
 });
 
-// Message handler — MUST be at the top level, not inside fetch
+// Message handler — TOP LEVEL, not inside fetch
 self.addEventListener('message', event => {
   if (event.data && event.data.type === 'SKIP_WAITING') {
     self.skipWaiting();
@@ -75,7 +75,6 @@ self.addEventListener('fetch', event => {
   const url = new URL(req.url);
   if (url.origin !== self.location.origin) return;
 
-  // Pages: always network, friendly fallback if it fails or Render is cold
   if (req.mode === 'navigate') {
     const fallback = () => new Response(OFFLINE_HTML, {
       status: 200,
@@ -89,7 +88,6 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // Static files only: cache + background refresh
   if (url.pathname.startsWith('/static/')) {
     event.respondWith(
       caches.match(req).then(cached => {

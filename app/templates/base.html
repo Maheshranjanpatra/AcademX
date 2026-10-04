@@ -243,8 +243,7 @@
 
 <!-- ===== Service Worker & PWA Install ===== -->
 <script>
-    // Register Service Worker
-    (function () {
+    document.addEventListener('DOMContentLoaded', function () {
         if (!('serviceWorker' in navigator)) return;
 
         var updateTimer = null;
@@ -252,21 +251,12 @@
 
         navigator.serviceWorker.register('/sw.js', { scope: '/' })
             .then(function (reg) {
-                // Poll for updates every 30 minutes
                 setInterval(function () { reg.update(); }, 30 * 60 * 1000);
 
-                // Already-waiting SW (page reloaded after deploy)
                 if (reg.waiting && navigator.serviceWorker.controller) {
-                    if (document.readyState === 'loading') {
-                        document.addEventListener('DOMContentLoaded', function () {
-                            showUpdateToast(reg);
-                        });
-                    } else {
-                        showUpdateToast(reg);
-                    }
+                    showUpdateToast(reg);
                 }
 
-                // New SW installing
                 reg.addEventListener('updatefound', function () {
                     var sw = reg.installing;
                     if (!sw) return;
@@ -279,7 +269,6 @@
             })
             .catch(function (err) { console.log('SW registration failed:', err); });
 
-        // Reload once the new SW takes control
         navigator.serviceWorker.addEventListener('controllerchange', function () {
             if (refreshing) return;
             refreshing = true;
@@ -294,13 +283,16 @@
             toast.style.opacity = '1';
 
             clearTimeout(updateTimer);
-            // Hide after 20 s; show again in 10 min
             updateTimer = setTimeout(function () {
                 hideToast();
                 setTimeout(function () { showUpdateToast(reg); }, 10 * 60 * 1000);
             }, 20000);
 
             document.getElementById('update-now-btn').onclick = function () {
+                // Show full-screen loading via existing AcademX spinner
+                if (window.AcademXSpinner) {
+                    window.AcademXSpinner.show('Updating to the latest version....');
+                }
                 if (reg.waiting) reg.waiting.postMessage({ type: 'SKIP_WAITING' });
                 setTimeout(function () { window.location.reload(); }, 400);
             };
@@ -316,32 +308,26 @@
                 toast.style.opacity = '0';
             }
         }
-    })();
 
-    // Show PWA install prompt
-    let deferredPrompt;
-    window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-        const installBtn = document.getElementById('install-btn');
-        if (installBtn) {
-            installBtn.style.display = 'flex';
-            installBtn.addEventListener('click', () => {
-                deferredPrompt.prompt();
-                deferredPrompt.userChoice.then((choiceResult) => {
-                    if (choiceResult.outcome === 'accepted') {
-                        console.log('User installed PWA');
-                    } else {
-                        console.log('User dismissed install');
-                    }
-                    deferredPrompt = null;
-                    installBtn.style.display = 'none';
+        // PWA install prompt
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', function (e) {
+            e.preventDefault();
+            deferredPrompt = e;
+            const installBtn = document.getElementById('install-btn');
+            if (installBtn) {
+                installBtn.style.display = 'flex';
+                installBtn.addEventListener('click', function () {
+                    deferredPrompt.prompt();
+                    deferredPrompt.userChoice.then(function (choiceResult) {
+                        deferredPrompt = null;
+                        installBtn.style.display = 'none';
+                    });
                 });
-            });
-        }
+            }
+        });
     });
 </script>
-
 <!-- ===== Offline Overlay ===== -->
 <div id="offline-overlay" class="err-offline-overlay" aria-hidden="true">
   <div class="err-card">
