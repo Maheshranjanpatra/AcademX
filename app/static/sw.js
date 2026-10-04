@@ -1,5 +1,5 @@
-// AcademX Service Worker v3
-const CACHE_NAME = 'academx-v3';
+// AcademX Service Worker v4
+const CACHE_NAME = 'academx-v4';
 const PRECACHE = [
   '/static/css/tailwind.build.css',
   '/static/css/style.css',
@@ -59,6 +59,13 @@ self.addEventListener('activate', event => {
       ))
       .then(() => self.clients.claim())
   );
+});
+
+// Message handler — MUST be at the top level, not inside fetch
+self.addEventListener('message', event => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
 });
 
 self.addEventListener('fetch', event => {
