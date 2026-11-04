@@ -16,6 +16,9 @@ def save_file(file_storage, subfolder):
         config=BotoConfig(signature_version="s3v4"),
         region_name=current_app.config["B2_REGION"],
     )
+    def _no_expect(params, **kwargs):
+        params["headers"].pop("Expect", None)
+    s3.meta.events.register("before-call.s3", _no_expect)
 
     bucket = current_app.config["B2_BUCKET_NAME"]
 
@@ -24,7 +27,7 @@ def save_file(file_storage, subfolder):
     safe_name = "".join(
         c if c.isalnum() or c in "._-" else "_" for c in filename
     )
-    key = f"academx/{subfolder}/{int(time.time())}_{safe_name}"
+    key = f"nymora/{subfolder}/{int(time.time())}_{safe_name}"
 
     file_storage.seek(0)
 
