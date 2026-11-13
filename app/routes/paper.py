@@ -7,8 +7,15 @@ from app.models.paper import Paper
 from app.forms.paper import UploadPaperForm
 from app.utils.helpers import save_file
 from sqlalchemy import or_
+from app.utils.telegram import notify_upload
 
 paper_bp = Blueprint("paper", __name__)
+def _uploader_display(user):
+    for attr in ("username", "name", "full_name", "email"):
+        v = getattr(user, attr, None)
+        if v:
+            return str(v)
+    return f"User#{getattr(user, 'id', '?')}"
 
 @paper_bp.route("/")
 def list_papers():
@@ -42,6 +49,12 @@ def upload():
         )
         db.session.add(paper)
         db.session.commit()
+        notify_upload(
+            uploader=_uploader_display(current_user),
+            item_type="Question Paper",
+            title=f"{paper.subject} - {paper.exam_type} {paper.year}",
+            link=url_for("admin.papers", tab="pending", _external=True),
+        )
 
         flash("Uploaded — pending admin approval.", "success")
         return redirect(url_for("paper.list_papers"))

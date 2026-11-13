@@ -7,9 +7,16 @@ from app.models.paper import Paper
 from app.models.video import Playlist
 from app.forms.materials import MaterialUploadForm
 from app.utils.helpers import save_file
+from app.utils.telegram import notify_upload
 
 materials_bp = Blueprint("materials", __name__)
-
+def _uploader_display(user):
+    """Best-effort display name — works regardless of which field your User model uses."""
+    for attr in ("username", "name", "full_name", "email"):
+        v = getattr(user, attr, None)
+        if v:
+            return str(v)
+    return f"User#{getattr(user, 'id', '?')}"
 
 @materials_bp.route("/")
 def list_materials():
@@ -64,6 +71,12 @@ def upload_material():
 
         db.session.add(material)
         db.session.commit()
+        notify_upload(
+            uploader=_uploader_display(current_user),
+            item_type="Study Material (PDF)" if material.material_type == "pdf" else "External Link",
+            title=material.title or "(untitled)",
+            link=url_for("admin.materials", status="pending", _external=True),
+        )
         flash("Material uploaded successfully! It will be visible after admin approval.", "success")
         return redirect(url_for("materials.my_uploads"))
 

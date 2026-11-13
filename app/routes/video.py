@@ -15,9 +15,15 @@ from app.utils.helpers import (
 from app.utils.youtube import (
     extract_playlist_id, extract_video_id, get_playlist_videos
 )
+from app.utils.telegram import notify_upload
 
 video_bp = Blueprint("video", __name__)
-
+def _uploader_display(user):
+    for attr in ("username", "name", "full_name", "email"):
+        v = getattr(user, attr, None)
+        if v:
+            return str(v)
+    return f"User#{getattr(user, 'id', '?')}"
 
 def _set_progress_animation(user_id, video):
     """Shared logic: after marking a video complete, checks this
@@ -114,7 +120,12 @@ def upload_playlist():
             db.session.add(video)
 
         db.session.commit()
-
+        notify_upload(
+            uploader=_uploader_display(current_user),
+            item_type="YouTube Playlist",
+            title=playlist.title or "(untitled)",
+            link=url_for("admin.playlists", tab="pending", _external=True),
+        )
         flash(
             f"Playlist submitted with {len(videos_data)} video(s) — "
             f"pending admin approval.",

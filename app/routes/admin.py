@@ -26,6 +26,7 @@ def inject_admin_globals():
         'sidebar_pending_papers':    Paper.query.filter_by(status='pending').count(),
         'sidebar_pending_playlists': Playlist.query.filter_by(status='pending').count(),
         'sidebar_pending_questions': Question.query.filter_by(status='pending').count(),
+        'sidebar_pending_materials': Material.query.filter_by(status='pending').count(),
     }
 
 # DASHBOARD
