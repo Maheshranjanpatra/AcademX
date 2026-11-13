@@ -3,10 +3,11 @@ from flask_login import current_user
 from app.config import Config
 from app.extensions import db, migrate, login_manager, csrf
 from datetime import date
-
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 def create_app(config_class=Config):
     app = Flask(__name__)
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
     app.config.from_object(config_class)
     secret_key = app.config.get("SECRET_KEY")
     if not isinstance(secret_key, str) or len(secret_key) < 32:
