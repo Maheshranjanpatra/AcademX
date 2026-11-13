@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, abort, request
 from flask_login import current_user
 from sqlalchemy import func
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 from app.extensions import db
 from app.models.user import User
 from app.models.question import Question, Answer
@@ -25,7 +25,6 @@ def inject_admin_globals():
     return {
         'sidebar_pending_papers':    Paper.query.filter_by(status='pending').count(),
         'sidebar_pending_playlists': Playlist.query.filter_by(status='pending').count(),
-        'sidebar_pending_questions': Question.query.filter_by(status='pending').count(),
         'sidebar_pending_materials': Material.query.filter_by(status='pending').count(),
     }
 
@@ -437,11 +436,7 @@ def delete_playlist_admin(playlist_id):
 @check_session_timeout
 def qa():
     search = request.args.get('search', '')
-    status = request.args.get('status', 'pending')
-
     query = Question.query
-    if status in {'pending', 'approved', 'rejected'}:
-        query = query.filter_by(status=status)
 
     if search:
         query = query.filter(
@@ -462,43 +457,7 @@ def qa():
         'admin/qa.html',
         questions=questions,
         search=search,
-        status=status,
-        pending_count=Question.query.filter_by(status='pending').count(),
-        approved_count=Question.query.filter_by(status='approved').count(),
-        rejected_count=Question.query.filter_by(status='rejected').count(),
     )
-
-@admin_bp.route("/qa/<int:question_id>/approve", methods=["POST"])
-@admin_required
-@check_session_timeout
-def approve_question(question_id):
-    question = Question.query.get_or_404(question_id)
-    if question.status != 'pending':
-        flash("This question has already been reviewed.", "warning")
-        return redirect(url_for('admin.qa', status='pending'))
-
-    question.status = 'approved'
-    question.reviewed_by = current_user.id
-    question.reviewed_at = datetime.now(timezone.utc).replace(tzinfo=None)
-    db.session.commit()
-    flash("Question approved and published.", "success")
-    return redirect(url_for('admin.qa', status='pending'))
-
-@admin_bp.route("/qa/<int:question_id>/reject", methods=["POST"])
-@admin_required
-@check_session_timeout
-def reject_question(question_id):
-    question = Question.query.get_or_404(question_id)
-    if question.status != 'pending':
-        flash("This question has already been reviewed.", "warning")
-        return redirect(url_for('admin.qa', status='pending'))
-
-    question.status = 'rejected'
-    question.reviewed_by = current_user.id
-    question.reviewed_at = datetime.now(timezone.utc).replace(tzinfo=None)
-    db.session.commit()
-    flash("Question rejected.", "success")
-    return redirect(url_for('admin.qa', status='pending'))
 
 @admin_bp.route("/qa/<int:question_id>/delete", methods=["POST"])
 @admin_required

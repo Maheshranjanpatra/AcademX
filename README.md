@@ -75,11 +75,11 @@ The platform is live, actively maintained, and designed to scale from a single u
 
 ### For Admins
 
-- **Moderation dashboards** for papers, playlists, materials, Q&A, and users
+- **Moderation dashboards** for papers, playlists, and materials, plus Q&A and user management
 - **Batch actions** to approve or reject pending submissions
 - **Guest management**: disable or delete pseudonymous guest profiles
 - **Admin security**: environment-only credentials, CSRF-protected forms, short sessions, and a five-failure/15-minute sign-in limit
-- **Review attribution**: question, paper, and material approvals record the reviewing admin and timestamp
+- **Review attribution**: paper and material approvals record the reviewing admin and timestamp
 
 ---
 
@@ -187,6 +187,10 @@ B2_REGION=us-west-004
 
 # YouTube Data API (optional, for playlist imports)
 YOUTUBE_API_KEY=your-youtube-api-key
+
+# Telegram notifications (optional)
+TELEGRAM_BOT_TOKEN=your-telegram-bot-token
+TELEGRAM_ADMIN_CHAT_ID=your-telegram-chat-id
 ```
 
 | Variable | Required | Purpose |
@@ -197,6 +201,7 @@ YOUTUBE_API_KEY=your-youtube-api-key
 | `SESSION_COOKIE_SECURE` | ✅ | Set `true` for HTTPS; use `false` only for local HTTP |
 | `B2_*` | ✅ | Backblaze B2 bucket access for uploads |
 | `YOUTUBE_API_KEY` | ❌ | Enables playlist imports |
+| `TELEGRAM_BOT_TOKEN` / `TELEGRAM_ADMIN_CHAT_ID` | ❌ | Sends admin notifications for new questions and submissions |
 
 > ⚠️ **Never commit `.env`.** It is already listed in `.gitignore`.
 
@@ -318,7 +323,7 @@ Only `status="approved"` items appear in public listings.
 - The application does not collect guest email, Google identity, or registration number.
 - Contributions are linked to a pseudonymous profile so ownership and progress can be displayed.
 - The `User_0000`–`User_9999` namespace supports at most 10,000 retained profiles.
-- Questions, playlists, papers, and materials remain private until approved by an administrator.
+- New questions and their answers are available immediately. Playlists, papers, and materials remain private until approved by an administrator.
 
 ### Math Composer
 
@@ -444,7 +449,7 @@ Full details are in the [Privacy Policy](https://nymora-anon.onrender.com/policy
 - Guest sign-in does not collect real names, email, Google identity, or registration numbers.
 - Department, avatar, pseudonymous ID, and content/activity associated with that profile are stored.
 - A guest ID is not a password; a cleared browser session cannot be recovered.
-- Questions and user submissions are only public after admin approval.
+- Questions and answers are public immediately; papers, materials, and playlists become public only after admin approval.
 - See the [Privacy Policy](https://nymora-anon.onrender.com/policy) for hosting and retention details.
 
 ---

@@ -57,47 +57,80 @@ class GuestAuthAndModerationTests(unittest.TestCase):
         self.assertFalse(hasattr(guest, "email"))
         self.assertFalse(hasattr(guest, "google_sub"))
 
-    def test_question_is_private_until_admin_approval(self):
+    def test_question_is_public_immediately_and_notifies_admin(self):
         guest = self._sign_in_guest()
-        response = self.client.post(
-            "/qa/ask",
-            data={
-                "title": "Pending question",
-                "body": "This should not be public yet.",
-                "subject": "Calculus",
-                "is_anonymous": "y",
-            },
-        )
+        with patch("app.routes.qa.notify_question") as notify:
+            response = self.client.post(
+                "/qa/ask",
+                data={
+                    "title": "New calculus question",
+                    "body": "How do I solve this integral?",
+                    "subject": "Calculus",
+                    "is_anonymous": "y",
+                },
+            )
         self.assertEqual(response.status_code, 302)
+
         with self.app.app_context():
             question = Question.query.one()
-        self.assertEqual(question.user_id, guest.id)
-        self.assertEqual(question.status, "pending")
-        self.assertNotIn(b"Pending question", self.client.get("/qa/").data)
-        self.assertEqual(self.client.get(f"/qa/{question.id}").status_code, 200)
+            self.assertEqual(question.user_id, guest.id)
+            self.assertEqual(question.status, "approved")
+            question_id = question.id
+            pending_question = Question(
+                user_id=guest.id,
+                title="Previously pending question",
+                body="Publish this without another approval.",
+                subject="Calculus",
+                status="pending",
+            )
+            db.session.add(pending_question)
+            rejected_question = Question(
+                user_id=guest.id,
+                title="Previously rejected question",
+                body="Keep this historical rejection private.",
+                subject="Calculus",
+                status="rejected",
+            )
+            db.session.add(rejected_question)
+            db.session.commit()
+            pending_id = pending_question.id
+            rejected_id = rejected_question.id
+        notify.assert_called_once()
+        self.assertEqual(notify.call_args.kwargs["title"], "New calculus question")
+        self.assertEqual(notify.call_args.kwargs["body"], "How do I solve this integral?")
 
         stranger = self.app.test_client()
-        self.assertEqual(stranger.get(f"/qa/{question.id}").status_code, 404)
+        self.assertIn(b"New calculus question", stranger.get("/qa/").data)
+        self.assertIn(b"Previously pending question", stranger.get("/qa/").data)
+        self.assertEqual(stranger.get(f"/qa/{question_id}").status_code, 200)
+        self.assertEqual(stranger.get(f"/qa/{pending_id}").status_code, 200)
+        self.assertNotIn(b"Previously rejected question", stranger.get("/qa/").data)
+        self.assertEqual(stranger.get(f"/qa/{rejected_id}").status_code, 404)
 
-        admin = self.app.test_client()
-        response = admin.post(
-            "/admin-login",
-            data={
-                "username": TestConfig.ADMIN_USERNAME,
-                "password": TestConfig.ADMIN_PASSWORD,
-            },
+        stranger.post("/login", data={"department": "CSE", "avatar": "avatar2.webp"})
+        response = stranger.post(
+            f"/qa/{pending_id}/answer",
+            data={"body": "Use integration by parts.", "is_anonymous": "y"},
         )
         self.assertEqual(response.status_code, 302)
-        review_page = admin.get("/admin/qa")
-        self.assertEqual(review_page.status_code, 200)
-        self.assertIn(b"Pending question", review_page.data)
-        response = admin.post(f"/admin/qa/{question.id}/approve")
-        self.assertEqual(response.status_code, 302)
+        self.assertIn(b"Use integration by parts.", stranger.get(f"/qa/{pending_id}").data)
 
-        with self.app.app_context():
-            reviewed_question = db.session.get(Question, question.id)
-            self.assertEqual(reviewed_question.status, "approved")
-        self.assertIn(b"Pending question", stranger.get("/qa/").data)
+    def test_question_telegram_message_includes_escaped_question_content(self):
+        from app.utils.telegram import notify_question
+
+        with patch("app.utils.telegram.send_telegram_message") as send:
+            notify_question(
+                asker="User_1234",
+                title="Need help <please>",
+                body="What does x & y mean?",
+                link="https://academx.example/admin/qa",
+            )
+
+        message = send.call_args.args[0]
+        self.assertIn("NEW QUESTION", message)
+        self.assertIn("Need help &lt;please&gt;", message)
+        self.assertIn("What does x &amp; y mean?", message)
+        self.assertIn("User_1234", message)
 
     def test_admin_login_is_rate_limited(self):
         for _ in range(5):
@@ -116,61 +149,76 @@ class GuestAuthAndModerationTests(unittest.TestCase):
     def test_user_uploads_are_private_until_approved_then_public(self):
         guest = self._sign_in_guest()
 
-        with patch("app.routes.paper.save_file", return_value="papers/calculus.pdf"):
-            paper_response = self.client.post(
-                "/papers/upload",
-                data={
-                    "subject": "Calculus",
-                    "exam_type": "semester",
-                    "year": "2024",
-                    "file": (io.BytesIO(b"%PDF-1.4 test"), "calculus.pdf", "application/pdf"),
-                },
-                content_type="multipart/form-data",
-            )
-        self.assertEqual(paper_response.status_code, 302)
+        with (
+            patch("app.routes.paper.notify_upload") as notify_paper,
+            patch("app.routes.materials.notify_upload") as notify_material,
+            patch("app.routes.video.notify_upload") as notify_playlist,
+        ):
+            with patch("app.routes.paper.save_file", return_value="papers/calculus.pdf"):
+                paper_response = self.client.post(
+                    "/papers/upload",
+                    data={
+                        "subject": "Calculus",
+                        "exam_type": "semester",
+                        "year": "2024",
+                        "file": (io.BytesIO(b"%PDF-1.4 test"), "calculus.pdf", "application/pdf"),
+                    },
+                    content_type="multipart/form-data",
+                )
+            self.assertEqual(paper_response.status_code, 302)
 
-        with patch("app.routes.materials.save_file", return_value="materials/physics.pdf"):
-            material_response = self.client.post(
+            with patch("app.routes.materials.save_file", return_value="materials/physics.pdf"):
+                material_response = self.client.post(
+                    "/materials/upload",
+                    data={
+                        "title": "Physics Notes",
+                        "subject": "Physics",
+                        "category": "Notes",
+                        "description": "Lecture notes",
+                        "file": (io.BytesIO(b"%PDF-1.4 test"), "physics.pdf", "application/pdf"),
+                    },
+                    content_type="multipart/form-data",
+                )
+            self.assertEqual(material_response.status_code, 302)
+
+            link_response = self.client.post(
                 "/materials/upload",
                 data={
-                    "title": "Physics Notes",
+                    "title": "External Notes",
                     "subject": "Physics",
                     "category": "Notes",
-                    "description": "Lecture notes",
-                    "file": (io.BytesIO(b"%PDF-1.4 test"), "physics.pdf", "application/pdf"),
+                    "description": "Linked lecture notes",
+                    "file_url": "https://example.com/physics-notes.pdf",
                 },
-                content_type="multipart/form-data",
             )
-        self.assertEqual(material_response.status_code, 302)
+            self.assertEqual(link_response.status_code, 302)
 
-        link_response = self.client.post(
-            "/materials/upload",
-            data={
-                "title": "External Notes",
-                "subject": "Physics",
-                "category": "Notes",
-                "description": "Linked lecture notes",
-                "file_url": "https://example.com/physics-notes.pdf",
-            },
+            with patch(
+                "app.routes.video.get_playlist_videos",
+                return_value=[
+                    {"title": "Introduction", "video_id": "abcdefghijk", "duration_seconds": 60}
+                ],
+            ):
+                playlist_response = self.client.post(
+                    "/video/upload",
+                    data={
+                        "title": "Calculus Lectures",
+                        "subject": "Mathematics",
+                        "description": "Course playlist",
+                        "playlist_url": "https://www.youtube.com/playlist?list=PLtest",
+                    },
+                )
+            self.assertEqual(playlist_response.status_code, 302)
+
+        notify_paper.assert_called_once()
+        self.assertEqual(notify_paper.call_args.kwargs["title"], "Calculus - semester 2024")
+        self.assertEqual(notify_material.call_count, 2)
+        self.assertEqual(
+            [call.kwargs["title"] for call in notify_material.call_args_list],
+            ["Physics Notes", "External Notes"],
         )
-        self.assertEqual(link_response.status_code, 302)
-
-        with patch(
-            "app.routes.video.get_playlist_videos",
-            return_value=[
-                {"title": "Introduction", "video_id": "abcdefghijk", "duration_seconds": 60}
-            ],
-        ):
-            playlist_response = self.client.post(
-                "/video/upload",
-                data={
-                    "title": "Calculus Lectures",
-                    "subject": "Mathematics",
-                    "description": "Course playlist",
-                    "playlist_url": "https://www.youtube.com/playlist?list=PLtest",
-                },
-            )
-        self.assertEqual(playlist_response.status_code, 302)
+        notify_playlist.assert_called_once()
+        self.assertEqual(notify_playlist.call_args.kwargs["title"], "Calculus Lectures")
 
         with self.app.app_context():
             from app.models.material import Material

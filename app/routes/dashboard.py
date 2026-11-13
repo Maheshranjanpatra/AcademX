@@ -11,7 +11,7 @@ dashboard_bp = Blueprint("dashboard", __name__)
 @login_required
 def home():
     recent_questions = (
-        Question.query.filter_by(status="approved")
+        Question.query.filter(Question.status != "rejected")
         .order_by(Question.created_at.desc()).limit(5).all()
     )
 

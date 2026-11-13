@@ -126,11 +126,11 @@ def index():
         return redirect(url_for("dashboard.home"))
 
     recent_questions = (
-        Question.query.filter_by(status="approved")
+        Question.query.filter(Question.status != "rejected")
         .order_by(Question.created_at.desc()).limit(3).all()
     )
     popular_playlists = Playlist.query.filter_by(status="approved").limit(3).all()
-    total_questions = Question.query.filter_by(status="approved").count()
+    total_questions = Question.query.filter(Question.status != "rejected").count()
     total_students = User.query.filter_by(is_admin=False, profile_complete=True).count()
 
     return render_template(
@@ -186,7 +186,7 @@ def login():
         return render_template("auth_login.html", form=form), 503
 
     recent_questions = (
-        Question.query.filter_by(status="approved")
+        Question.query.filter(Question.status != "rejected")
         .order_by(Question.created_at.desc()).limit(3).all()
     )
     return render_template(

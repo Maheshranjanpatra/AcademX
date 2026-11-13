@@ -6,13 +6,26 @@ Env vars: TELEGRAM_BOT_TOKEN, TELEGRAM_ADMIN_CHAT_ID
 import html
 import logging
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 
 import requests
 
 logger = logging.getLogger(__name__)
 
 _TG_API = "https://api.telegram.org/bot{token}/{method}"
+
+
+def _escape_limited(value: str, limit: int) -> str:
+    escaped = []
+    length = 0
+    for character in value:
+        safe_character = html.escape(character)
+        char_length = len(safe_character.encode("utf-16-le")) // 2
+        if length + char_length > limit - 3:
+            return "".join(escaped) + "..."
+        escaped.append(safe_character)
+        length += char_length
+    return "".join(escaped)
 
 
 def send_telegram_message(text: str, chat_id: str | None = None) -> bool:
@@ -46,7 +59,7 @@ def notify_upload(
     title: str,
     link: str | None = None,
 ) -> bool:
-    timestamp = datetime.utcnow().strftime("%d %b %Y \u00b7 %H:%M UTC")
+    timestamp = datetime.now(timezone.utc).strftime("%d %b %Y \u00b7 %H:%M UTC")
 
     safe_type     = html.escape(item_type or "Upload")
     safe_title    = html.escape(title or "(untitled)")
@@ -66,6 +79,42 @@ def notify_upload(
         "",
         f"\u2192 <b>Submitted By</b>  <code>{safe_uploader}</code>",
         f"  <b>Received</b>      <code>{timestamp}</code>",
+        "",
+        f"<code>{light}</code>",
+    ]
+
+    if link:
+        safe_link = html.escape(link, quote=True)
+        lines.append(f'\u2192 <a href="{safe_link}"><b>Open Admin Panel</b></a>')
+
+    return send_telegram_message("\n".join(lines))
+
+
+def notify_question(
+    asker: str,
+    title: str,
+    body: str,
+    link: str | None = None,
+) -> bool:
+    timestamp = datetime.now(timezone.utc).strftime("%d %b %Y \u00b7 %H:%M UTC")
+
+    safe_asker = _escape_limited(asker or "Unknown", 120)
+    safe_title = _escape_limited(title or "(untitled)", 600)
+    escaped_body = _escape_limited(body or "(no details provided)", 2200)
+
+    heavy = "\u2550" * 31
+    light = "\u2500" * 31
+    lines = [
+        f"<code>{heavy}</code>",
+        " <b>NEW QUESTION</b>",
+        f"<code>{heavy}</code>",
+        "",
+        f"\u2192 <b>{safe_title}</b>",
+        "",
+        f"<blockquote>{escaped_body}</blockquote>",
+        "",
+        f"\u2192 <b>Asked By</b>  <code>{safe_asker}</code>",
+        f"  <b>Received</b>   <code>{timestamp}</code>",
         "",
         f"<code>{light}</code>",
     ]
