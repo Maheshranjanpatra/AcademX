@@ -10,18 +10,18 @@
         <div class="flex items-center gap-md mb-md">
             {{ user_avatar(current_user, 'w-16 h-16') }}
             <div>
-                <h2 class="font-headline-md text-headline-md text-on-surface">{{ current_user.name }}</h2>
+                <h2 class="font-headline-md text-headline-md text-on-surface">{{ current_user.anonymous_id }}</h2>
                 <p class="font-label-md text-label-md text-primary font-bold">{{ current_user.department }}</p>
             </div>
         </div>
       <div class="space-y-sm font-label-md text-label-md text-on-surface-variant">
         <div class="flex justify-between border-b border-surface-variant pb-xs">
           <span>Username</span>
-          <span class="text-on-surface font-mono">{{ current_user.reg_num }}</span>
+          <span class="text-on-surface font-mono">{{ current_user.anonymous_id }}</span>
         </div>
         <div class="flex justify-between pb-xs">
-          <span>Email</span>
-          <span class="text-on-surface">{{ current_user.email }}</span>
+          <span>Privacy</span>
+          <span class="text-on-surface">No account details stored</span>
         </div>
       </div>
     </div>

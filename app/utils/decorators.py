@@ -17,17 +17,6 @@ def admin_required(f):
     return decorated
 
 
-def profile_required(f):
-    """Block access until the user has completed their profile."""
-    @wraps(f)
-    def decorated(*args, **kwargs):
-        if current_user.is_authenticated and not current_user.profile_complete:
-            flash("Please complete your profile first.", "error")
-            return redirect(url_for("auth.complete_profile"))
-        return f(*args, **kwargs)
-    return decorated
-
-
 def check_session_timeout(f):
     """Check session timeout for admin routes."""
     @wraps(f)
@@ -39,7 +28,7 @@ def check_session_timeout(f):
             if datetime.utcnow() - last_active > timedelta(minutes=SESSION_TIMEOUT):
                 session.clear()
                 flash('Your session has expired. Please log in again.', 'error')
-                return redirect(url_for('auth.login'))
+                return redirect(url_for('auth.admin_login'))
         session['last_activity'] = datetime.utcnow().isoformat()
         return f(*args, **kwargs)
     return decorated

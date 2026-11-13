@@ -4,14 +4,13 @@
 {% block content %}
 <main class="max-w-[640px] mx-auto px-margin-mobile md:px-margin-desktop py-lg space-y-lg pb-24 md:pb-lg">
 
-  <!-- ===== HEADER: Avatar (centre) · Nym ID (centre, bold) · Username + Dept (left) ===== -->
+  <!-- ===== Pseudonymous profile ===== -->
   <section class="bg-surface-container-lowest border border-outline-variant rounded-2xl p-lg card-shadow">
 
-    <!-- Avatar (centred) — first letter of Google name -->
     <div class="flex justify-center">
       <div class="dr-avatar aurora-bg"
            style="width: 88px; height: 88px; font-size: 36px; border-radius: 26px;">
-        {{ (current_user.name or current_user.username)[0]|upper }}
+        {{ current_user.anonymous_id[-1] }}
       </div>
     </div>
 
@@ -25,29 +24,23 @@
       </p>
     </div>
 
-    <!-- Name (gradient, bold) + identity rows -->
     <div class="mt-lg text-left space-y-2">
 
       <h1 class="font-display text-3xl font-black tracking-tight leading-tight pb-1"
           style="background: linear-gradient(120deg, #0058be 0%, #006b5f 45%, #b8860b 100%);
                  -webkit-background-clip: text; background-clip: text;
                  -webkit-text-fill-color: transparent;">
-        {{ current_user.name or current_user.username }}
+        {{ current_user.anonymous_id }}
       </h1>
 
       <p class="text-sm text-on-surface-variant flex items-center gap-2">
         <span class="material-symbols-outlined text-[18px]">badge</span>
-        <span><span class="text-on-surface-variant">Username:</span> {{ current_user.username }}</span>
+        <span><span class="text-on-surface-variant">Pseudonymous ID:</span> {{ current_user.anonymous_id }}</span>
       </p>
 
       <p class="text-sm text-on-surface-variant flex items-center gap-2">
         <span class="material-symbols-outlined text-[18px]">school</span>
         <span><span class="text-on-surface-variant">Dept:</span> {{ current_user.department or 'Not set' }}</span>
-      </p>
-
-      <p class="text-sm text-on-surface-variant flex items-center gap-2">
-        <span class="material-symbols-outlined text-[18px]">mail</span>
-        <span><span class="text-on-surface-variant">Email:</span> {{ current_user.email }}</span>
       </p>
 
     </div>
@@ -128,11 +121,13 @@
   {% endif %}
 
   <!-- ===== LOGOUT ===== -->
-  <a href="{{ url_for('auth.logout') }}"
-     class="flex items-center justify-center gap-2 w-full bg-error-container text-on-error-container font-label-md text-label-md px-6 py-3 rounded-xl hover:opacity-90 transition-all">
-    <span class="material-symbols-outlined text-[18px]">logout</span>
-    Logout
-  </a>
+  <form method="POST" action="{{ url_for('auth.logout') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button type="submit" class="flex items-center justify-center gap-2 w-full bg-error-container text-on-error-container font-label-md text-label-md px-6 py-3 rounded-xl hover:opacity-90 transition-all">
+      <span class="material-symbols-outlined text-[18px]">logout</span>
+      Logout
+    </button>
+  </form>
 
 </main>
 {% endblock %}

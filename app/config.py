@@ -1,4 +1,5 @@
 import os
+from datetime import timedelta
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -13,7 +14,13 @@ def _normalize_db_url(url: str | None) -> str | None:
     return url
 
 class Config:
-    SECRET_KEY = os.environ.get("SECRET_KEY", "dev-key-change-this")
+    SECRET_KEY = os.environ.get("SECRET_KEY")
+    ADMIN_USERNAME = os.environ.get("ADMIN_USERNAME")
+    ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD")
+    SESSION_COOKIE_SECURE = os.environ.get("SESSION_COOKIE_SECURE", "true").lower() == "true"
+    SESSION_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SAMESITE = "Lax"
+    PERMANENT_SESSION_LIFETIME = timedelta(minutes=30)
 
     # PostgreSQL Database URL
     SQLALCHEMY_DATABASE_URI = _normalize_db_url(os.environ.get("DATABASE_URL"))
@@ -31,10 +38,6 @@ class Config:
             "keepalives_count": 3,
         },
     }
-    # Google OAuth
-    GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID")
-    GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET")
-
     # Uploads
     UPLOAD_FOLDER = os.path.join(os.getcwd(), "app", "static", "uploads")
     MAX_CONTENT_LENGTH = 26 * 1024 * 1024 #26 MB

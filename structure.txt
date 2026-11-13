@@ -12,6 +12,7 @@
 │   │   └── video.py
 │   ├── models
 │   │   ├── __init__.py
+│   │   ├── admin_login_attempt.py
 │   │   ├── material.py
 │   │   ├── paper.py
 │   │   ├── question.py
@@ -63,7 +64,6 @@
 │   │   │   ├── admin_dashboard.js
 │   │   │   ├── admin.js
 │   │   │   ├── admin_login.js
-│   │   │   ├── auth_login.js
 │   │   │   ├── landing.js
 │   │   │   ├── math_composer.js
 │   │   │   ├── mobile_nav.js
@@ -102,7 +102,6 @@
 │   │   │   ├── slow.html
 │   │   │   └── timeout.html
 │   │   ├── about.html
-│   │   ├── auth_complete_profile.html
 │   │   ├── auth_login.html
 │   │   ├── base.html
 │   │   ├── contact.html

@@ -1,9 +1,8 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, abort, render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
 from app.extensions import db
 from app.models.question import Question, Answer, Tag
 from app.forms.qa import AskQuestionForm, AnswerForm
-from app.utils.decorators import profile_required
 from app.utils.constants import POPULAR_TAGS, ALL_SUBJECTS
 
 qa_bp = Blueprint("qa", __name__)
@@ -11,7 +10,7 @@ qa_bp = Blueprint("qa", __name__)
 @qa_bp.route("/")
 def list_questions():
     subject = request.args.get("subject")
-    query = Question.query.order_by(Question.created_at.desc())
+    query = Question.query.filter_by(status="approved").order_by(Question.created_at.desc())
     if subject:
         query = query.filter_by(subject=subject)
     questions = query.all()
@@ -19,7 +18,6 @@ def list_questions():
 
 @qa_bp.route("/ask", methods=["GET", "POST"])
 @login_required
-@profile_required
 def ask():
     form = AskQuestionForm()
 
@@ -43,12 +41,25 @@ def ask():
         db.session.add(question)
         db.session.commit()
 
+        flash("Question submitted. It will be public after admin approval.", "success")
         return redirect(url_for("qa.view_question", question_id=question.id))
     return render_template("qa_ask.html", form=form, popular_tags=POPULAR_TAGS)
 
 @qa_bp.route("/<int:question_id>")
 def view_question(question_id):
     question = Question.query.get_or_404(question_id)
+    if (
+        question.status != "approved"
+        and not (
+            current_user.is_authenticated
+            and (
+                question.user_id == current_user.id
+                or getattr(current_user, "is_admin", False)
+            )
+        )
+    ):
+        abort(404)
+
     answers = question.answers.order_by(Answer.upvotes.desc()).all()
     answer_form = AnswerForm()
     return render_template(
@@ -57,9 +68,11 @@ def view_question(question_id):
 
 @qa_bp.route("/<int:question_id>/answer", methods=["POST"])
 @login_required
-@profile_required
 def answer_question(question_id):
     question = Question.query.get_or_404(question_id)
+    if question.status != "approved" and not current_user.is_admin:
+        abort(404)
+
     form = AnswerForm()
 
     if form.validate_on_submit():
@@ -78,16 +91,17 @@ def answer_question(question_id):
 
 @qa_bp.route("/<int:question_id>/upvote", methods=["POST"])
 @login_required
-@profile_required
 def upvote_question(question_id):
     question = Question.query.get_or_404(question_id)
+    if question.status != "approved":
+        abort(404)
+
     question.upvotes += 1
     db.session.commit()
     return redirect(url_for("qa.view_question", question_id=question_id))
 
 @qa_bp.route("/answer/<int:answer_id>/best", methods=["POST"])
 @login_required
-@profile_required
 def mark_best_answer(answer_id):
     answer = Answer.query.get_or_404(answer_id)
     question = answer.question

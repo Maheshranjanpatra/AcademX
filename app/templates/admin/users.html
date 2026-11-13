@@ -8,7 +8,7 @@
     <form method="GET" action="{{ url_for('admin.users') }}" class="table-header-actions">
         <div class="search-filter-group">
             <div class="search-bar">
-                <input type="text" name="search" value="{{ request.args.get('search', '') }}" placeholder="Search by name or email...">
+                <input type="text" name="search" value="{{ request.args.get('search', '') }}" placeholder="Search pseudonymous ID...">
             </div>
             <select name="department" class="filter-select" onchange="this.form.submit()">
                 <option value="">All Departments</option>
@@ -41,8 +41,8 @@
                 <tr>
                     <td>
                         <a href="{{ url_for('admin.view_user', user_id=user.id) }}" style="text-decoration:none; color:inherit;">
-                            <strong>{{ user.name }}</strong><br>
-                            <small class="text-muted">{{ user.email }}</small>
+                            <strong>{{ user.anonymous_id or 'Administrator' }}</strong><br>
+                            <small class="text-muted">{{ user.department or 'No department' }}</small>
                         </a>
                     </td>
                     <td>

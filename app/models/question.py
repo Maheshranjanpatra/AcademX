@@ -30,6 +30,14 @@ class Question(db.Model):
     subject = db.Column(db.String(80))
     is_resolved = db.Column(db.Boolean, default=False)
     upvotes = db.Column(db.Integer, default=0)
+    status = db.Column(
+        db.String(20),
+        default="pending",
+        server_default="pending",
+        nullable=False,
+    )
+    reviewed_by = db.Column(db.Integer, db.ForeignKey("users.id"))
+    reviewed_at = db.Column(db.DateTime)
 
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 

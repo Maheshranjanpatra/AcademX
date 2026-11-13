@@ -11,7 +11,6 @@
 <!-- Auth Page Stylesheet -->
 <link rel="stylesheet" href="{{ url_for('static', filename='css/auth_login.css') }}">
 {% endblock %}
-
 {% block content %}
 <div class="academx-page-wrapper">
     <div class="academx-bg-orb academx-bg-orb-1" aria-hidden="true"></div>
@@ -62,51 +61,66 @@
                         <span class="academx-divider-line"></span>
                     </div>
 
-                    <!-- Welcome Headline -->
-                    <h1 class="academx-headline">Begin your quest for understanding.</h1>
+                    <h1 class="academx-headline">Join without an account.</h1>
 
-                    <!-- Inspirational Subtext -->
                     <p class="academx-subtext">
-                        Join a community where curiosity is celebrated, and every question is a step toward mastery.
+                        Choose a department and avatar. AcademX will assign you a random pseudonymous ID.
+                        No email, password, or Google account is collected.
+                    </p>
+                    <p class="academx-subtext" style="margin-top:0;">
+                        Your ID: <strong>{{ anonymous_id_preview }}</strong>
                     </p>
 
-                    <!-- Trust & Social Proof Badges -->
-                    <div class="academx-badges-container">
-                        <span class="academx-badge-icon" aria-hidden="true">
-                            <svg class="w-4 h-4 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                                <polyline points="9 12 11 14 15 10"/>
-                            </svg>
-                        </span>
-                    </div>
-
-                    <!-- Google Button -->
-                    <div class="academx-action-container">
-                        <a href="{{ url_for('auth.login_google') }}" class="academx-google-btn" id="academxGoogleBtn">
-                            <div class="academx-btn-content">
-                                <svg class="academx-google-svg" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
-                                    <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
-                                    <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.11-6.72-4.96H1.29v3.15C3.26 21.3 7.37 24 12 24z"/>
-                                    <path fill="#FBBC05" d="M5.28 14.24c-.25-.72-.38-1.49-.38-2.24s.13-1.52.38-2.24V6.61H1.29C.47 8.24 0 10.06 0 12s.47 3.76 1.29 5.39l3.99-3.15z"/>
-                                    <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.37 0 3.26 2.7 1.29 6.61l3.99 3.15c.95-2.85 3.6-4.96 6.72-4.96z"/>
-                                </svg>
-                                <span class="academx-btn-text">Continue with Google</span>
+                    <form method="POST" action="{{ url_for('auth.login') }}" class="academx-action-container">
+                        {{ form.hidden_tag() }}
+                        <div class="form-group academx-department-field">
+                            {{ form.department.label(class="academx-field-label") }}
+                            <div class="academx-select-wrap">
+                                {{ form.department(
+                                    class="academx-department-select",
+                                    id="department",
+                                    **{"aria-describedby": "department-help"}
+                                ) }}
                             </div>
+                            <p id="department-help" class="academx-field-help">
+                                Choose the department you study in.
+                            </p>
+                            {% for error in form.department.errors %}
+                                <p class="academx-field-error">{{ error }}</p>
+                            {% endfor %}
+                        </div>
 
-                            <div class="academx-btn-spinner" aria-hidden="true">
-                                <svg class="academx-spinner-svg" viewBox="0 0 50 50">
-                                    <circle class="academx-spinner-path" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle>
-                                </svg>
+                        <fieldset class="form-group">
+                            <legend class="form-label">{{ form.avatar.label.text }}</legend>
+                            <div style="display:grid; grid-template-columns:repeat(5, 1fr); gap:.5rem;">
+                                {% for value, label in form.avatar.choices %}
+                                <label style="display:flex; flex-direction:column; align-items:center; gap:.25rem; cursor:pointer;">
+                                    <img src="{{ url_for('static', filename='images/profiles/' + value) }}"
+                                         alt="{{ label }}" width="48" height="48"
+                                         style="border-radius:50%; object-fit:cover;">
+                                    <input type="radio" name="avatar" value="{{ value }}"
+                                           {% if form.avatar.data == value %}checked{% endif %}>
+                                </label>
+                                {% endfor %}
                             </div>
+                            {% for error in form.avatar.errors %}
+                                <p class="field-error">{{ error }}</p>
+                            {% endfor %}
+                        </fieldset>
 
-                        </a>
-                    </div>
-
+                        <p class="academx-subtext" style="font-size:.8rem;">
+                            Your User_XXXX ID is a public pseudonym, not a password. If you clear this browser session,
+                            you cannot recover that guest profile.
+                        </p>
+                        <button type="submit" class="academx-google-btn">
+                            <span class="academx-btn-text">Continue anonymously</span>
+                        </button>
+                    </form>
 
                     <!-- Footer & Terms -->
                     <footer class="academx-card-footer">
                         <p>
-                            By continuing, you agree to our
+                            Please review our
                             <a href="{{ url_for('pages.policy') }}" class="academx-legal-link">Privacy Policy</a>.
                         </p>
                     </footer>
@@ -116,24 +130,4 @@
         </section>
     </main>
 </div>
-{% endblock %}
-
-{% block scripts %}
-<script src="{{ url_for('static', filename='js/auth_login.js') }}" defer></script>
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-    const googleBtn = document.getElementById("academxGoogleBtn");
-
-    if (googleBtn) {
-        googleBtn.addEventListener("click", function (e) {
-            e.preventDefault();
-            this.classList.add("is-loading");
-            const targetUrl = this.getAttribute("href");
-            setTimeout(() => {
-                window.location.href = targetUrl;
-            }, 600);
-        });
-    }
-});
-</script>
 {% endblock %}

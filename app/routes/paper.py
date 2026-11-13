@@ -7,7 +7,6 @@ from app.models.paper import Paper
 from app.forms.paper import UploadPaperForm
 from app.utils.helpers import save_file
 from sqlalchemy import or_
-from app.utils.decorators import profile_required
 
 paper_bp = Blueprint("paper", __name__)
 
@@ -27,7 +26,6 @@ def list_papers():
 
 @paper_bp.route("/upload", methods=["GET", "POST"])
 @login_required
-@profile_required
 def upload():
     form = UploadPaperForm()
 

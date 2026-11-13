@@ -5,3 +5,4 @@ from app.models.video import Playlist, Video, VideoProgress
 from app.models.paper import Paper
 from app.models.material import Material
 from app.models.streak import Streak
+from app.models.admin_login_attempt import AdminLoginAttempt

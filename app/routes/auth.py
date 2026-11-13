@@ -1,74 +1,137 @@
-from flask import Blueprint, redirect, url_for, render_template, flash, request, session
-from flask_login import login_user, logout_user, login_required, current_user
-from app.extensions import db, oauth
-from app.models.user import User
+import hashlib
+import hmac
+import re
+from datetime import datetime, timedelta, timezone
+
+from flask import (
+    Blueprint, current_app, flash, redirect, render_template, request, session,
+    url_for,
+)
+from flask_login import current_user, login_user, logout_user
+from sqlalchemy.exc import IntegrityError
+
+from app.extensions import db
+from app.forms.admin_login import AdminLoginForm
+from app.forms.auth import GuestLoginForm
+from app.models.admin_login_attempt import AdminLoginAttempt
 from app.models.question import Question
+from app.models.user import User
 from app.models.video import Playlist
-from app.forms.auth import CompleteProfileForm
-from app.forms.admin_login import AdminLoginForm  # NEW
-import os
 
 auth_bp = Blueprint("auth", __name__)
 
-# ADMIN LOGIN (NEW ROUTES)
+ADMIN_LOGIN_WINDOW = timedelta(minutes=15)
+ADMIN_LOGIN_MAX_ATTEMPTS = 5
+
+
+def _guest_id_preview():
+    candidate = session.get("guest_id_preview")
+    if (
+        isinstance(candidate, str)
+        and re.fullmatch(r"User_\d{4}", candidate)
+        and User.query.filter_by(anonymous_id=candidate).first() is None
+    ):
+        return candidate
+
+    preview_user = User()
+    preview_user.generate_anonymous_id()
+    session["guest_id_preview"] = preview_user.anonymous_id
+    return preview_user.anonymous_id
+
+
+def _admin_login_address_hash():
+    address = request.remote_addr or "unknown"
+    key = current_app.config["SECRET_KEY"].encode("utf-8")
+    return hmac.new(key, address.encode("utf-8"), hashlib.sha256).hexdigest()
+
 
 @auth_bp.route("/admin-login", methods=["GET", "POST"])
 def admin_login():
-    """Admin login page with username/password from .env."""
-
     if current_user.is_authenticated and current_user.is_admin:
-        return redirect(url_for('admin.dashboard'))
+        return redirect(url_for("admin.dashboard"))
 
     form = AdminLoginForm()
-
     if form.validate_on_submit():
-        username = form.username.data
-        password = form.password.data
+        admin_username = current_app.config.get("ADMIN_USERNAME")
+        admin_password = current_app.config.get("ADMIN_PASSWORD")
+        if (
+            not admin_username
+            or not admin_password
+            or not 3 <= len(admin_username) <= 50
+            or len(admin_password) < 16
+        ):
+            current_app.logger.error(
+                "Admin login is unavailable: credentials are missing or do not meet minimum requirements."
+            )
+            flash("Admin login is not securely configured. Please contact the site administrator.", "error")
+            return render_template("admin/login.html", form=form), 503
 
-        admin_username = os.environ.get('ADMIN_USERNAME', 'admin')
-        admin_password = os.environ.get('ADMIN_PASSWORD', 'admin123')
+        address_hash = _admin_login_address_hash()
+        cutoff = datetime.now(timezone.utc).replace(tzinfo=None) - ADMIN_LOGIN_WINDOW
+        AdminLoginAttempt.query.filter(
+            AdminLoginAttempt.attempted_at < cutoff
+        ).delete(synchronize_session=False)
+        recent_attempts = AdminLoginAttempt.query.filter(
+            AdminLoginAttempt.address_hash == address_hash,
+            AdminLoginAttempt.attempted_at >= cutoff,
+        ).count()
 
-        if username == admin_username and password == admin_password:
+        if recent_attempts >= ADMIN_LOGIN_MAX_ATTEMPTS:
+            db.session.commit()
+            flash("Too many failed attempts. Please wait 15 minutes before trying again.", "error")
+            return render_template("admin/login.html", form=form), 429
+
+        username_matches = hmac.compare_digest(form.username.data, admin_username)
+        password_matches = hmac.compare_digest(form.password.data, admin_password)
+        if username_matches and password_matches:
             admin_user = User.query.filter_by(is_admin=True).first()
             if not admin_user:
                 admin_user = User(
-                    google_sub='admin',
-                    name='Administrator',
-                    email='admin@academx.com',
+                    name="Administrator",
                     is_admin=True,
                     profile_complete=True,
-                    avatar='avatar1.png',
-                    anonymous_id='User_0000'
+                    avatar="avatar1.webp",
                 )
                 db.session.add(admin_user)
-                db.session.commit()
 
-            login_user(admin_user, remember=False)
-            flash('Welcome back, Administrator!', 'success')
-            return redirect(url_for('admin.dashboard'))
-        else:
-            flash('Invalid username or password.', 'error')
+            AdminLoginAttempt.query.filter_by(address_hash=address_hash).delete(
+                synchronize_session=False
+            )
+            db.session.commit()
+            session.clear()
+            session.permanent = True
+            login_user(admin_user, remember=False, fresh=True)
+            flash("Welcome back, Administrator!", "success")
+            return redirect(url_for("admin.dashboard"))
 
-    return render_template('admin/login.html', form=form)
+        db.session.add(AdminLoginAttempt(address_hash=address_hash))
+        db.session.commit()
+        flash("Invalid username or password.", "error")
 
-@auth_bp.route("/admin-logout")
+    return render_template("admin/login.html", form=form)
+
+
+@auth_bp.route("/admin-logout", methods=["POST"])
 def admin_logout():
-    """Logout from admin panel."""
-    logout_user()
-    flash('Logged out from admin panel.', 'success')
-    return redirect(url_for('auth.login'))
+    if current_user.is_authenticated and current_user.is_admin:
+        logout_user()
+    session.clear()
+    flash("Logged out from the admin panel.", "success")
+    return redirect(url_for("auth.login"))
 
-# EXISTING ROUTES (unchanged)
 
 @auth_bp.route("/")
 def index():
     if current_user.is_authenticated:
         return redirect(url_for("dashboard.home"))
 
-    recent_questions = Question.query.order_by(Question.created_at.desc()).limit(3).all()
-    popular_playlists = Playlist.query.limit(3).all()
-    total_questions = Question.query.count()
-    total_students = User.query.filter_by(profile_complete=True).count()
+    recent_questions = (
+        Question.query.filter_by(status="approved")
+        .order_by(Question.created_at.desc()).limit(3).all()
+    )
+    popular_playlists = Playlist.query.filter_by(status="approved").limit(3).all()
+    total_questions = Question.query.filter_by(status="approved").count()
+    total_students = User.query.filter_by(is_admin=False, profile_complete=True).count()
 
     return render_template(
         "index.html",
@@ -78,93 +141,64 @@ def index():
         total_students=total_students,
     )
 
-@auth_bp.route("/login")
+
+@auth_bp.route("/login", methods=["GET", "POST"])
 def login():
     if current_user.is_authenticated:
         return redirect(url_for("dashboard.home"))
 
-    recent_questions = Question.query.order_by(Question.created_at.desc()).limit(3).all()
-    return render_template("auth_login.html", recent_questions=recent_questions)
-
-@auth_bp.route("/login/google")
-def login_google():
-    redirect_uri = url_for("auth.callback", _external=True)
-    return oauth.google.authorize_redirect(redirect_uri)
-
-@auth_bp.route("/callback")
-def callback():
-    try:
-        token = oauth.google.authorize_access_token()
-    except Exception as e:
-        flash(f"Google authentication failed: {str(e)}", "error")
-        return redirect(url_for("auth.login"))
-
-    user_info = token.get("userinfo")
-
-    if not user_info:
-        flash("Could not retrieve your profile information.", "error")
-        return redirect(url_for("auth.login"))
-
-    email = user_info["email"]
-
-    # @pondiuni.ac.in
-    # if not email.endswith('@pondiuni.ac.in'):
-    #     flash("Only @pondiuni.ac.in email addresses are allowed to sign in.", "error")
-    #     return redirect(url_for("auth.login"))
-
-    google_sub = user_info["sub"]
-    name = user_info["name"]
-
-    user = User.query.filter_by(google_sub=google_sub).first()
-
-    if not user:
-        user = User(google_sub=google_sub, email=email, name=name, profile_complete=False)
-        user.generate_anonymous_id()
-        db.session.add(user)
-        db.session.commit()
-
-    login_user(user, remember=True)
-
-    if not user.profile_complete:
-        return redirect(url_for("auth.complete_profile"))
-
-    return redirect(url_for("dashboard.home"))
-
-@auth_bp.route("/complete-profile", methods=["GET", "POST"])
-@login_required
-def complete_profile():
-    if current_user.profile_complete:
-        return redirect(url_for("dashboard.home"))
-
-    form = CompleteProfileForm()
-
+    form = GuestLoginForm()
     if form.validate_on_submit():
-        reg_num = current_user.email.split('@')[0]
+        user = User(
+            department=form.department.data,
+            avatar=form.avatar.data,
+            profile_complete=True,
+            is_admin=False,
+        )
+        for attempt in range(3):
+            try:
+                user.anonymous_id = _guest_id_preview()
+                user.name = user.anonymous_id
+                db.session.add(user)
+                db.session.commit()
+                break
+            except RuntimeError:
+                flash("No anonymous IDs are available. Please contact the site administrator.", "error")
+                return render_template("auth_login.html", form=form), 503
+            except IntegrityError:
+                db.session.rollback()
+                session.pop("guest_id_preview", None)
+                if attempt == 2:
+                    current_app.logger.exception("Could not allocate a unique guest ID.")
+                    flash("Could not create a guest profile. Please try again.", "error")
+                    return render_template("auth_login.html", form=form), 503
 
-        existing_user = User.query.filter(
-            db.func.lower(User.reg_num) == db.func.lower(reg_num)
-        ).first()
-        if existing_user and existing_user.id != current_user.id:
-            flash('This registration number is already registered. Please contact support.', 'error')
-            return render_template("auth_complete_profile.html", form=form)
-
-        current_user.department = form.department.data
-        current_user.reg_num = reg_num
-        current_user.avatar = form.avatar.data
-        current_user.profile_complete = True
-
-        if not current_user.anonymous_id:
-            current_user.generate_anonymous_id()
-
-        db.session.commit()
-
-        flash('Profile completed successfully! Welcome to AcademX.', 'success')
+        session.clear()
+        session.permanent = True
+        login_user(user, remember=False, fresh=True)
+        flash(f"You're signed in as {user.anonymous_id}. Keep this ID to recognize your pseudonym.", "success")
         return redirect(url_for("dashboard.home"))
 
-    return render_template("auth_complete_profile.html", form=form)
+    try:
+        anonymous_id_preview = _guest_id_preview()
+    except RuntimeError:
+        flash("No anonymous IDs are available. Please contact the site administrator.", "error")
+        return render_template("auth_login.html", form=form), 503
 
-@auth_bp.route("/logout")
-@login_required
+    recent_questions = (
+        Question.query.filter_by(status="approved")
+        .order_by(Question.created_at.desc()).limit(3).all()
+    )
+    return render_template(
+        "auth_login.html",
+        form=form,
+        recent_questions=recent_questions,
+        anonymous_id_preview=anonymous_id_preview,
+    )
+
+
+@auth_bp.route("/logout", methods=["POST"])
 def logout():
     logout_user()
+    session.clear()
     return redirect(url_for("auth.login"))

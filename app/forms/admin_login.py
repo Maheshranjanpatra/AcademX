@@ -10,5 +10,5 @@ class AdminLoginForm(FlaskForm):
     )
     password = PasswordField(
         "Password",
-        validators=[DataRequired()]
+        validators=[DataRequired(), Length(max=256)]
     )

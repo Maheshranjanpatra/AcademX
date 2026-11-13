@@ -9,7 +9,6 @@ from app.extensions import db
 from app.models.video import Playlist, Video, VideoProgress
 from app.models.streak import Streak
 from app.forms.video import UserPlaylistForm
-from app.utils.decorators import profile_required
 from app.utils.helpers import (
     get_progress_animation, get_animation_copy
 )
@@ -57,7 +56,6 @@ def playlists():
 # ============================================================
 @video_bp.route("/upload", methods=["GET", "POST"])
 @login_required
-@profile_required
 def upload_playlist():
     form = UserPlaylistForm()
 
@@ -132,7 +130,6 @@ def upload_playlist():
 # ============================================================
 @video_bp.route("/watch/<int:video_id>")
 @login_required
-@profile_required
 def watch(video_id):
     video = Video.query.get_or_404(video_id)
     playlist = video.playlist
@@ -168,7 +165,6 @@ def watch(video_id):
 # ============================================================
 @video_bp.route("/<int:video_id>/complete", methods=["POST"])
 @login_required
-@profile_required
 def mark_complete(video_id):
     progress = VideoProgress.query.filter_by(
         user_id=current_user.id, video_id=video_id
@@ -199,7 +195,6 @@ def clear_completion_modal():
 
 @video_bp.route("/<int:video_id>/toggle-complete", methods=["POST"])
 @login_required
-@profile_required
 def toggle_complete(video_id):
     progress = VideoProgress.query.filter_by(
         user_id=current_user.id, video_id=video_id

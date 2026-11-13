@@ -1,35 +1,32 @@
-from flask import Flask, request, redirect, url_for, session, flash, render_template
+from flask import Flask, request, redirect, url_for, session, render_template
 from flask_login import current_user
 from app.config import Config
-from app.extensions import db, migrate, login_manager, oauth, csrf
+from app.extensions import db, migrate, login_manager, csrf
 from datetime import date
 
 
 def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
+    secret_key = app.config.get("SECRET_KEY")
+    if not isinstance(secret_key, str) or len(secret_key) < 32:
+        raise RuntimeError("Set SECRET_KEY to a random value of at least 32 characters.")
 
     # ---- Extensions ----
     db.init_app(app)
     migrate.init_app(app, db)
     login_manager.init_app(app)
-    oauth.init_app(app)
     csrf.init_app(app)
 
-    google = oauth.register(
-        name="google",
-        client_id=app.config["GOOGLE_CLIENT_ID"],
-        client_secret=app.config["GOOGLE_CLIENT_SECRET"],
-        server_metadata_url="https://accounts.google.com/.well-known/openid-configuration",
-        client_kwargs={"scope": "openid email profile"},
-    )
-
     # ---- Models ----
-    from app.models import user, question, quiz, video, paper, material
+    from app.models import user, question, quiz, video, paper, material, admin_login_attempt
 
     @login_manager.user_loader
     def load_user(user_id):
-        return user.User.query.get(int(user_id))
+        try:
+            return db.session.get(user.User, int(user_id))
+        except (TypeError, ValueError):
+            return None
 
     # ---- Blueprints ----
     from app.routes.auth import auth_bp
@@ -55,33 +52,6 @@ def create_app(config_class=Config):
     # ---- Jinja filter for B2 signed URLs ----
     from app.utils.helpers import get_file_url
     app.jinja_env.filters["file_url"] = get_file_url
-
-    # ---- Global before_request ----
-    @app.before_request
-    def enforce_profile_completion():
-        if request.endpoint == 'static' or request.path.startswith('/static/'):
-            return
-
-        PUBLIC_ENDPOINTS = [
-            'auth.index',
-            'auth.login',
-            'auth.admin_login',
-            'auth.login_google',
-            'auth.callback',
-            'pages.about',
-            'pages.contact',
-            'pages.policy',
-            'auth.complete_profile',
-            'pages.ping',
-        ]
-
-        if current_user.is_authenticated and not current_user.profile_complete:
-            if request.endpoint not in ['auth.complete_profile', 'auth.logout']:
-                flash("Please complete your profile first.", "error")
-                return redirect(url_for('auth.complete_profile'))
-
-        if not current_user.is_authenticated and request.endpoint not in PUBLIC_ENDPOINTS:
-            return redirect(url_for('auth.login'))
 
     # ---- Context processors ----
     @app.context_processor

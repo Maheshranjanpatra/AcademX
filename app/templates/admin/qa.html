@@ -1,17 +1,25 @@
 {% extends "admin/layout.html" %}
 
 {% block title %}Q&A Moderation - AcademX Admin{% endblock %}
-{% block page_title %}Q&A Moderation{% endblock %}
+{% block page_title %}Question Moderation{% endblock %}
 
 {% block content %}
+<div class="tabs-container">
+    <a href="{{ url_for('admin.qa', status='pending') }}" class="tab-btn {% if status == 'pending' %}active{% endif %}">Pending ({{ pending_count }})</a>
+    <a href="{{ url_for('admin.qa', status='approved') }}" class="tab-btn {% if status == 'approved' %}active{% endif %}">Approved ({{ approved_count }})</a>
+    <a href="{{ url_for('admin.qa', status='rejected') }}" class="tab-btn {% if status == 'rejected' %}active{% endif %}">Rejected ({{ rejected_count }})</a>
+    <a href="{{ url_for('admin.qa', status='') }}" class="tab-btn {% if not status %}active{% endif %}">All</a>
+</div>
+
 <div class="admin-card">
     <div class="table-header-actions">
         <form method="GET" action="{{ url_for('admin.qa') }}" class="search-filter-group">
-            <input type="text" name="q" value="{{ request.args.get('q', '') }}" class="form-input" placeholder="Search questions..." style="max-width: 300px;">
-            <select name="status" class="filter-select" onchange="this.form.submit()">
-                <option value="">All Statuses</option>
-                <option value="resolved" {% if request.args.get('status') == 'resolved' %}selected{% endif %}>Resolved</option>
-                <option value="unresolved" {% if request.args.get('status') == 'unresolved' %}selected{% endif %}>Unresolved</option>
+            <input type="hidden" name="status" value="{{ status }}">
+            <input type="text" name="search" value="{{ search }}" class="form-input" placeholder="Search questions..." style="max-width: 300px;">
+            <select name="resolution" class="filter-select" onchange="this.form.submit()">
+                <option value="">All resolutions</option>
+                <option value="resolved" {% if request.args.get('resolution') == 'resolved' %}selected{% endif %}>Resolved</option>
+                <option value="unresolved" {% if request.args.get('resolution') == 'unresolved' %}selected{% endif %}>Unresolved</option>
             </select>
         </form>
     </div>
@@ -21,8 +29,8 @@
             <thead>
                 <tr>
                     <th>Question</th>
-                    <th>Status</th>
-                    <th>Author</th>
+                    <th>Moderation</th>
+                    <th>Pseudonym</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -34,15 +42,27 @@
                         <p class="text-muted" style="font-size: 0.8rem;">{{ qa.body|truncate(100) }}</p>
                     </td>
                     <td>
+                        <span class="status-badge {{ qa.status }}">
+                            {{ qa.status|capitalize }}
+                        </span>
+                        <br>
                         <span class="status-badge {{ 'resolved' if qa.is_resolved else 'unresolved' }}">
                             {{ 'Resolved' if qa.is_resolved else 'Unresolved' }}
                         </span>
                     </td>
-                    <td>
-                        <button type="button" onclick="revealAuthor({{ qa.id }})" class="action-btn">Reveal Author</button>
-                    </td>
+                    <td>{{ qa.author.anonymous_id if qa.author else 'Unknown' }}</td>
                     <td>
                         <div class="flex gap-2">
+                            {% if qa.status == 'pending' %}
+                            <form action="{{ url_for('admin.approve_question', question_id=qa.id) }}" method="POST">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="action-btn success">Approve</button>
+                            </form>
+                            <form action="{{ url_for('admin.reject_question', question_id=qa.id) }}" method="POST">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="action-btn danger">Reject</button>
+                            </form>
+                            {% endif %}
                             <form action="{{ url_for('admin.toggle_resolved', question_id=qa.id) }}" method="POST">
                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                 <button type="submit" class="action-btn">Toggle Status</button>
@@ -62,12 +82,4 @@
     </div>
 </div>
 
-<!-- Reveal Author Modal -->
-<div id="author-modal" class="modal-overlay">
-    <div class="modal-card">
-        <h3>Author Info</h3>
-        <div id="author-modal-content" class="mt-4 mb-4"></div>
-        <button type="button" onclick="closeModal('author-modal')" class="btn btn-secondary" style="width: 100%;">Close</button>
-    </div>
-</div>
 {% endblock %}

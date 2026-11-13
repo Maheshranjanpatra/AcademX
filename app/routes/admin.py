@@ -1,8 +1,8 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, abort, request, jsonify
-from flask_login import login_required, current_user
+from flask import Blueprint, render_template, redirect, url_for, flash, abort, request
+from flask_login import current_user
 from sqlalchemy import func
-from datetime import datetime, timedelta
-from app.extensions import db, csrf
+from datetime import datetime, timedelta, timezone
+from app.extensions import db
 from app.models.user import User
 from app.models.question import Question, Answer
 from app.models.paper import Paper
@@ -25,6 +25,7 @@ def inject_admin_globals():
     return {
         'sidebar_pending_papers':    Paper.query.filter_by(status='pending').count(),
         'sidebar_pending_playlists': Playlist.query.filter_by(status='pending').count(),
+        'sidebar_pending_questions': Question.query.filter_by(status='pending').count(),
     }
 
 # DASHBOARD
@@ -35,7 +36,7 @@ def inject_admin_globals():
 def dashboard():
     """Admin dashboard with metrics and charts."""
 
-    total_users = User.query.count()
+    total_users = User.query.filter_by(is_admin=False).count()
     total_questions = Question.query.count()
     pending_papers = Paper.query.filter_by(status="pending").count()
     pending_playlists = Playlist.query.filter_by(status="pending").count()
@@ -43,7 +44,9 @@ def dashboard():
 
     one_week_ago = datetime.utcnow() - timedelta(days=7)
 
-    users_last_week = User.query.filter(User.created_at >= one_week_ago).count()
+    users_last_week = User.query.filter(
+        User.is_admin.is_(False), User.created_at >= one_week_ago
+    ).count()
     questions_last_week = Question.query.filter(Question.created_at >= one_week_ago).count()
     quizzes_last_week = Quiz.query.filter(Quiz.created_at >= one_week_ago).count()
 
@@ -51,7 +54,9 @@ def dashboard():
     day_labels = []
     for i in range(6, -1, -1):
         day = datetime.utcnow().date() - timedelta(days=i)
-        count = User.query.filter(func.date(User.created_at) == day).count()
+        count = User.query.filter(
+            User.is_admin.is_(False), func.date(User.created_at) == day
+        ).count()
         daily_users.append(count)
         day_labels.append(day.strftime('%a'))
 
@@ -62,7 +67,7 @@ def dashboard():
         author = User.query.get(q.user_id)
         activities.append({
             'type': 'question',
-            'user': author.name if author else 'Unknown',
+            'user': author.anonymous_id if author else 'Unknown',
             'action': f'asked "{q.title[:50]}"',
             'time': q.created_at,
             'icon': 'forum',
@@ -77,7 +82,7 @@ def dashboard():
         status_color = 'var(--accent-secondary)' if p.status == 'approved' else 'var(--accent-gold)' if p.status == 'pending' else 'var(--accent-danger)'
         activities.append({
             'type': 'paper',
-            'user': uploader.name if uploader else 'Unknown',
+            'user': uploader.anonymous_id if uploader else 'Unknown',
             'action': f'uploaded a paper: {p.subject} ({p.status})',
             'time': p.uploaded_at,
             'icon': status_icon,
@@ -118,14 +123,13 @@ def users():
     page = request.args.get('page', 1, type=int)
     per_page = 15
 
-    query = User.query
+    query = User.query.filter_by(is_admin=False)
 
     if search:
         query = query.filter(
             db.or_(
-                User.name.ilike(f'%{search}%'),
-                User.email.ilike(f'%{search}%'),
-                User.reg_num.ilike(f'%{search}%')
+                User.anonymous_id.ilike(f'%{search}%'),
+                User.department.ilike(f'%{search}%')
             )
         )
 
@@ -159,6 +163,8 @@ def users():
 @check_session_timeout
 def view_user(user_id):
     user = User.query.get_or_404(user_id)
+    if user.is_admin:
+        abort(404)
 
     stats = {
         'questions': user.questions.count(),
@@ -172,38 +178,21 @@ def view_user(user_id):
 
     return render_template('admin/user_detail.html', user=user, stats=stats)
 
-@admin_bp.route("/users/<int:user_id>/toggle-admin", methods=["POST"])
-@admin_required
-@check_session_timeout
-def toggle_admin(user_id):
-    user = User.query.get_or_404(user_id)
-
-    if user.id == current_user.id:
-        flash("You cannot change your own admin status.", "error")
-        return redirect(url_for('admin.users'))
-
-    user.is_admin = not user.is_admin
-    db.session.commit()
-
-    status = "promoted to" if user.is_admin else "demoted from"
-    flash(f"User {user.name} has been {status} admin.", "success")
-    return redirect(url_for('admin.users'))
-
 @admin_bp.route("/users/<int:user_id>/toggle-status", methods=["POST"])
 @admin_required
 @check_session_timeout
 def toggle_user_status(user_id):
     user = User.query.get_or_404(user_id)
 
-    if user.id == current_user.id:
-        flash("You cannot disable your own account.", "error")
+    if user.is_admin:
+        flash("Admin account status cannot be changed here.", "error")
         return redirect(url_for('admin.users'))
 
     user.profile_complete = not user.profile_complete
     db.session.commit()
 
     status = "enabled" if user.profile_complete else "disabled"
-    flash(f"User {user.name} has been {status}.", "success")
+    flash(f"{user.anonymous_id} has been {status}.", "success")
     return redirect(url_for('admin.users'))
 
 @admin_bp.route("/users/<int:user_id>/delete", methods=["POST"])
@@ -212,10 +201,11 @@ def toggle_user_status(user_id):
 def delete_user(user_id):
     user = User.query.get_or_404(user_id)
 
-    if user.id == current_user.id:
-        flash("You cannot delete your own account.", "error")
+    if user.is_admin:
+        flash("Admin accounts cannot be deleted here.", "error")
         return redirect(url_for('admin.users'))
 
+    anonymous_id = user.anonymous_id
     Streak.query.filter_by(user_id=user_id).delete()
     VideoProgress.query.filter_by(user_id=user_id).delete()
     QuizAttempt.query.filter_by(user_id=user_id).delete()
@@ -223,11 +213,17 @@ def delete_user(user_id):
     Question.query.filter_by(user_id=user_id).delete()
     Paper.query.filter_by(uploaded_by=user_id).delete()
     Material.query.filter_by(uploaded_by=user_id).delete()
+    Playlist.query.filter_by(uploaded_by=user_id).update(
+        {"uploaded_by": None}, synchronize_session=False
+    )
+    Quiz.query.filter_by(created_by=user_id).update(
+        {"created_by": None}, synchronize_session=False
+    )
 
     db.session.delete(user)
     db.session.commit()
 
-    flash(f"User {user.name} has been permanently deleted.", "success")
+    flash(f"{anonymous_id} has been permanently deleted.", "success")
     return redirect(url_for('admin.users'))
 
 # PAPER MODERATION
@@ -440,9 +436,11 @@ def delete_playlist_admin(playlist_id):
 @check_session_timeout
 def qa():
     search = request.args.get('search', '')
-    status = request.args.get('status', '')
+    status = request.args.get('status', 'pending')
 
     query = Question.query
+    if status in {'pending', 'approved', 'rejected'}:
+        query = query.filter_by(status=status)
 
     if search:
         query = query.filter(
@@ -452,14 +450,54 @@ def qa():
             )
         )
 
-    if status == 'resolved':
+    if request.args.get('resolution') == 'resolved':
         query = query.filter_by(is_resolved=True)
-    elif status == 'unresolved':
+    elif request.args.get('resolution') == 'unresolved':
         query = query.filter_by(is_resolved=False)
 
     questions = query.order_by(Question.created_at.desc()).all()
 
-    return render_template('admin/qa.html', questions=questions, search=search, status=status)
+    return render_template(
+        'admin/qa.html',
+        questions=questions,
+        search=search,
+        status=status,
+        pending_count=Question.query.filter_by(status='pending').count(),
+        approved_count=Question.query.filter_by(status='approved').count(),
+        rejected_count=Question.query.filter_by(status='rejected').count(),
+    )
+
+@admin_bp.route("/qa/<int:question_id>/approve", methods=["POST"])
+@admin_required
+@check_session_timeout
+def approve_question(question_id):
+    question = Question.query.get_or_404(question_id)
+    if question.status != 'pending':
+        flash("This question has already been reviewed.", "warning")
+        return redirect(url_for('admin.qa', status='pending'))
+
+    question.status = 'approved'
+    question.reviewed_by = current_user.id
+    question.reviewed_at = datetime.now(timezone.utc).replace(tzinfo=None)
+    db.session.commit()
+    flash("Question approved and published.", "success")
+    return redirect(url_for('admin.qa', status='pending'))
+
+@admin_bp.route("/qa/<int:question_id>/reject", methods=["POST"])
+@admin_required
+@check_session_timeout
+def reject_question(question_id):
+    question = Question.query.get_or_404(question_id)
+    if question.status != 'pending':
+        flash("This question has already been reviewed.", "warning")
+        return redirect(url_for('admin.qa', status='pending'))
+
+    question.status = 'rejected'
+    question.reviewed_by = current_user.id
+    question.reviewed_at = datetime.now(timezone.utc).replace(tzinfo=None)
+    db.session.commit()
+    flash("Question rejected.", "success")
+    return redirect(url_for('admin.qa', status='pending'))
 
 @admin_bp.route("/qa/<int:question_id>/delete", methods=["POST"])
 @admin_required
@@ -481,17 +519,6 @@ def toggle_resolved(question_id):
     status = "resolved" if question.is_resolved else "unresolved"
     flash(f"Question marked as {status}.", "success")
     return redirect(url_for('admin.qa'))
-
-@admin_bp.route("/qa/<int:question_id>/reveal-author", methods=["POST"])
-@admin_required
-@check_session_timeout
-def reveal_author(question_id):
-    question = Question.query.get_or_404(question_id)
-    author = User.query.get(question.user_id)
-    return jsonify({
-        'author_name': author.name if author else 'Unknown',
-        'author_email': author.email if author else 'Unknown'
-    })
 
 @admin_bp.route("/qa/answer/<int:answer_id>/delete", methods=["POST"])
 @admin_required
@@ -786,7 +813,6 @@ def delete_video(video_id):
     return redirect(url_for('admin.videos'))
 
 @admin_bp.route("/videos/playlist/<int:playlist_id>/import", methods=["GET", "POST"])
-@csrf.exempt
 @admin_required
 @check_session_timeout
 def import_playlist_videos(playlist_id):

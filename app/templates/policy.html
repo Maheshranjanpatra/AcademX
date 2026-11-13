@@ -4,61 +4,41 @@
 {% block content %}
 <section class="max-w-[760px] mx-auto px-margin-mobile md:px-margin-desktop py-xl space-y-md">
   <h1 class="font-display text-headline-lg-mobile md:text-headline-lg text-on-surface">Privacy Policy</h1>
-  <p class="font-body-md text-body-md text-on-surface-variant">Last updated: August 2026</p>
+  <p class="font-body-md text-body-md text-on-surface-variant">Last updated: November 2026</p>
 
   <div class="space-y-md font-body-md text-body-md text-on-surface-variant">
 
     <div>
       <h2 class="font-headline-md text-[18px] text-on-surface mb-1">1. What We Collect</h2>
-      <p>When you sign in with Google, we receive your name and email. We additionally ask for your department and registration number. Your identity is tied to your university credentials for moderation purposes — even when your posts appear anonymous to other students.</p>
-      <p class="mt-1 text-sm">We <strong>do not</strong> store your IP address, browsing history, or location data.</p>
+      <p>Guest sign-in does not ask for a name, email, password, Google account, or registration number. We store the department and avatar you choose, a randomly assigned pseudonymous ID, and content/activity associated with that ID so the application can provide its features.</p>
+      <p class="mt-1 text-sm">Your browser sends network information to the hosting provider as part of normal web requests. Failed admin sign-in attempts are rate-limited using a keyed hash of the connecting address; only attempts from the most recent 15 minutes affect the limit, and old entries are cleaned up on admin sign-in requests.</p>
     </div>
 
     <div>
       <h2 class="font-headline-md text-[18px] text-on-surface mb-1">2. How Anonymity Works</h2>
-      <p>When you post anonymously, other students see a randomly generated identifier (e.g., <code>User_8472</code>). Your real name is never visible to other users. Only platform administrators can link your anonymous posts to your real identity — and this is done strictly under the conditions listed below.</p>
+      <p>Public posts use your randomly assigned ID (for example, <code>User_8472</code>). This ID is a pseudonym, not a password or verified identity, and anyone using your current browser session can act as that guest profile. If you clear or let your browser session expire, you cannot recover the profile. We do not collect identity details that would let admins link the ID to your real-world identity.</p>
     </div>
 
     <div>
-      <h2 class="font-headline-md text-[18px] text-on-surface mb-1">3. When Your Identity May Be Revealed</h2>
-      <p>Your real identity will only be disclosed to third parties in the following specific situations:</p>
+      <h2 class="font-headline-md text-[18px] text-on-surface mb-1">3. Content Review</h2>
+      <p>Questions, submitted video playlists, papers, and study materials are held for administrator review. They appear in public listings only after approval. Administrators may inspect submissions and remove content that violates platform rules.</p>
+    </div>
+
+    <div>
+      <h2 class="font-headline-md text-[18px] text-on-surface mb-1">4. Data Retention & Deletion</h2>
+      <p>Contributions and activity remain associated with their pseudonymous profile while retained by the service. Admin deletion removes the profile and associated activity and submission records. Content that has been de-attributed may remain, and files already placed in external storage may require separate cleanup. Do not include personal or sensitive information in a post or uploaded file.</p>
+    </div>
+
+    <div>
+      <h2 class="font-headline-md text-[18px] text-on-surface mb-1">5. Your Rights</h2>
       <ul class="list-disc list-inside space-y-1 mt-1 ml-2">
-        <li><strong>Harassment, threats, or illegal content</strong> — If you use the platform to harass others, make threats, or post illegal content, admins may reveal your identity to address the issue.</li>
-        <li><strong>Law enforcement (with a court order)</strong> — If law enforcement presents a legally binding warrant or court order, we will disclose the necessary information.</li>
-      </ul>
-      <p class="mt-1 text-sm"><strong>Note:</strong> Academic dishonesty (e.g., sharing exam papers) or spam alone do <em>not</em> automatically trigger identity disclosure.</p>
-    </div>
-
-    <div>
-      <h2 class="font-headline-md text-[18px] text-on-surface mb-1">4. How You'll Be Notified</h2>
-      <p>If your identity is ever disclosed to a third party, we will notify you <strong>immediately</strong> (unless legally prohibited). The notification will include:</p>
-      <ul class="list-disc list-inside space-y-1 mt-1 ml-2">
-        <li><strong>Who</strong> requested the disclosure (e.g., university authorities or law enforcement).</li>
-        <li><strong>Why</strong> the disclosure was made.</li>
-        <li>A brief <strong>timeline</strong> of events leading to the disclosure.</li>
-      </ul>
-    </div>
-
-    <div>
-      <h2 class="font-headline-md text-[18px] text-on-surface mb-1">5. Admin Accountability</h2>
-      <p>Only authorized platform administrators can access your real identity. All such access is logged strictly for security purposes. We <strong>do not</strong> maintain permanent audit logs of identity disclosures to protect your privacy — only the minimum information (department, registration number, email) is stored as part of your user profile.</p>
-    </div>
-
-    <div>
-      <h2 class="font-headline-md text-[18px] text-on-surface mb-1">6. Data Retention & Deletion</h2>
-      <p>If you delete your account, we will retain your data for <strong>one (1) month</strong> to allow for recovery in case of accidental deletion, or to assist with any ongoing investigations. After this period, all your personal data (including questions, answers, quiz attempts, and video progress) will be permanently erased from our systems.</p>
-    </div>
-
-    <div>
-      <h2 class="font-headline-md text-[18px] text-on-surface mb-1">7. Your Rights</h2>
-      <ul class="list-disc list-inside space-y-1 mt-1 ml-2">
-        <li><strong>Right to deletion</strong> — You may request permanent deletion of your account and all associated data at any time via the <a href="{{ url_for('pages.contact') }}" class="text-primary hover:underline">Contact page</a>.</li>
+        <li><strong>Right to deletion</strong> — You may request deletion of your pseudonymous profile and associated data via the <a href="{{ url_for('pages.contact') }}" class="text-primary hover:underline">Contact page</a>.</li>
         <li><strong>No automated data export</strong> — We do not offer a built-in data export tool. However, you may manually copy your questions and answers before deletion.</li>
       </ul>
     </div>
 
     <div>
-      <h2 class="font-headline-md text-[18px] text-on-surface mb-1">8. What We Don't Do</h2>
+      <h2 class="font-headline-md text-[18px] text-on-surface mb-1">6. What We Don't Do</h2>
       <ul class="list-disc list-inside space-y-1 mt-1 ml-2">
         <li>We <strong>do not</strong> sell your data.</li>
         <li>We <strong>do not</strong> share your identity with other students.</li>
@@ -67,12 +47,12 @@
     </div>
 
     <div>
-      <h2 class="font-headline-md text-[18px] text-on-surface mb-1">9. Changes to This Policy</h2>
-      <p>This policy may be updated as AcademX grows. Continued use of the platform after changes means you accept the updated terms. Significant changes will be communicated via email or a platform announcement.</p>
+      <h2 class="font-headline-md text-[18px] text-on-surface mb-1">7. Changes to This Policy</h2>
+      <p>This policy may be updated as AcademX grows. Please review it for changes.</p>
     </div>
 
     <div>
-      <h2 class="font-headline-md text-[18px] text-on-surface mb-1">10. Contact</h2>
+      <h2 class="font-headline-md text-[18px] text-on-surface mb-1">8. Contact</h2>
       <p>If you have any questions about this policy, or if you wish to request account deletion, reach out via our <a href="{{ url_for('pages.contact') }}" class="text-primary hover:underline">Contact page</a>.</p>
     </div>
 

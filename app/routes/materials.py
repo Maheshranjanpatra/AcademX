@@ -6,7 +6,6 @@ from app.models.material import Material
 from app.models.paper import Paper
 from app.models.video import Playlist
 from app.forms.materials import MaterialUploadForm
-from app.utils.decorators import profile_required
 from app.utils.helpers import save_file
 
 materials_bp = Blueprint("materials", __name__)
@@ -32,7 +31,6 @@ def list_materials():
 
 @materials_bp.route("/upload", methods=["GET", "POST"])
 @login_required
-@profile_required
 def upload_material():
     form = MaterialUploadForm()
 
@@ -74,7 +72,6 @@ def upload_material():
 
 @materials_bp.route("/my-uploads")
 @login_required
-@profile_required
 def my_uploads():
     """Show everything the current user has uploaded — with filter tabs."""
     filter_type = request.args.get("filter", "all")  # all | playlists | materials | papers

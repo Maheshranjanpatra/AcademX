@@ -8,6 +8,12 @@
 {% block content %}
 <main class="max-w-[840px] mx-auto w-full px-margin-mobile md:px-margin-desktop py-lg space-y-lg">
 
+  {% if question.status != 'approved' %}
+  <div class="rounded-lg bg-tertiary-container text-on-tertiary-container px-md py-sm">
+    This question is {{ question.status }} and is not public.
+  </div>
+  {% endif %}
+
   <!-- Question -->
   <article class="bg-surface-container-lowest border border-outline-variant rounded-xl card-shadow p-md space-y-sm">
     <div class="flex items-center gap-sm">
@@ -93,7 +99,7 @@
   </section>
 
   <!-- Answer form -->
-  {% if current_user.is_authenticated %}
+  {% if current_user.is_authenticated and question.status == 'approved' %}
   <section class="bg-surface-container-lowest border border-outline-variant rounded-xl card-shadow p-md">
     <h3 class="font-headline-md text-on-surface text-[18px] mb-sm">Your Answer</h3>
     <form method="post" action="{{ url_for('qa.answer_question', question_id=question.id) }}" class="space-y-sm">
@@ -111,9 +117,9 @@
       </button>
     </form>
   </section>
-  {% else %}
+  {% elif not current_user.is_authenticated %}
   <p class="font-label-md text-label-md text-on-surface-variant">
-    <a href="{{ url_for('auth.login') }}" class="text-primary hover:underline">Log in</a> to post an answer.
+    <a href="{{ url_for('auth.login') }}" class="text-primary hover:underline">Sign in anonymously</a> to post an answer.
   </p>
   {% endif %}
 

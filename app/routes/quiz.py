@@ -2,7 +2,6 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
 from app.extensions import db
 from app.models.quiz import Quiz, QuizQuestion, QuizAttempt
-from app.utils.decorators import profile_required
 
 quiz_bp = Blueprint("quiz", __name__)
 
@@ -14,7 +13,6 @@ def list_quizzes():
 
 @quiz_bp.route("/<int:quiz_id>/attempt", methods=["GET", "POST"])
 @login_required
-@profile_required
 def attempt(quiz_id):
     quiz = Quiz.query.get_or_404(quiz_id)
     questions = quiz.questions.all()
@@ -46,7 +44,6 @@ def attempt(quiz_id):
 
 @quiz_bp.route("/result/<int:attempt_id>")
 @login_required
-@profile_required
 def result(attempt_id):
     attempt_record = QuizAttempt.query.get_or_404(attempt_id)
 

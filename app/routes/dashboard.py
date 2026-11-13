@@ -3,22 +3,23 @@ from flask_login import login_required, current_user
 from app.models.question import Question
 from app.models.video import Playlist, VideoProgress
 from app.models.streak import Streak
-from app.utils.decorators import profile_required
 from app.utils.helpers import get_animation_copy
 
 dashboard_bp = Blueprint("dashboard", __name__)
 
 @dashboard_bp.route("/")
 @login_required
-@profile_required
 def home():
-    recent_questions = Question.query.order_by(Question.created_at.desc()).limit(5).all()
+    recent_questions = (
+        Question.query.filter_by(status="approved")
+        .order_by(Question.created_at.desc()).limit(5).all()
+    )
 
     total_answers = current_user.answers.count()
     total_questions = current_user.questions.count()
     videos_completed = current_user.video_progress.filter_by(completed=True).count()
 
-    playlists = Playlist.query.all()
+    playlists = Playlist.query.filter_by(status="approved").all()
     playlist_progress = []
     for pl in playlists:
         total = len(pl.videos)

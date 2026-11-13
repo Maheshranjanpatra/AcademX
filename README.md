@@ -69,7 +69,7 @@ The platform is live, actively maintained, and designed to scale from a single u
 | **Community uploads** | Contribute materials, playlists, and papers. Every submission is reviewed before going public. |
 | **Learning streaks** | A small gamified egg that cracks and hatches as you finish videos. |
 | **Math composer** | Type `$x^2$` and get a live LaTeX preview, plus a symbol palette for beginners. |
-| **Google Sign-In** | One-tap OAuth. No passwords stored. |
+| **Guest sign-in** | Choose a department and avatar; receive a random pseudonymous ID without an account credential. |
 | **PWA** | Installable to the home screen like a native app. |
 | **Responsive UI** | Dedicated mobile bottom navigation and side drawer. |
 
@@ -77,8 +77,9 @@ The platform is live, actively maintained, and designed to scale from a single u
 
 - **Moderation dashboards** for papers, playlists, materials, Q&A, and users
 - **Batch actions** to approve or reject pending submissions
-- **User management**: promote to admin, disable, or delete accounts
-- **Audit trail**: every approval records who reviewed what, and when
+- **Guest management**: disable or delete pseudonymous guest profiles
+- **Admin security**: environment-only credentials, CSRF-protected forms, short sessions, and a five-failure/15-minute sign-in limit
+- **Review attribution**: question, paper, and material approvals record the reviewing admin and timestamp
 
 ---
 
@@ -88,7 +89,7 @@ The platform is live, actively maintained, and designed to scale from a single u
 |---|---|
 | **Backend** | Python 3.12 · Flask 3 · Flask-SQLAlchemy · Flask-Migrate |
 | **Database** | PostgreSQL (Neon) · SQLAlchemy ORM |
-| **Auth** | Google OAuth 2.0 (Authlib) · Flask-Login |
+| **Auth** | Anonymous guest sessions · environment-configured admin credentials · Flask-Login |
 | **Frontend** | Jinja2 · Tailwind CSS (compiled) · Vanilla JS |
 | **Typography** | Inter · Playfair Display |
 | **Icons** | Material Symbols Rounded (subset) |
@@ -139,9 +140,7 @@ npm run build:css
 
 **4. Configure environment variables**
 
-```bash
-cp .env.example .env
-```
+Create a `.env` file at the project root and set the variables below.
 
 Fill in your own values. See [Environment Variables](#-environment-variables).
 
@@ -166,15 +165,18 @@ Open [http://127.0.0.1:5000](http://127.0.0.1:5000).
 Create a `.env` file at the project root:
 
 ```dotenv
-# Flask
-SECRET_KEY=your-long-random-secret
+# Flask (at least 32 random characters)
+SECRET_KEY=replace-with-at-least-32-random-characters
 
 # Database (Neon / any Postgres)
 DATABASE_URL="postgresql+psycopg://user:password@host/dbname?sslmode=require"
 
-# Google OAuth
-GOOGLE_CLIENT_ID=xxxxxxxx.apps.googleusercontent.com
-GOOGLE_CLIENT_SECRET=xxxxxxxxxxxxxxxxxxxx
+# Admin login (required; use a unique, strong password)
+ADMIN_USERNAME=your-admin-username
+ADMIN_PASSWORD=your-long-random-admin-password
+
+# Set false only for local HTTP development; use true for HTTPS deployments
+SESSION_COOKIE_SECURE=true
 
 # Backblaze B2 (file uploads)
 B2_KEY_ID=your-b2-key-id
@@ -191,7 +193,8 @@ YOUTUBE_API_KEY=your-youtube-api-key
 |---|:---:|---|
 | `SECRET_KEY` | ✅ | Session signing and CSRF protection |
 | `DATABASE_URL` | ✅ | PostgreSQL connection string |
-| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | ✅ | Google OAuth credentials |
+| `ADMIN_USERNAME` / `ADMIN_PASSWORD` | ✅ | Admin-only credentials; password must be at least 16 characters, with no insecure defaults |
+| `SESSION_COOKIE_SECURE` | ✅ | Set `true` for HTTPS; use `false` only for local HTTP |
 | `B2_*` | ✅ | Backblaze B2 bucket access for uploads |
 | `YOUTUBE_API_KEY` | ❌ | Enables playlist imports |
 
@@ -206,7 +209,7 @@ Nymora/
 ├── app/
 │   ├── __init__.py            # App factory, blueprint registration
 │   ├── config.py              # Config class, DB URL normalization
-│   ├── extensions.py          # db, migrate, login_manager, oauth, csrf
+│   ├── extensions.py          # db, migrate, login_manager, csrf
 │   │
 │   ├── forms/                 # WTForms (auth, qa, quiz, materials, ...)
 │   ├── models/                # SQLAlchemy models
@@ -219,7 +222,7 @@ Nymora/
 │   │   └── streak.py          # Streak (gamification)
 │   │
 │   ├── routes/                # Blueprints
-│   │   ├── auth.py            # Google OAuth, complete-profile, logout
+│   │   ├── auth.py            # Guest profile creation, admin login, logout
 │   │   ├── dashboard.py       # Home dashboard
 │   │   ├── qa.py              # List, ask, view, answer, upvote
 │   │   ├── quiz.py            # List, attempt, result
@@ -244,7 +247,7 @@ Nymora/
 │   │   └── admin/             # Admin templates
 │   │
 │   └── utils/
-│       ├── decorators.py      # admin_required, profile_required
+│       ├── decorators.py      # admin_required, admin session timeout
 │       ├── helpers.py         # B2 save_file, YouTube ID extractor
 │       └── validators.py
 │
@@ -260,7 +263,7 @@ Nymora/
 
 ## 🗄️ Database & Migrations
 
-Nymora uses Flask-Migrate (Alembic) on top of SQLAlchemy.
+AcademX uses Flask-Migrate (Alembic) on top of SQLAlchemy. The anonymous-guest migration permanently removes stored Google subject, email, and registration-number columns after scrubbing historical account names. It retains existing posts and activity with pseudonymous IDs; take a database snapshot before applying it.
 
 ```bash
 # After changing a model
@@ -280,26 +283,22 @@ python -m flask db upgrade
 
 </details>
 
-> **Neon note:** `flask db upgrade` runs against the live database. Create a Neon branch or snapshot before running destructive migrations.
+> **Neon note:** `flask db upgrade` runs against the live database. Before applying the anonymization migration, take a secured snapshot for rollback and expire/remove it after validation because it contains the pre-migration identifiers.
 
 ---
 
 ## 🔄 Key Workflows
 
-### Google Sign-In
+### Guest Sign-In
 
 ```mermaid
 flowchart LR
-    A[Continue with Google] --> B[Google consent screen]
-    B --> C[Callback: code → token → userinfo]
-    C --> D{New user?}
-    D -- Yes --> E[Create user<br/>profile_complete = False]
-    E --> F[/complete-profile<br/>department + avatar/]
-    F --> G[/dashboard/]
-    D -- No --> G
+    A[Choose department + avatar] --> B[Create guest profile]
+    B --> C[Assign random User_XXXX ID]
+    C --> D[Start guest session]
 ```
 
-> Any email domain is allowed. Users with an incomplete profile are redirected to `/complete-profile` on every request.
+The four-digit ID is a pseudonym, not a credential. Clearing or allowing the browser session to expire loses access to that guest profile.
 
 ### Upload & Moderation
 
@@ -316,8 +315,10 @@ Only `status="approved"` items appear in public listings.
 ### Anonymity Model
 
 - Every user receives a unique `anonymous_id` (e.g. `User_8472`) on signup.
-- Anonymous posts display the Nym ID, never the real name.
-- Admins can resolve identity only in limited cases (see [Privacy](#-privacy)).
+- The application does not collect guest email, Google identity, or registration number.
+- Contributions are linked to a pseudonymous profile so ownership and progress can be displayed.
+- The `User_0000`–`User_9999` namespace supports at most 10,000 retained profiles.
+- Questions, playlists, papers, and materials remain private until approved by an administrator.
 
 ### Math Composer
 
@@ -394,7 +395,7 @@ npm run watch:css
 
 **Shipped**
 
-- [x] Google OAuth and anonymous identity
+- [x] Guest sign-in with pseudonymous IDs
 - [x] Q&A with best-answer marking
 - [x] Quizzes with explanations
 - [x] Video playlists with progress and streaks
@@ -440,10 +441,11 @@ Full details are in the [Privacy Policy](https://nymora-anon.onrender.com/policy
 
 **In short:**
 
-- We store your name, email, department, and registration number.
-- Your identity is never shown to other students; they only see a Nym ID.
-- Admins can reveal identity only for harassment, threats, or legal requests.
-- You can request account deletion through the Contact page.
+- Guest sign-in does not collect real names, email, Google identity, or registration numbers.
+- Department, avatar, pseudonymous ID, and content/activity associated with that profile are stored.
+- A guest ID is not a password; a cleared browser session cannot be recovered.
+- Questions and user submissions are only public after admin approval.
+- See the [Privacy Policy](https://nymora-anon.onrender.com/policy) for hosting and retention details.
 
 ---
 

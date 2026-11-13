@@ -42,6 +42,9 @@
                 <a href="{{ url_for('admin.qa') }}" class="nav-item {% if request.endpoint == 'admin.qa' %}active{% endif %}">
                     <span class="material-symbols-outlined">forum</span>
                     <span class="nav-label">Q&A</span>
+                    {% if sidebar_pending_questions %}
+                    <span class="badge badge-pending">{{ sidebar_pending_questions }}</span>
+                    {% endif %}
                 </a>
                 <a href="{{ url_for('admin.quizzes') }}" class="nav-item {% if request.endpoint == 'admin.quizzes' %}active{% endif %}">
                     <span class="material-symbols-outlined">quiz</span>
@@ -61,10 +64,13 @@
                     <span class="material-symbols-outlined">settings</span>
                     <span class="nav-label">Settings</span>
                 </a>
-                <a href="{{ url_for('auth.admin_logout') }}" class="nav-item">
-                      <span class="material-symbols-outlined">logout</span>
-                      <span class="nav-label">Logout</span>
-                </a>
+                <form method="POST" action="{{ url_for('auth.admin_logout') }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="nav-item">
+                        <span class="material-symbols-outlined">logout</span>
+                        <span class="nav-label">Logout</span>
+                    </button>
+                </form>
             </div>
         </aside>
 

@@ -61,13 +61,11 @@
       {% endif %}
 
       <!-- Admin button (desktop only) -->
-      {% if not current_user.is_authenticated %}
       <a href="{{ url_for('auth.admin_login') }}"
          class="hidden md:flex items-center gap-1.5 border border-primary-fixed-dim/50 hover:bg-primary-fixed/10 text-primary-fixed-dim hover:text-secondary-fixed transition-all rounded-[8px] px-3 py-1.5 font-label-md text-label-md font-medium">
         <span class="material-symbols-outlined text-[18px]">admin_panel_settings</span>
         Admin
       </a>
-      {% endif %}
 
       {% if current_user.is_authenticated %}
           <!-- User avatar (desktop only — mobile has it in drawer) -->
@@ -78,10 +76,13 @@
               </a>
           </div>
           <!-- Logout button (desktop only) -->
-          <a href="{{ url_for('auth.logout') }}" class="hidden md:flex bg-primary-fixed/10 hover:bg-primary-fixed/20 transition-all rounded-[8px] px-3 py-1.5 font-label-md text-label-md text-primary-fixed items-center gap-1.5">
-              <span class="material-symbols-outlined text-[18px]">logout</span>
-              <span class="hidden sm:inline">Logout</span>
-          </a>
+          <form method="POST" action="{{ url_for('auth.logout') }}" class="hidden md:block">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="flex bg-primary-fixed/10 hover:bg-primary-fixed/20 transition-all rounded-[8px] px-3 py-1.5 font-label-md text-label-md text-primary-fixed items-center gap-1.5">
+                  <span class="material-symbols-outlined text-[18px]">logout</span>
+                  <span class="hidden sm:inline">Logout</span>
+              </button>
+          </form>
       {% else %}
           <!-- Login button -->
           <a href="{{ url_for('auth.login') }}" class="bg-primary text-on-primary hover:bg-surface-tint hover:shadow-md hover:-translate-y-0.5 transition-all rounded-[8px] px-3 md:px-4 py-1.5 font-label-md text-label-md shadow-sm flex items-center gap-1.5 flex-shrink-0">
@@ -231,10 +232,13 @@
       <span>Profile</span>
     </a>
 
-    <a class="dr-item" href="{{ url_for('auth.logout') }}">
-      <span class="material-symbols-outlined msr">logout</span>
-      <span>Logout</span>
-    </a>
+    <form method="POST" action="{{ url_for('auth.logout') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button type="submit" class="dr-item">
+        <span class="material-symbols-outlined msr">logout</span>
+        <span>Logout</span>
+      </button>
+    </form>
   </nav>
 
   <!-- Theme toggle -->

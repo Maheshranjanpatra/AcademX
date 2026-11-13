@@ -8,16 +8,10 @@
     <div class="flex justify-between items-center" style="flex-wrap:wrap; gap:1rem;">
         <div>
             <h2>{{ user.name }}</h2>
-            <p class="text-muted">{{ user.email }}</p>
-            <p class="text-muted">Reg: {{ user.reg_num or 'N/A' }} | Dept: {{ user.department or 'N/A' }}</p>
+            <p class="text-muted">Pseudonymous ID: {{ user.anonymous_id or 'Administrator' }}</p>
+            <p class="text-muted">Dept: {{ user.department or 'N/A' }}</p>
         </div>
         <div class="flex gap-2" style="flex-wrap:wrap;">
-            <form action="{{ url_for('admin.toggle_admin', user_id=user.id) }}" method="POST">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <button type="submit" class="btn btn-secondary">
-                    {{ 'Demote to User' if user.is_admin else 'Promote to Admin' }}
-                </button>
-            </form>
             <form action="{{ url_for('admin.toggle_user_status', user_id=user.id) }}" method="POST">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <button type="submit" class="btn btn-secondary">
