@@ -43,25 +43,12 @@
             </h1>
           </div>
 
-          <!-- Mark Complete / Incomplete -->
+          <!-- Mark Complete / Incomplete (handled by the script below) -->
           <div class="flex-shrink-0">
-              {% if is_completed %}
-                  <form method="post" action="{{ url_for('video.toggle_complete', video_id=video.id) }}">
-                      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                      <button type="submit" class="bg-secondary-container text-on-secondary-container hover:bg-secondary-container/80 transition-all rounded-lg px-md py-sm font-label-md text-label-md flex items-center gap-xs">
-                          <span class="material-symbols-outlined text-[20px]">undo</span>
-                          Mark as Incomplete
-                      </button>
-                  </form>
-              {% else %}
-                  <form method="post" action="{{ url_for('video.toggle_complete', video_id=video.id) }}">
-                      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                      <button type="submit" class="bg-primary text-on-primary hover:bg-surface-tint transition-all rounded-lg px-md py-sm font-label-md text-label-md shadow-sm flex items-center gap-xs">
-                          <span class="material-symbols-outlined text-[20px]">done</span>
-                          Mark as Complete
-                      </button>
-                  </form>
-              {% endif %}
+            <button type="button" id="complete-btn"
+                    class="bg-primary text-on-primary hover:bg-surface-tint transition-all rounded-lg px-md py-sm font-label-md text-label-md shadow-sm flex items-center gap-xs">
+              Mark as Complete
+            </button>
           </div>
         </div>
       </div>
@@ -83,9 +70,9 @@
         <div class="space-y-xs max-h-[500px] overflow-y-auto pr-1">
           {% for item in playlist.videos %}
           {% set is_current = (item.id == video.id) %}
-          {% set item_completed = item.id in completed_video_ids %}
 
           <a href="{{ url_for('video.watch', video_id=item.id) }}"
+             data-video-id="{{ item.id }}"
              class="flex items-center gap-sm p-sm rounded-lg border transition-all duration-200
                     {% if is_current %}
                       bg-primary-fixed/30 border-primary text-primary font-semibold
@@ -93,15 +80,10 @@
                       bg-surface border-outline-variant text-on-surface hover:bg-surface-container-low
                     {% endif %}">
 
-            <span class="font-label-md text-xs w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0
-                         {% if item_completed %} bg-secondary text-on-secondary {% elif is_current %} bg-primary text-on-primary {% else %} bg-surface-container-high text-on-surface-variant {% endif %}">
-              {% if item_completed %}
-                <span class="material-symbols-outlined text-[14px]">check</span>
-              {% elif is_current %}
-                <span class="material-symbols-outlined text-[14px]">play_arrow</span>
-              {% else %}
-                {{ loop.index }}
-              {% endif %}
+            <span data-badge data-index="{{ loop.index }}"
+                  class="font-label-md text-xs w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0
+                         {% if is_current %} bg-primary text-on-primary {% else %} bg-surface-container-high text-on-surface-variant {% endif %}">
+              {{ loop.index }}
             </span>
 
             <span class="font-body-md text-label-md line-clamp-2 flex-grow">
@@ -115,4 +97,166 @@
 
   </div>
 </main>
+
+<!-- Playlist Finished Modal -->
+<div id="finished-modal" style="display:none"
+     class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+  <div class="bg-surface-container-lowest rounded-2xl p-8 max-w-sm w-full text-center shadow-2xl animate-pop-in">
+
+    <div class="flex justify-center mb-4">
+      <svg class="w-16 h-16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color: #b8860b;">
+        <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
+        <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
+        <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" />
+        <path d="M9 4v3" stroke-width="1" opacity="0.5" />
+        <path d="M15 4v3" stroke-width="1" opacity="0.5" />
+        <path d="M4 22h16" stroke-width="2.5" />
+        <path d="M6 18h12" stroke-width="2" />
+        <path d="M8 22l1.5-4h5l1.5 4" />
+        <path d="M12 15l-1 2h2l-1-2Z" fill="currentColor" stroke="none" />
+      </svg>
+    </div>
+
+    <h2 class="font-display text-headline-md text-on-surface mb-2">
+      Congratulations!
+    </h2>
+    <p class="font-body-md text-body-md text-on-surface-variant mb-1">
+      You finished the playlist <strong class="text-primary">{{ playlist.title }}</strong>.
+    </p>
+    <p class="font-body-md text-body-md text-on-surface-variant mb-6">
+      Keep the momentum going, or take a well-deserved break.
+    </p>
+
+    <div class="flex flex-col gap-3">
+      <a href="{{ url_for('dashboard.home') }}"
+         class="flex items-center justify-center gap-3 w-full bg-secondary text-on-secondary font-label-md text-label-md px-6 py-2.5 rounded-lg hover:bg-secondary-fixed-dim transition-all">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M17 8h1a4 4 0 0 1 0 8h-1"/>
+          <path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V8z"/>
+          <line x1="6" y1="2" x2="6" y2="4"/>
+          <line x1="10" y1="2" x2="10" y2="4"/>
+          <line x1="14" y1="2" x2="14" y2="4"/>
+        </svg>
+        Have a break
+      </a>
+
+      <a href="{{ url_for('video.playlists') }}"
+         class="flex items-center justify-center gap-3 w-full bg-primary text-on-primary font-label-md text-label-md px-6 py-2.5 rounded-lg hover:bg-surface-tint transition-all">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2L4 14h6l-2 9L20 10h-6l2-8Z" />
+        </svg>
+        Be strong &ndash; keep watching
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  var USER_ID = {{ current_user.id | tojson }};
+  var PLAYLIST_ID = {{ playlist.id | tojson }};
+  var CURRENT = {{ video.id | tojson }};
+  var ALL_IDS = {{ playlist.videos | map(attribute='id') | list | tojson }};
+
+  var KEY = "academx_done_" + USER_ID + "_" + PLAYLIST_ID;
+  var FIN_KEY = "academx_finished_" + USER_ID + "_" + PLAYLIST_ID;
+
+  var btn = document.getElementById("complete-btn");
+  var modal = document.getElementById("finished-modal");
+  var links = document.querySelectorAll("[data-video-id]");
+
+  var BTN_TODO = "bg-primary text-on-primary hover:bg-surface-tint transition-all rounded-lg px-md py-sm font-label-md text-label-md shadow-sm flex items-center gap-xs";
+  var BTN_DONE = "bg-secondary-container text-on-secondary-container hover:bg-secondary-container/80 transition-all rounded-lg px-md py-sm font-label-md text-label-md flex items-center gap-xs";
+
+  var BADGE_BASE = "font-label-md text-xs w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 ";
+  var BADGE_DONE = "bg-secondary text-on-secondary";
+  var BADGE_CURRENT = "bg-primary text-on-primary";
+  var BADGE_IDLE = "bg-surface-container-high text-on-surface-variant";
+
+  var ICON_CHECK = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';
+  var ICON_UNDO = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-15-6.7L3 13"/></svg>';
+  var BADGE_CHECK = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';
+  var BADGE_PLAY = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
+
+  function readDone() {
+    try {
+      var raw = JSON.parse(localStorage.getItem(KEY) || "[]");
+      if (!Array.isArray(raw)) return [];
+      return raw.filter(function (id) { return ALL_IDS.indexOf(id) !== -1; });
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function writeDone(list) {
+    try { localStorage.setItem(KEY, JSON.stringify(list)); } catch (e) {}
+  }
+
+  function wasShown() {
+    try { return localStorage.getItem(FIN_KEY) === "1"; } catch (e) { return false; }
+  }
+
+  function markShown() {
+    try { localStorage.setItem(FIN_KEY, "1"); } catch (e) {}
+  }
+
+  var done = readDone();
+
+  function allDone() {
+    return ALL_IDS.length > 0 && ALL_IDS.every(function (id) {
+      return done.indexOf(id) !== -1;
+    });
+  }
+
+  function render() {
+    var isDone = done.indexOf(CURRENT) !== -1;
+    btn.className = isDone ? BTN_DONE : BTN_TODO;
+    btn.innerHTML = (isDone ? ICON_UNDO : ICON_CHECK) + (isDone ? "Mark as Incomplete" : "Mark as Complete");
+
+    links.forEach(function (a) {
+      var id = parseInt(a.getAttribute("data-video-id"), 10);
+      var badge = a.querySelector("[data-badge]");
+      if (!badge) return;
+
+      if (done.indexOf(id) !== -1) {
+        badge.className = BADGE_BASE + BADGE_DONE;
+        badge.innerHTML = BADGE_CHECK;
+      } else if (id === CURRENT) {
+        badge.className = BADGE_BASE + BADGE_CURRENT;
+        badge.innerHTML = BADGE_PLAY;
+      } else {
+        badge.className = BADGE_BASE + BADGE_IDLE;
+        badge.textContent = badge.getAttribute("data-index");
+      }
+    });
+  }
+
+  btn.addEventListener("click", function () {
+    var pos = done.indexOf(CURRENT);
+    var justCompleted = (pos === -1);
+
+    if (justCompleted) {
+      done.push(CURRENT);
+    } else {
+      done.splice(pos, 1);
+    }
+
+    writeDone(done);
+    render();
+
+    if (justCompleted && allDone() && !wasShown()) {
+      markShown();
+      modal.style.display = "flex";
+    }
+  });
+
+  modal.addEventListener("click", function (e) {
+    if (e.target === modal) {
+      modal.style.display = "none";
+    }
+  });
+
+  render();
+})();
+</script>
 {% endblock %}

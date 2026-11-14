@@ -133,19 +133,6 @@
   {% endif %}
 {% endwith %}
 
-<!-- ===== Streak Warning Banner ===== -->
-{% if streak_warning %}
-<div class="w-full bg-tertiary-fixed text-on-tertiary-fixed text-center py-2 px-md font-label-md text-label-md flex items-center justify-center gap-2 flex-wrap">
-  <svg class="w-5 h-5 inline-block flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M12 9v4"/>
-    <path d="M12 17h.01"/>
-    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
-  </svg>
-  <span>Your egg is at risk — complete a video today to keep your streak alive.</span>
-  <a href="{{ url_for('video.playlists') }}" class="underline font-semibold">Watch now →</a>
-</div>
-{% endif %}
-
 <!-- ===== Main Content ===== -->
 <main class="flex-grow">
   {% block content %}{% endblock %}
@@ -156,7 +143,7 @@
   {% include "footer.html" %}
 </footer>
 
-<!-- ===== Completion Modal ===== -->
+<!-- ===== Completion Modal 
 {% set video_id = session.pop('completion_video_id', None) %}
 {% set video_title = session.pop('completion_video_title', None) %}
 {% if session.pop('show_completion_modal', None) %}
@@ -201,8 +188,7 @@
                     <line x1="10" y1="2" x2="10" y2="4"/>
                     <line x1="14" y1="2" x2="14" y2="4"/>
                 </svg>
-                Have a break
-            </a>
+          </a>
 
             <a href="{{ url_for('video.watch', video_id=video_id) }}"
                class="flex items-center justify-center gap-3 w-full bg-primary text-on-primary font-label-md text-label-md px-6 py-2.5 rounded-lg hover:bg-surface-tint transition-all">
@@ -216,7 +202,7 @@
             </a>
         </div>
     </div>
-</div>
+</div> -->
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {

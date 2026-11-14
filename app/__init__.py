@@ -56,19 +56,6 @@ def create_app(config_class=Config):
 
     # ---- Context processors ----
     @app.context_processor
-    def inject_streak_status():
-        if not current_user.is_authenticated:
-            return {"streak_warning": False}
-
-        streak = getattr(current_user, "streak", None)
-        if streak and streak.last_completed_date:
-            gap = (date.today() - streak.last_completed_date).days
-            if gap == 2:
-                return {"streak_warning": True}
-
-        return {"streak_warning": False}
-
-    @app.context_processor
     def inject_upload_limit():
         return {
             "MAX_UPLOAD_MB": app.config["MAX_CONTENT_LENGTH"] // (1024 * 1024)
