@@ -53,41 +53,61 @@ def send_telegram_message(text: str, chat_id: str | None = None) -> bool:
         return False
 
 
+
 def notify_upload(
     uploader: str,
     item_type: str,
     title: str,
     link: str | None = None,
 ) -> bool:
-    timestamp = datetime.now(timezone.utc).strftime("%d %b %Y \u00b7 %H:%M UTC")
+    timestamp = datetime.now(timezone.utc).strftime(
+        "%d %b %Y · %H:%M UTC"
+    )
 
-    safe_type     = html.escape(item_type or "Upload")
-    safe_title    = html.escape(title or "(untitled)")
-    safe_uploader = html.escape(uploader or "Unknown")
+    safe_type = _escape_limited(item_type or "Upload", 100)
+    safe_title = _escape_limited(title or "(untitled)", 600)
+    safe_uploader = _escape_limited(uploader or "Unknown", 120)
 
-    heavy = "\u2550" * 31
-    light = "\u2500" * 31
+    heavy = "═" * 31
+    light = "─" * 31
 
     lines = [
         f"<code>{heavy}</code>",
-        " <b>NEW SUBMISSION</b>",
+        "      <b>ACADEMX / NEW SUBMISSION</b>",
         f"<code>{heavy}</code>",
         "",
-        f"\u2192 <code>{safe_type}</code>",
+        "          [^_^]  <i>UPLOAD DETECTED</i>",
         "",
-        f"\u2192 <b>{safe_title}</b>",
+        f"  <b>» Category</b>    <code>{safe_type}</code>",
         "",
-        f"\u2192 <b>Submitted By</b>  <code>{safe_uploader}</code>",
-        f"  <b>Received</b>      <code>{timestamp}</code>",
+        f"  <b>» Title</b>",
+        f"  <b>{safe_title}</b>",
+        "",
+        f"  <b>» Submitted By</b>  <code>{safe_uploader}</code>",
+        f"  <b>» Received</b>      <code>{timestamp}</code>",
         "",
         f"<code>{light}</code>",
+        "  <code>[ STATUS: SUCCESSFUL ]</code>",
+        "",
+        "  <i>New material has entered the system.</i>",
     ]
 
     if link:
         safe_link = html.escape(link, quote=True)
-        lines.append(f'\u2192 <a href="{safe_link}"><b>Open Admin Panel</b></a>')
+        lines.extend([
+            "",
+            f'  → <a href="{safe_link}"><b>OPEN ADMIN PANEL</b></a>',
+        ])
+
+    lines.extend([
+        "",
+        "  <i>AcademX Notification System</i>",
+        "  <code>(⌐■_■)  Submission logged.</code>",
+    ])
 
     return send_telegram_message("\n".join(lines))
+
+
 
 
 def notify_question(
@@ -96,31 +116,87 @@ def notify_question(
     body: str,
     link: str | None = None,
 ) -> bool:
-    timestamp = datetime.now(timezone.utc).strftime("%d %b %Y \u00b7 %H:%M UTC")
+    timestamp = datetime.now(timezone.utc).strftime(
+        "%d %b %Y · %H:%M UTC"
+    )
 
     safe_asker = _escape_limited(asker or "Unknown", 120)
     safe_title = _escape_limited(title or "(untitled)", 600)
-    escaped_body = _escape_limited(body or "(no details provided)", 2200)
+    escaped_body = _escape_limited(
+        body or "(no details provided)", 2200
+    )
 
-    heavy = "\u2550" * 31
-    light = "\u2500" * 31
+    heavy = "═" * 31
+    light = "─" * 31
+
     lines = [
         f"<code>{heavy}</code>",
-        " <b>NEW QUESTION</b>",
+        "   <b>ACADEMX  /  INCOMING QUESTION</b>",
         f"<code>{heavy}</code>",
         "",
-        f"\u2192 <b>{safe_title}</b>",
+        "       ¯\_(ツ)_/¯",
+        "",
+        f"  <b>» {safe_title}</b>",
         "",
         f"<blockquote>{escaped_body}</blockquote>",
         "",
-        f"\u2192 <b>Asked By</b>  <code>{safe_asker}</code>",
-        f"  <b>Received</b>   <code>{timestamp}</code>",
+        f"  <b>» Asked By</b>   <code>{safe_asker}</code>",
+        f"  <b>» Received</b>   <code>{timestamp}</code>",
         "",
         f"<code>{light}</code>",
+        "  <i>Another question just landed.</i>",
+        "",
+        "  <code>[ SYSTEM: QUESTION RECEIVED ]</code>",
     ]
 
     if link:
         safe_link = html.escape(link, quote=True)
-        lines.append(f'\u2192 <a href="{safe_link}"><b>Open Admin Panel</b></a>')
+        lines.extend([
+            "",
+            f'  → <a href="{safe_link}"><b>OPEN ADMIN PANEL</b></a>',
+        ])
+
+    lines.extend([
+        "",
+        "  <i>AcademX Notification System</i>",
+        "  <code>(•_•)  Stay curious.</code>",
+    ])
+
+    return send_telegram_message("\n".join(lines))
+
+
+
+def notify_signin(user_id, department, link=None):
+    timestamp = datetime.now(timezone.utc).strftime(
+        "%d %b %Y · %H:%M UTC"
+    )
+
+    safe_user = _escape_limited(user_id or "Unknown", 100)
+    safe_department = _escape_limited(department or "Unknown", 150)
+
+    separator = "━━━━━━━━━━━━━━━━━━━━━━━━"
+
+    lines = [
+        f"<b>ACADEMX | USER ACTIVITY</b>",
+        f"<code>{separator}</code>",
+        "",
+        "<b>[ NEW SIGN-IN ]</b>",
+        "",
+        f"<b>User ID</b>       <code>{safe_user}</code>",
+        f"<b>Department</b>    <code>{safe_department}</code>",
+        f"<b>Timestamp</b>    <code>{timestamp}</code>",
+        "",
+        f"<code>{separator}</code>",
+        "<b>STATUS:</b> <code>SUCCESSFUL</code>",
+        "",
+        "<i>AcademX Notification System</i>",
+    ]
+
+    if link:
+        safe_link = html.escape(link, quote=True)
+        lines.extend([
+            "",
+            f'<a href="{safe_link}">[ OPEN ADMIN DASHBOARD ]</a>'
+        ])
 
     return send_telegram_message("\n".join(lines))
