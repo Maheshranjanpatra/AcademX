@@ -17,6 +17,7 @@ from app.models.admin_login_attempt import AdminLoginAttempt
 from app.models.question import Question
 from app.models.user import User
 from app.models.video import Playlist
+from app.utils.telegram import notify_signin
 
 auth_bp = Blueprint("auth", __name__)
 
@@ -176,6 +177,11 @@ def login():
         session.clear()
         session.permanent = True
         login_user(user, remember=True, fresh=True)
+        notify_signin(
+        user_id=user.anonymous_id,
+        department=user.department,
+        link=url_for("admin.dashboard", _external=True),
+        )
         flash(f"You're signed in as {user.anonymous_id}. Keep this ID to recognize your pseudonym.", "success")
         return redirect(url_for("dashboard.home"))
 
