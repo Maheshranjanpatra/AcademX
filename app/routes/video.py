@@ -4,7 +4,7 @@ from flask import (
 )
 from flask_login import login_required, current_user
 from app.extensions import db
-from app.models.video import Playlist, Video
+from app.models.video import Playlist, Video, VideoProgress
 from app.forms.video import UserPlaylistForm
 from app.utils.youtube import (
     extract_playlist_id, extract_video_id, get_playlist_videos
@@ -111,7 +111,21 @@ def upload_playlist():
     return render_template("video_upload.html", form=form)
 
 
-# WATCH (completion is tracked in the browser only)
+@video_bp.route("/complete/<int:video_id>", methods=["POST"])
+@login_required
+def mark_video_complete(video_id):
+    video = Video.query.get_or_404(video_id)
+    progress = VideoProgress.query.filter_by(user_id=current_user.id, video_id=video.id).first()
+    if progress is None:
+        progress = VideoProgress(user_id=current_user.id, video_id=video.id)
+        db.session.add(progress)
+
+    progress.completed = True
+    progress.completed_at = datetime.utcnow()
+    db.session.commit()
+    return {"status": "ok", "completed": True, "video_id": video.id}
+
+
 @video_bp.route("/watch/<int:video_id>")
 @login_required
 def watch(video_id):
@@ -123,4 +137,6 @@ def watch(video_id):
         if not (is_owner or current_user.is_admin):
             abort(404)
 
-    return render_template("video_watch.html", video=video, playlist=playlist)
+    progress = VideoProgress.query.filter_by(user_id=current_user.id, video_id=video.id).first()
+    is_completed = bool(progress and progress.completed)
+    return render_template("video_watch.html", video=video, playlist=playlist, is_completed=is_completed)

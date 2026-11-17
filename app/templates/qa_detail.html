@@ -122,4 +122,24 @@
 
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/math_composer.js') }}" defer></script>
+<script>
+(function () {
+  const forms = document.querySelectorAll('form[action*="/answer"]');
+  forms.forEach(function (form) {
+    form.addEventListener('submit', function () {
+      const submitBtn = form.querySelector('button[type="submit"]');
+      if (!submitBtn) return;
+      if (submitBtn.dataset.locked === 'true') {
+        return false;
+      }
+      submitBtn.dataset.locked = 'true';
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Posting...';
+      setTimeout(function () {
+        submitBtn.disabled = false;
+      }, 1200);
+    });
+  });
+})();
+</script>
 {% endblock %}

@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template
 from flask_login import login_required, current_user
 from app.models.question import Question
-from app.models.video import Playlist, VideoProgress
+from app.models.video import Playlist, Video, VideoProgress
 
 dashboard_bp = Blueprint("dashboard", __name__)
 
@@ -23,10 +23,16 @@ def home():
         total = len(pl.videos)
         if total == 0:
             continue
-        done = VideoProgress.query.join(VideoProgress.video).filter(
-            VideoProgress.user_id == current_user.id,
-            VideoProgress.completed == True,
-        ).filter_by(playlist_id=pl.id).count()
+        done = (
+            VideoProgress.query
+            .join(Video, Video.id == VideoProgress.video_id)
+            .filter(
+                VideoProgress.user_id == current_user.id,
+                VideoProgress.completed.is_(True),
+                Video.playlist_id == pl.id,
+            )
+            .count()
+        )
         if done > 0:
             playlist_progress.append({"playlist": pl, "done": done, "total": total})
 

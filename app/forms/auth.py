@@ -65,8 +65,8 @@ VALID_DEPARTMENTS = {
     # ── Madanjeet School of Green Energy Technologies ──
     "NST": "Nano Sciences & Technology",
     "GET": "Green Energy Technology",
-    # ── LEGACY (backward compatibility only) ──
-    "ITP": "ITEP [legacy]",
+    # ── LEGACY
+    "ITEP": "ITEP",
 }
 
 class GuestLoginForm(FlaskForm):

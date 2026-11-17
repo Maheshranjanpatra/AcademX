@@ -32,8 +32,8 @@ class Question(db.Model):
     upvotes = db.Column(db.Integer, default=0)
     status = db.Column(
         db.String(20),
-        default="pending",
-        server_default="pending",
+        default="approved",
+        server_default="approved",
         nullable=False,
     )
     reviewed_by = db.Column(db.Integer, db.ForeignKey("users.id"))

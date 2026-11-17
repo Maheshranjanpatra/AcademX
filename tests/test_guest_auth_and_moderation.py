@@ -115,6 +115,41 @@ class GuestAuthAndModerationTests(unittest.TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertIn(b"Use integration by parts.", stranger.get(f"/qa/{pending_id}").data)
 
+    def test_duplicate_answers_are_rejected_during_a_short_cooldown(self):
+        guest = self._sign_in_guest()
+        with patch("app.routes.qa.notify_question"):
+            response = self.client.post(
+                "/qa/ask",
+                data={
+                    "title": "Repeated solution",
+                    "body": "Can someone explain the same idea?",
+                    "subject": "Calculus",
+                    "is_anonymous": "y",
+                },
+            )
+        self.assertEqual(response.status_code, 302)
+
+        with self.app.app_context():
+            question = Question.query.one()
+
+        first = self.client.post(
+            f"/qa/{question.id}/answer",
+            data={"body": "Use the midpoint formula.", "is_anonymous": "y"},
+        )
+        second = self.client.post(
+            f"/qa/{question.id}/answer",
+            data={"body": "Use the midpoint formula.", "is_anonymous": "y"},
+        )
+
+        self.assertEqual(first.status_code, 302)
+        self.assertEqual(second.status_code, 302)
+        with self.app.app_context():
+            fresh_question = Question.query.get(question.id)
+            self.assertIsNotNone(fresh_question)
+            self.assertEqual(fresh_question.answers.count(), 1)
+            self.assertEqual(fresh_question.answers.first().body, "Use the midpoint formula.")
+            self.assertEqual(fresh_question.answers.first().user_id, guest.id)
+
     def test_question_telegram_message_includes_escaped_question_content(self):
         from app.utils.telegram import notify_question
 

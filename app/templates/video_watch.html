@@ -153,110 +153,76 @@
 
 <script>
 (function () {
-  var USER_ID = {{ current_user.id | tojson }};
-  var PLAYLIST_ID = {{ playlist.id | tojson }};
   var CURRENT = {{ video.id | tojson }};
   var ALL_IDS = {{ playlist.videos | map(attribute='id') | list | tojson }};
+  var CSRF = {{ csrf_token() | tojson }};
+  var btn = document.getElementById('complete-btn');
+  var modal = document.getElementById('finished-modal');
+  var links = document.querySelectorAll('[data-video-id]');
 
-  var KEY = "academx_done_" + USER_ID + "_" + PLAYLIST_ID;
-  var FIN_KEY = "academx_finished_" + USER_ID + "_" + PLAYLIST_ID;
-
-  var btn = document.getElementById("complete-btn");
-  var modal = document.getElementById("finished-modal");
-  var links = document.querySelectorAll("[data-video-id]");
-
-  var BTN_TODO = "bg-primary text-on-primary hover:bg-surface-tint transition-all rounded-lg px-md py-sm font-label-md text-label-md shadow-sm flex items-center gap-xs";
-  var BTN_DONE = "bg-secondary-container text-on-secondary-container hover:bg-secondary-container/80 transition-all rounded-lg px-md py-sm font-label-md text-label-md flex items-center gap-xs";
-
-  var BADGE_BASE = "font-label-md text-xs w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 ";
-  var BADGE_DONE = "bg-secondary text-on-secondary";
-  var BADGE_CURRENT = "bg-primary text-on-primary";
-  var BADGE_IDLE = "bg-surface-container-high text-on-surface-variant";
+  var BTN_TODO = 'bg-primary text-on-primary hover:bg-surface-tint transition-all rounded-lg px-md py-sm font-label-md text-label-md shadow-sm flex items-center gap-xs';
+  var BTN_DONE = 'bg-secondary-container text-on-secondary-container hover:bg-secondary-container/80 transition-all rounded-lg px-md py-sm font-label-md text-label-md flex items-center gap-xs';
 
   var ICON_CHECK = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';
   var ICON_UNDO = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-15-6.7L3 13"/></svg>';
-  var BADGE_CHECK = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';
-  var BADGE_PLAY = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
 
-  function readDone() {
-    try {
-      var raw = JSON.parse(localStorage.getItem(KEY) || "[]");
-      if (!Array.isArray(raw)) return [];
-      return raw.filter(function (id) { return ALL_IDS.indexOf(id) !== -1; });
-    } catch (e) {
-      return [];
-    }
-  }
-
-  function writeDone(list) {
-    try { localStorage.setItem(KEY, JSON.stringify(list)); } catch (e) {}
-  }
-
-  function wasShown() {
-    try { return localStorage.getItem(FIN_KEY) === "1"; } catch (e) { return false; }
-  }
-
-  function markShown() {
-    try { localStorage.setItem(FIN_KEY, "1"); } catch (e) {}
-  }
-
-  var done = readDone();
-
-  function allDone() {
-    return ALL_IDS.length > 0 && ALL_IDS.every(function (id) {
-      return done.indexOf(id) !== -1;
-    });
-  }
-
-  function render() {
-    var isDone = done.indexOf(CURRENT) !== -1;
-    btn.className = isDone ? BTN_DONE : BTN_TODO;
-    btn.innerHTML = (isDone ? ICON_UNDO : ICON_CHECK) + (isDone ? "Mark as Incomplete" : "Mark as Complete");
+  function applyState(completed) {
+    btn.className = completed ? BTN_DONE : BTN_TODO;
+    btn.innerHTML = (completed ? ICON_UNDO : ICON_CHECK) + (completed ? ' Mark as Incomplete' : ' Mark as Complete');
+    btn.dataset.completed = completed ? 'true' : 'false';
 
     links.forEach(function (a) {
-      var id = parseInt(a.getAttribute("data-video-id"), 10);
-      var badge = a.querySelector("[data-badge]");
+      var id = parseInt(a.getAttribute('data-video-id'), 10);
+      var badge = a.querySelector('[data-badge]');
       if (!badge) return;
 
-      if (done.indexOf(id) !== -1) {
-        badge.className = BADGE_BASE + BADGE_DONE;
-        badge.innerHTML = BADGE_CHECK;
-      } else if (id === CURRENT) {
-        badge.className = BADGE_BASE + BADGE_CURRENT;
-        badge.innerHTML = BADGE_PLAY;
-      } else {
-        badge.className = BADGE_BASE + BADGE_IDLE;
-        badge.textContent = badge.getAttribute("data-index");
+      if (id === CURRENT) {
+        if (completed) {
+          badge.className = 'font-label-md text-xs w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 bg-secondary text-on-secondary';
+          badge.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';
+        } else {
+          badge.className = 'font-label-md text-xs w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 bg-primary text-on-primary';
+          badge.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
+        }
       }
     });
   }
 
-  btn.addEventListener("click", function () {
-    var pos = done.indexOf(CURRENT);
-    var justCompleted = (pos === -1);
+  btn.addEventListener('click', function () {
+    if (btn.dataset.busy === 'true') return;
+    btn.dataset.busy = 'true';
+    var isCompleted = btn.dataset.completed === 'true';
+    btn.disabled = true;
 
-    if (justCompleted) {
-      done.push(CURRENT);
-    } else {
-      done.splice(pos, 1);
-    }
-
-    writeDone(done);
-    render();
-
-    if (justCompleted && allDone() && !wasShown()) {
-      markShown();
-      modal.style.display = "flex";
-    }
+    fetch('/video/complete/' + CURRENT, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': CSRF
+      },
+      body: JSON.stringify({ completed: !isCompleted })
+    }).then(function (response) {
+      if (!response.ok) throw new Error('Request failed');
+      return response.json();
+    }).then(function () {
+      applyState(!isCompleted);
+      if (!isCompleted && ALL_IDS.length > 0 && ALL_IDS.every(function (id) { return id === CURRENT; })) {
+        modal.style.display = 'flex';
+      }
+    }).catch(function () {
+      btn.disabled = false;
+      btn.dataset.busy = 'false';
+    }).finally(function () {
+      btn.disabled = false;
+      btn.dataset.busy = 'false';
+    });
   });
 
-  modal.addEventListener("click", function (e) {
-    if (e.target === modal) {
-      modal.style.display = "none";
-    }
+  modal.addEventListener('click', function (e) {
+    if (e.target === modal) modal.style.display = 'none';
   });
 
-  render();
+  applyState({{ 'true' if is_completed else 'false' }} === 'true');
 })();
 </script>
 {% endblock %}

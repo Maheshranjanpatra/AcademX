@@ -1,8 +1,19 @@
-import requests
-from flask import current_app
 import re
 
+import requests
+from flask import current_app
+
 YOUTUBE_API_URL = "https://www.googleapis.com/youtube/v3"
+
+
+def _youtube_request(endpoint, params):
+    response = requests.get(
+        f"{YOUTUBE_API_URL}/{endpoint}",
+        params=params,
+        timeout=15,
+    )
+    response.raise_for_status()
+    return response.json()
 
 
 def extract_playlist_id(url):
@@ -42,6 +53,7 @@ def get_playlist_videos(playlist_id, api_key=None):
         raise ValueError("YouTube API key not configured.")
 
     videos = []
+    video_ids = []
     next_page_token = None
 
     while True:
@@ -54,9 +66,7 @@ def get_playlist_videos(playlist_id, api_key=None):
         if next_page_token:
             params['pageToken'] = next_page_token
 
-        response = requests.get(f"{YOUTUBE_API_URL}/playlistItems", params=params)
-        data = response.json()
-
+        data = _youtube_request('playlistItems', params)
         if 'items' not in data:
             break
 
@@ -64,19 +74,18 @@ def get_playlist_videos(playlist_id, api_key=None):
             snippet = item.get('snippet', {})
             content_details = item.get('contentDetails', {})
             video_id = content_details.get('videoId')
+            if not video_id:
+                continue
+            video_ids.append(video_id)
             title = snippet.get('title', 'Untitled')
             description = snippet.get('description', '')
             thumbnail = snippet.get('thumbnails', {}).get('default', {}).get('url', '')
-
-            duration_str = content_details.get('duration', 'PT0S')
-            duration_seconds = parse_duration(duration_str)
-
             videos.append({
                 'video_id': video_id,
                 'title': title,
                 'description': description,
                 'thumbnail': thumbnail,
-                'duration_seconds': duration_seconds,
+                'duration_seconds': 0,
                 'embed_url': f"https://www.youtube-nocookie.com/embed/{video_id}",
                 'watch_url': f"https://www.youtube.com/watch?v={video_id}",
             })
@@ -84,6 +93,25 @@ def get_playlist_videos(playlist_id, api_key=None):
         next_page_token = data.get('nextPageToken')
         if not next_page_token:
             break
+
+    if not video_ids:
+        return videos
+
+    video_id_list = ','.join(video_ids)
+    detail_data = _youtube_request('videos', {
+        'key': api_key,
+        'id': video_id_list,
+        'part': 'contentDetails',
+        'maxResults': 50,
+    })
+    duration_by_id = {}
+    for item in detail_data.get('items', []):
+        details = item.get('contentDetails', {})
+        video_id = item.get('id')
+        duration_by_id[video_id] = parse_duration(details.get('duration', 'PT0S'))
+
+    for video in videos:
+        video['duration_seconds'] = duration_by_id.get(video['video_id'], 0)
 
     return videos
 
@@ -111,8 +139,7 @@ def get_playlist_details(playlist_id, api_key=None):
         'id': playlist_id,
         'part': 'snippet',
     }
-    response = requests.get(f"{YOUTUBE_API_URL}/playlists", params=params)
-    data = response.json()
+    data = _youtube_request('playlists', params)
 
     if 'items' in data and data['items']:
         snippet = data['items'][0].get('snippet', {})

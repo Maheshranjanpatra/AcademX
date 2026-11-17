@@ -64,7 +64,7 @@
                 {% endwith %}
 
                 <!-- Login Form -->
-                <form action="{{ url_for('auth.admin_login') }}" method="POST" class="admin-form" id="adminLoginForm" novalidate>
+                <form action="{{ url_for('auth.admin_login') }}" method="POST" class="admin-form" id="adminLoginForm" data-auto-spinner data-spinner-text="Checking credentials..." novalidate>
                     {{ form.hidden_tag() }}
 
                     <!-- Username Field -->

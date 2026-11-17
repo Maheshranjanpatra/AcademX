@@ -71,7 +71,7 @@
                         Your ID: <strong>{{ anonymous_id_preview }}</strong>
                     </p>
 
-                    <form method="POST" action="{{ url_for('auth.login') }}" class="academx-action-container">
+                    <form method="POST" action="{{ url_for('auth.login') }}" class="academx-action-container" data-auto-spinner data-spinner-text="Signing you in...">
                         {{ form.hidden_tag() }}
                         <div class="form-group academx-department-field">
                             {{ form.department.label(class="academx-field-label") }}
@@ -112,7 +112,7 @@
                             Your User_XXXX ID is a public pseudonym, not a password. If you clear this browser session,
                             you cannot recover that guest profile.
                         </p>
-                        <button type="submit" class="academx-google-btn">
+                        <button type="submit" class="academx-google-btn" id="guestLoginBtn">
                             <span class="academx-btn-text">Continue anonymously</span>
                         </button>
                     </form>

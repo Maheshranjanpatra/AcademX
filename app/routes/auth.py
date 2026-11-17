@@ -175,7 +175,7 @@ def login():
 
         session.clear()
         session.permanent = True
-        login_user(user, remember=False, fresh=True)
+        login_user(user, remember=True, fresh=True)
         flash(f"You're signed in as {user.anonymous_id}. Keep this ID to recognize your pseudonym.", "success")
         return redirect(url_for("dashboard.home"))
 

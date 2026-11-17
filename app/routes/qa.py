@@ -1,3 +1,5 @@
+from datetime import datetime, timedelta
+
 from flask import Blueprint, abort, render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
 from app.extensions import db
@@ -76,14 +78,30 @@ def answer_question(question_id):
     form = AnswerForm()
 
     if form.validate_on_submit():
+        answer_text = (form.body.data or "").strip()
+        if not answer_text:
+            flash("Answer cannot be empty.", "error")
+            return redirect(url_for("qa.view_question", question_id=question_id))
+
+        recent_duplicate = (
+            Answer.query
+            .filter_by(question_id=question.id, user_id=current_user.id, body=answer_text)
+            .filter(Answer.created_at >= datetime.utcnow() - timedelta(seconds=10))
+            .first()
+        )
+        if recent_duplicate is not None:
+            flash("You already posted that answer recently. Please wait a moment before submitting it again.", "error")
+            return redirect(url_for("qa.view_question", question_id=question_id))
+
         answer = Answer(
             question_id=question.id,
             user_id=current_user.id,
-            body=form.body.data,
+            body=answer_text,
             is_anonymous=form.is_anonymous.data,
         )
         db.session.add(answer)
         db.session.commit()
+        flash("Answer posted successfully.", "success")
     else:
         flash("Answer cannot be empty.", "error")
 
