@@ -32,41 +32,40 @@
                     <td>
                         <strong>{{ qa.title }}</strong>
                         <p class="text-muted" style="font-size: 0.8rem;">{{ qa.body|truncate(100) }}</p>
-                        
-<div style="margin-top: 12px;">
-    <strong>Answers ({{ qa.answers.count() }})</strong>
-
-    {% for answer in qa.answers.all() %}
-    <div style="padding: 10px; margin-top: 8px; border: 1px solid var(--border-color); border-radius: 8px;">
-        <p style="font-size: 0.9rem;">
-            {{ answer.body|truncate(180) }}
-        </p>
-
-        <small class="text-muted">
-            By: {{ answer.author.anonymous_id if answer.author else 'Unknown' }}
-            | Answer ID: {{ answer.id }}
-        </small>
-
-        <form
-            action="{{ url_for('admin.delete_answer', answer_id=answer.id) }}"
-            method="POST"
-            style="margin-top: 8px;"
-        >
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-
-            <button
-                type="submit"
-                class="action-btn danger"
-                data-confirm="Permanently delete this answer?"
-            >
-                Delete Answer
-            </button>
-        </form>
-    </div>
-    {% else %}
-        <p class="text-muted" style="font-size: 0.8rem;">No answers yet.</p>
-    {% endfor %}
-</div>
+                            <div style="margin-top: 12px;">
+                                <strong>Answers ({{ qa.answers.count() }})</strong>
+                            
+                                {% for answer in qa.answers.all() %}
+                                <div style="padding: 10px; margin-top: 8px; border: 1px solid var(--border-color); border-radius: 8px;">
+                                    <p style="font-size: 0.9rem;">
+                                        {{ answer.body|truncate(180) }}
+                                    </p>
+                            
+                                    <small class="text-muted">
+                                        By: {{ answer.author.anonymous_id if answer.author else 'Unknown' }}
+                                        | Answer ID: {{ answer.id }}
+                                    </small>
+                            
+                                    <form
+                                        action="{{ url_for('admin.delete_answer', answer_id=answer.id) }}"
+                                        method="POST"
+                                        style="margin-top: 8px;"
+                                    >
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            
+                                        <button
+                                            type="submit"
+                                            class="action-btn danger"
+                                            data-confirm="Permanently delete this answer?"
+                                        >
+                                            Delete Answer
+                                        </button>
+                                    </form>
+                                </div>
+                                {% else %}
+                                    <p class="text-muted" style="font-size: 0.8rem;">No answers yet.</p>
+                                {% endfor %}
+                            </div>
 
                     </td>
                     <td>
